@@ -8,15 +8,16 @@ O projeto segue Clean Architecture com separação clara de responsabilidades em
 
 ```
 barbApp/
-├── src/
-│   ├── BarbApp.Domain/          # Camada de Domínio (Core)
-│   ├── BarbApp.Application/     # Camada de Aplicação (Use Cases)
-│   ├── BarbApp.Infrastructure/  # Camada de Infraestrutura (Implementações)
-│   └── BarbApp.API/            # Camada de Apresentação (Web API)
-└── tests/
-    ├── BarbApp.Domain.Tests/
-    ├── BarbApp.Application.Tests/
-    └── BarbApp.IntegrationTests/
+└── backend/
+    ├── src/
+    │   ├── BarbApp.Domain/          # Camada de Domínio (Core)
+    │   ├── BarbApp.Application/     # Camada de Aplicação (Use Cases)
+    │   ├── BarbApp.Infrastructure/  # Camada de Infraestrutura (Implementações)
+    │   └── BarbApp.API/            # Camada de Apresentação (Web API)
+    └── tests/
+        ├── BarbApp.Domain.Tests/
+        ├── BarbApp.Application.Tests/
+        └── BarbApp.IntegrationTests/
 ```
 
 ## Camadas
@@ -151,18 +152,20 @@ API → Infrastructure → Application → Domain
 
 ### Build
 ```bash
+cd backend
 dotnet build
 ```
 
 ### Executar API
 ```bash
-cd src/BarbApp.API
+cd backend/src/BarbApp.API
 dotnet run
 ```
 
 ### Executar Testes
 ```bash
 # Todos os testes
+cd backend
 dotnet test
 
 # Apenas testes unitários

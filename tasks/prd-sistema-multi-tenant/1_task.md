@@ -84,15 +84,16 @@ openssl rand -base64 32
 
 ```
 barbApp/
-├── src/
-│   ├── BarbApp.Domain/
-│   ├── BarbApp.Application/
-│   ├── BarbApp.Infrastructure/
-│   └── BarbApp.API/
-└── tests/
-    ├── BarbApp.Domain.Tests/
-    ├── BarbApp.Application.Tests/
-    └── BarbApp.IntegrationTests/
+└── backend/
+    ├── src/
+    │   ├── BarbApp.Domain/          # Camada de Domínio (Core)
+    │   ├── BarbApp.Application/     # Camada de Aplicação (Use Cases)
+    │   ├── BarbApp.Infrastructure/  # Camada de Infraestrutura (Implementações)
+    │   └── BarbApp.API/            # Camada de Apresentação (Web API)
+    └── tests/
+        ├── BarbApp.Domain.Tests/
+        ├── BarbApp.Application.Tests/
+        └── BarbApp.IntegrationTests/
 ```
 
 ## Critérios de Sucesso
