@@ -10,6 +10,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Add controllers
+builder.Services.AddControllers();
+
 // Add authentication
 builder.Services.AddJwtAuthentication(builder.Configuration);
 
@@ -32,6 +35,9 @@ app.UseGlobalExceptionHandler();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseTenantMiddleware();
+
+// Map controllers
+app.MapControllers();
 
 var summaries = new[]
 {
