@@ -4,14 +4,14 @@ Você é um assistente IA responsável por gerenciar um projeto de desenvolvimen
 
 ## Localização dos Arquivos
 
-- PRD: `./tasks/prd-[$prd]/prd.md`
-- Tech Spec: `./tasks/prd-[$prd]/techspec.md`
+- PRD: `tasks/prd-[$prd]/prd.md`
+- Tech Spec: `tasks/prd-[$prd]/techspec.md`
 - Regras do Projeto: @rules 
 
 ## Etapas para Executar
 
 ### 1. Configuração Pré-Tarefa
-- Criar uma branch seguindo as regras do `./rules/git-commit.md`
+- Criar uma branch seguindo as regras do `rules/git-commit.md`
 - Ler a definição da tarefa
 - Revisar o contexto do PRD
 - Verificar requisitos da spec técnica
