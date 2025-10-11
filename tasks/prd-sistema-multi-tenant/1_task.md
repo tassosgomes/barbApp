@@ -20,6 +20,7 @@ blocked_by: []
 Configurar ambiente inicial do projeto com instalação de pacotes NuGet necessários para autenticação JWT, hashing de senhas e configuração de variáveis de ambiente. Esta é a tarefa fundacional que habilita todas as demais.
 
 <requirements>
+- Criar estrutura do projeto na pasta backend
 - Instalar pacotes NuGet: System.IdentityModel.Tokens.Jwt, BCrypt.Net-Next
 - Configurar variáveis de ambiente no appsettings.json
 - Gerar secret key JWT segura (mínimo 32 caracteres)
