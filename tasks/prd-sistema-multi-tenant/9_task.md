@@ -28,12 +28,12 @@ Implementar os middlewares essenciais para processar requisições HTTP: TenantM
 </requirements>
 
 ## Subtarefas
-- [ ] 9.1 Implementar TenantMiddleware
-- [ ] 9.2 Configurar autenticação JWT no pipeline
-- [ ] 9.3 Implementar GlobalExceptionHandlerMiddleware
-- [ ] 9.4 Configurar ordem de middlewares
-- [ ] 9.5 Adicionar logging de operações
-- [ ] 9.6 Criar testes de integração para middlewares
+- [x] 9.1 Implementar TenantMiddleware
+- [x] 9.2 Configurar autenticação JWT no pipeline
+- [x] 9.3 Implementar GlobalExceptionHandlerMiddleware
+- [x] 9.4 Configurar ordem de middlewares
+- [x] 9.5 Adicionar logging de operações
+- [x] 9.6 Criar testes de integração para middlewares
 
 ## Sequenciamento
 - **Bloqueado por**: 8.0 (JWT e TenantContext)

@@ -66,7 +66,7 @@ public static class AuthenticationConfiguration
                 {
                     if (context.Exception is SecurityTokenExpiredException)
                     {
-                        context.Response.Headers.Add("Token-Expired", "true");
+                        context.Response.Headers["Token-Expired"] = "true";
                     }
                     return Task.CompletedTask;
                 },

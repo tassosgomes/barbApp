@@ -1,5 +1,7 @@
 using BarbApp.Domain.Exceptions;
+using BarbApp.Domain.Interfaces;
 using BarbApp.Infrastructure.Middlewares;
+using BarbApp.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,7 +14,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddJwtAuthentication(builder.Configuration);
 
 // Add other services (to be added later)
-// builder.Services.AddScoped<ITenantContext, TenantContext>();
+builder.Services.AddScoped<ITenantContext, TenantContext>();
 
 var app = builder.Build();
 
@@ -29,7 +31,7 @@ app.UseHttpsRedirection();
 app.UseGlobalExceptionHandler();
 app.UseAuthentication();
 app.UseAuthorization();
-// app.UseTenantMiddleware(); // To be added after TenantContext is registered
+app.UseTenantMiddleware();
 
 var summaries = new[]
 {
@@ -48,6 +50,7 @@ app.MapGet("/weatherforecast", () =>
         .ToArray();
     return forecast;
 })
+.RequireAuthorization()
 .WithName("GetWeatherForecast")
 .WithOpenApi();
 
