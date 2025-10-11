@@ -23,7 +23,7 @@ public class LoginAdminBarbeariaInputValidatorTests
         {
             Email = "admin@barbearia.com",
             Senha = "password123",
-            Codigo = "ABC12345"
+            Codigo = "ABC23456"
         };
 
         // Act
@@ -43,7 +43,7 @@ public class LoginAdminBarbeariaInputValidatorTests
         {
             Email = email,
             Senha = "password123",
-            Codigo = "ABC12345"
+            Codigo = "ABC23456"
         };
 
         // Act
@@ -63,7 +63,7 @@ public class LoginAdminBarbeariaInputValidatorTests
         {
             Email = email,
             Senha = "password123",
-            Codigo = "ABC12345"
+            Codigo = "ABC23456"
         };
 
         // Act
@@ -84,7 +84,7 @@ public class LoginAdminBarbeariaInputValidatorTests
         {
             Email = "admin@barbearia.com",
             Senha = senha,
-            Codigo = "ABC12345"
+            Codigo = "ABC23456"
         };
 
         // Act
@@ -104,7 +104,7 @@ public class LoginAdminBarbeariaInputValidatorTests
         {
             Email = "admin@barbearia.com",
             Senha = senha,
-            Codigo = "ABC12345"
+            Codigo = "ABC23456"
         };
 
         // Act
