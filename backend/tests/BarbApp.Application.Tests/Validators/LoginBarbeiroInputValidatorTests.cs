@@ -21,7 +21,7 @@ public class LoginBarbeiroInputValidatorTests
         // Arrange
         var input = new LoginBarbeiroInput
         {
-            Codigo = "ABC12345",
+            Codigo = "ABC23456",
             Telefone = "11987654321"
         };
 
@@ -60,7 +60,7 @@ public class LoginBarbeiroInputValidatorTests
         // Arrange
         var input = new LoginBarbeiroInput
         {
-            Codigo = "ABC12345",
+            Codigo = "ABC23456",
             Telefone = telefone
         };
 
@@ -82,7 +82,7 @@ public class LoginBarbeiroInputValidatorTests
         // Arrange
         var input = new LoginBarbeiroInput
         {
-            Codigo = "ABC12345",
+            Codigo = "ABC23456",
             Telefone = telefone
         };
 

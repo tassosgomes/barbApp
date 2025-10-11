@@ -21,7 +21,7 @@ public class LoginClienteInputValidatorTests
         // Arrange
         var input = new LoginClienteInput
         {
-            Codigo = "ABC12345",
+            Codigo = "ABC23456",
             Telefone = "11987654321",
             Nome = "João Silva"
         };
@@ -62,7 +62,7 @@ public class LoginClienteInputValidatorTests
         // Arrange
         var input = new LoginClienteInput
         {
-            Codigo = "ABC12345",
+            Codigo = "ABC23456",
             Telefone = telefone,
             Nome = "João Silva"
         };
@@ -83,7 +83,7 @@ public class LoginClienteInputValidatorTests
         // Arrange
         var input = new LoginClienteInput
         {
-            Codigo = "ABC12345",
+            Codigo = "ABC23456",
             Telefone = telefone,
             Nome = "João Silva"
         };
@@ -104,7 +104,7 @@ public class LoginClienteInputValidatorTests
         // Arrange
         var input = new LoginClienteInput
         {
-            Codigo = "ABC12345",
+            Codigo = "ABC23456",
             Telefone = "11987654321",
             Nome = nome
         };
@@ -124,7 +124,7 @@ public class LoginClienteInputValidatorTests
         // Arrange
         var input = new LoginClienteInput
         {
-            Codigo = "ABC12345",
+            Codigo = "ABC23456",
             Telefone = "11987654321",
             Nome = nome
         };
@@ -144,7 +144,7 @@ public class LoginClienteInputValidatorTests
         var nome = new string('A', 101);
         var input = new LoginClienteInput
         {
-            Codigo = "ABC12345",
+            Codigo = "ABC23456",
             Telefone = "11987654321",
             Nome = nome
         };

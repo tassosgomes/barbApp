@@ -41,7 +41,8 @@ public class AuthenticateBarbeiroUseCase
             userId: barber.Id.ToString(),
             userType: "Barbeiro",
             email: barber.Telefone, // since no email, use telefone
-            barbeariaId: barbearia.Id
+            barbeariaId: barbearia.Id,
+            barbeariaCode: barbearia.Code.Value
         );
 
         return new AuthResponse

@@ -52,7 +52,8 @@ public class AuthenticateClienteUseCase
             userId: customer.Id.ToString(),
             userType: "Cliente",
             email: customer.Telefone, // use telefone
-            barbeariaId: barbearia.Id
+            barbeariaId: barbearia.Id,
+            barbeariaCode: barbearia.Code.Value
         );
 
         return new AuthResponse

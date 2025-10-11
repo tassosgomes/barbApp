@@ -56,7 +56,8 @@ public class AuthenticateAdminCentralUseCaseTests
                 It.Is<string>(id => id == user.Id.ToString()),
                 It.Is<string>(type => type == "AdminCentral"),
                 It.Is<string>(email => email == user.Email),
-                It.Is<Guid?>(barbeariaId => barbeariaId == null)))
+                It.Is<Guid?>(barbeariaId => barbeariaId == null),
+                It.Is<string>(barbeariaCode => barbeariaCode == null)))
             .Returns(expectedToken);
 
         // Act
@@ -76,7 +77,8 @@ public class AuthenticateAdminCentralUseCaseTests
             It.Is<string>(id => id == user.Id.ToString()),
             It.Is<string>(type => type == "AdminCentral"),
             It.Is<string>(email => email == user.Email),
-            It.Is<Guid?>(barbeariaId => barbeariaId == null)), Times.Once);
+            It.Is<Guid?>(barbeariaId => barbeariaId == null),
+            It.Is<string>(barbeariaCode => barbeariaCode == null)), Times.Once);
     }
 
     [Fact]
@@ -102,7 +104,7 @@ public class AuthenticateAdminCentralUseCaseTests
 
         _repositoryMock.Verify(x => x.GetByEmailAsync(input.Email, It.IsAny<CancellationToken>()), Times.Once);
         _passwordHasherMock.Verify(x => x.Verify(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
-        _tokenGeneratorMock.Verify(x => x.GenerateToken(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Guid?>()), Times.Never);
+        _tokenGeneratorMock.Verify(x => x.GenerateToken(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Guid?>(), It.IsAny<string>()), Times.Never);
     }
 
     [Fact]
@@ -134,6 +136,6 @@ public class AuthenticateAdminCentralUseCaseTests
 
         _repositoryMock.Verify(x => x.GetByEmailAsync(input.Email, It.IsAny<CancellationToken>()), Times.Once);
         _passwordHasherMock.Verify(x => x.Verify(input.Senha, user.PasswordHash), Times.Once);
-        _tokenGeneratorMock.Verify(x => x.GenerateToken(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Guid?>()), Times.Never);
+        _tokenGeneratorMock.Verify(x => x.GenerateToken(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Guid?>(), It.IsAny<string>()), Times.Never);
     }
 }

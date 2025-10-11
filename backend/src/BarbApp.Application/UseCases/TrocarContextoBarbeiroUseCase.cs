@@ -25,9 +25,15 @@ public class TrocarContextoBarbeiroUseCase
     public async Task<AuthResponse> ExecuteAsync(TrocarContextoInput input, CancellationToken cancellationToken = default)
     {
         var userId = _tenantContext.UserId;
+
+        if (string.IsNullOrEmpty(userId))
+        {
+            throw new BarbApp.Domain.Exceptions.UnauthorizedAccessException("Usuário não autenticado como barbeiro");
+        }
+
         var currentRole = _tenantContext.Role;
 
-        if (string.IsNullOrEmpty(userId) || currentRole != "Barbeiro")
+        if (currentRole != "Barbeiro")
         {
             throw new BarbApp.Domain.Exceptions.UnauthorizedAccessException("Usuário não autenticado como barbeiro");
         }
@@ -46,7 +52,8 @@ public class TrocarContextoBarbeiroUseCase
             userId: barber.Id.ToString(),
             userType: "Barbeiro",
             email: barber.Telefone,
-            barbeariaId: barber.BarbeariaId
+            barbeariaId: barber.BarbeariaId,
+            barbeariaCode: barber.Barbearia.Code.Value
         );
 
         return new AuthResponse

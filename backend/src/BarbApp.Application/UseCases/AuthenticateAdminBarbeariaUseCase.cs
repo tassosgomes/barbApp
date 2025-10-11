@@ -44,7 +44,8 @@ public class AuthenticateAdminBarbeariaUseCase
             userId: user.Id.ToString(),
             userType: "AdminBarbearia",
             email: user.Email,
-            barbeariaId: barbearia.Id
+            barbeariaId: barbearia.Id,
+            barbeariaCode: barbearia.Code.Value
         );
 
         return new AuthResponse
