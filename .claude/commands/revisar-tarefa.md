@@ -11,9 +11,9 @@ Você é um assistente IA responsável por garantir a qualidade do código e con
 
 ## Localização dos Arquivos
 
-- Tarefa: `./tasks/prd-[$prd]/[$task]_task.md`
-- PRD: `./tasks/prd-[$prd]/_prd.md`
-- Tech Spec: `./tasks/prd-[$prd]/_techspec.md`
+- Tarefa: `tasks/prd-[$prd]/[$task]_task.md`
+- PRD: `tasks/prd-[$prd]/prd.md`
+- Tech Spec: `tasks/prd-[$prd]/techspec.md`
 
 ## Fluxo de Trabalho de Conclusão de Tarefa
 
@@ -35,12 +35,12 @@ Confirme que a implementação satisfaz:
 
 #### 2.1 Análise de Regras
 Analise todas as regras Cursor aplicáveis aos arquivos alterados:
-- Identificar arquivos `/rules/*.md` relevantes
+- Identificar arquivos `rules/*.md` relevantes
 - Listar padrões de codificação específicos e requisitos
 - Verificar violações de regras ou áreas que precisam atenção
 
 #### 2.2 Revisão de Código
-Use os critérios de `/rules/review.md` como base para todas as revisões.
+Use os critérios de `rules/review.md` como base para todas as revisões.
 
 ### 3. Corrigir Problemas da Revisão
 
