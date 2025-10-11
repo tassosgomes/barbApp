@@ -5,17 +5,35 @@ namespace BarbApp.Infrastructure.Services;
 
 public class TenantContext : ITenantContext
 {
-    public Guid? BarbeariaId { get; private set; }
-    public string? BarbeariaCode { get; private set; }
-    public bool IsAdminCentral => string.IsNullOrEmpty(BarbeariaCode);
-    public string UserId { get; private set; } = string.Empty;
-    public string Role { get; private set; } = string.Empty;
+    private static readonly AsyncLocal<TenantInfo?> _currentTenant = new();
+
+    public Guid? BarbeariaId => _currentTenant.Value?.BarbeariaId;
+    public string? BarbeariaCode => _currentTenant.Value?.BarbeariaCode;
+    public bool IsAdminCentral => string.IsNullOrEmpty(_currentTenant.Value?.BarbeariaCode);
+    public string UserId => _currentTenant.Value?.UserId ?? string.Empty;
+    public string Role => _currentTenant.Value?.Role ?? string.Empty;
 
     public void SetContext(string userId, string role, Guid? barbeariaId, string? barbeariaCode)
     {
-        UserId = userId;
-        Role = role;
-        BarbeariaId = barbeariaId;
-        BarbeariaCode = barbeariaCode;
+        _currentTenant.Value = new TenantInfo
+        {
+            UserId = userId,
+            Role = role,
+            BarbeariaId = barbeariaId,
+            BarbeariaCode = barbeariaCode
+        };
+    }
+
+    public void Clear()
+    {
+        _currentTenant.Value = null;
+    }
+
+    private class TenantInfo
+    {
+        public Guid? BarbeariaId { get; init; }
+        public string? BarbeariaCode { get; init; }
+        public string UserId { get; init; } = string.Empty;
+        public string Role { get; init; } = string.Empty;
     }
 }

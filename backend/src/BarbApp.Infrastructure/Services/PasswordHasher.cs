@@ -9,11 +9,39 @@ public class PasswordHasher : IPasswordHasher
 
     public string Hash(string password)
     {
+        if (string.IsNullOrWhiteSpace(password))
+        {
+            throw new ArgumentException(
+                "Password cannot be null or whitespace",
+                nameof(password));
+        }
+
         return BCrypt.Net.BCrypt.HashPassword(password, WorkFactor);
     }
 
     public bool Verify(string password, string hash)
     {
-        return BCrypt.Net.BCrypt.Verify(password, hash);
+        if (string.IsNullOrWhiteSpace(password))
+        {
+            throw new ArgumentException(
+                "Password cannot be null or whitespace",
+                nameof(password));
+        }
+
+        if (string.IsNullOrWhiteSpace(hash))
+        {
+            throw new ArgumentException(
+                "Password hash cannot be null or whitespace",
+                nameof(hash));
+        }
+
+        try
+        {
+            return BCrypt.Net.BCrypt.Verify(password, hash);
+        }
+        catch
+        {
+            return false;
+        }
     }
 }
