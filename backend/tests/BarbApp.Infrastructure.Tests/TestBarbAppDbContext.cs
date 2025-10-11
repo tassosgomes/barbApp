@@ -26,5 +26,15 @@ public class TestBarbAppDbContext : BarbAppDbContext
         public bool IsAdminCentral => true;
         public string UserId => "test-user";
         public string Role => "admin";
+
+        public void SetContext(string userId, string role, Guid? barbeariaId, string? barbeariaCode)
+        {
+            // No-op for tests
+        }
+
+        public void Clear()
+        {
+            // No-op for tests
+        }
     }
 }

@@ -1,0 +1,72 @@
+// BarbApp.Infrastructure/Middlewares/GlobalExceptionHandlerMiddleware.cs
+using BarbApp.Domain.Exceptions;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
+using System.Net;
+using System.Text.Json;
+
+namespace BarbApp.Infrastructure.Middlewares;
+
+public class GlobalExceptionHandlerMiddleware
+{
+    private readonly RequestDelegate _next;
+    private readonly ILogger<GlobalExceptionHandlerMiddleware> _logger;
+
+    public GlobalExceptionHandlerMiddleware(
+        RequestDelegate next,
+        ILogger<GlobalExceptionHandlerMiddleware> _logger)
+    {
+        _next = next;
+        this._logger = _logger;
+    }
+
+    public async Task InvokeAsync(HttpContext context)
+    {
+        try
+        {
+            await _next(context);
+        }
+        catch (Exception ex)
+        {
+            await HandleExceptionAsync(context, ex);
+        }
+    }
+
+    private async Task HandleExceptionAsync(HttpContext context, Exception exception)
+    {
+        _logger.LogError(
+            exception,
+            "An unhandled exception occurred: {Message}",
+            exception.Message
+        );
+
+        context.Response.ContentType = "application/json";
+
+        var (statusCode, message) = exception switch
+        {
+            UnauthorizedException => (HttpStatusCode.Unauthorized, exception.Message),
+            ForbiddenException => (HttpStatusCode.Forbidden, exception.Message),
+            NotFoundException => (HttpStatusCode.NotFound, exception.Message),
+            ValidationException => (HttpStatusCode.BadRequest, exception.Message),
+            _ => (HttpStatusCode.InternalServerError, "An error occurred processing your request")
+        };
+
+        context.Response.StatusCode = (int)statusCode;
+
+        var response = new ErrorResponse
+        {
+            StatusCode = (int)statusCode,
+            Message = message,
+            Timestamp = DateTime.UtcNow
+        };
+
+        await context.Response.WriteAsJsonAsync(response);
+    }
+}
+
+public record ErrorResponse
+{
+    public int StatusCode { get; init; }
+    public string Message { get; init; } = string.Empty;
+    public DateTime Timestamp { get; init; }
+}
