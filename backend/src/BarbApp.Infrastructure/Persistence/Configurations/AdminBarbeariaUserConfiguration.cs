@@ -9,56 +9,37 @@ public class AdminBarbeariaUserConfiguration : IEntityTypeConfiguration<AdminBar
 {
     public void Configure(EntityTypeBuilder<AdminBarbeariaUser> builder)
     {
-        builder.ToTable("admin_barbearia_users");
-
+        // Primary key
         builder.HasKey(a => a.Id);
-        builder.Property(a => a.Id)
-            .HasColumnName("admin_barbearia_user_id")
-            .ValueGeneratedNever();
+        builder.Property(a => a.Id).HasColumnName("admin_barbearia_user_id");
 
-        builder.Property(a => a.BarbeariaId)
-            .HasColumnName("barbearia_id")
-            .IsRequired();
+        // Properties
+        builder.Property(a => a.BarbeariaId).HasColumnName("barbearia_id").IsRequired();
+        builder.Property(a => a.Email).HasColumnName("email").IsRequired().HasMaxLength(255);
+        builder.Property(a => a.PasswordHash).HasColumnName("password_hash").IsRequired();
+        builder.Property(a => a.Name).HasColumnName("name").IsRequired().HasMaxLength(255);
+        builder.Property(a => a.IsActive).HasColumnName("is_active").IsRequired();
+        builder.Property(a => a.CreatedAt).HasColumnName("created_at").IsRequired();
+        builder.Property(a => a.UpdatedAt).HasColumnName("updated_at").IsRequired();
 
-        builder.Property(a => a.Email)
-            .HasColumnName("email")
-            .HasMaxLength(255)
-            .IsRequired();
+        // Indexes for performance
+        builder.HasIndex(a => new { a.Email, a.BarbeariaId })
+            .HasDatabaseName("ix_admin_barbearia_users_email_barbearia_id")
+            .IsUnique();
 
-        builder.Property(a => a.PasswordHash)
-            .HasColumnName("password_hash")
-            .HasMaxLength(255)
-            .IsRequired();
+        builder.HasIndex(a => a.BarbeariaId)
+            .HasDatabaseName("ix_admin_barbearia_users_barbearia_id");
 
-        builder.Property(a => a.Name)
-            .HasColumnName("name")
-            .HasMaxLength(255)
-            .IsRequired();
+        builder.HasIndex(a => a.Email)
+            .HasDatabaseName("ix_admin_barbearia_users_email");
 
-        builder.Property(a => a.IsActive)
-            .HasColumnName("is_active")
-            .IsRequired();
-
-        builder.Property(a => a.CreatedAt)
-            .HasColumnName("created_at")
-            .IsRequired();
-
-        builder.Property(a => a.UpdatedAt)
-            .HasColumnName("updated_at")
-            .IsRequired();
-
-        // Relacionamentos
+        // Relationships
         builder.HasOne(a => a.Barbearia)
-            .WithMany()
+            .WithMany(b => b.AdminUsers)
             .HasForeignKey(a => a.BarbeariaId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        // Índices e constraints
-        builder.HasIndex(a => new { a.BarbeariaId, a.Email })
-            .IsUnique()
-            .HasDatabaseName("idx_admin_barbearia_users_barbearia_email");
-
-        builder.HasIndex(a => a.BarbeariaId)
-            .HasDatabaseName("idx_admin_barbearia_users_barbearia_id");
+        // Table name
+        builder.ToTable("admin_barbearia_users");
     }
 }
