@@ -9,51 +9,36 @@ public class BarberConfiguration : IEntityTypeConfiguration<Barber>
 {
     public void Configure(EntityTypeBuilder<Barber> builder)
     {
-        builder.ToTable("barbers");
-
+        // Primary key
         builder.HasKey(b => b.Id);
-        builder.Property(b => b.Id)
-            .HasColumnName("barber_id")
-            .ValueGeneratedNever();
+        builder.Property(b => b.Id).HasColumnName("barber_id");
 
-        builder.Property(b => b.BarbeariaId)
-            .HasColumnName("barbearia_id")
-            .IsRequired();
+        // Properties
+        builder.Property(b => b.BarbeariaId).HasColumnName("barbearia_id").IsRequired();
+        builder.Property(b => b.Telefone).HasColumnName("telefone").IsRequired().HasMaxLength(11);
+        builder.Property(b => b.Name).HasColumnName("name").IsRequired().HasMaxLength(255);
+        builder.Property(b => b.IsActive).HasColumnName("is_active").IsRequired();
+        builder.Property(b => b.CreatedAt).HasColumnName("created_at").IsRequired();
+        builder.Property(b => b.UpdatedAt).HasColumnName("updated_at").IsRequired();
 
-        builder.Property(b => b.Telefone)
-            .HasColumnName("telefone")
-            .HasMaxLength(20)
-            .IsRequired();
+        // Indexes for performance
+        builder.HasIndex(b => new { b.Telefone, b.BarbeariaId })
+            .HasDatabaseName("ix_barbers_telefone_barbearia_id")
+            .IsUnique();
 
-        builder.Property(b => b.Name)
-            .HasColumnName("name")
-            .HasMaxLength(255)
-            .IsRequired();
+        builder.HasIndex(b => b.BarbeariaId)
+            .HasDatabaseName("ix_barbers_barbearia_id");
 
-        builder.Property(b => b.IsActive)
-            .HasColumnName("is_active")
-            .IsRequired();
+        builder.HasIndex(b => b.Telefone)
+            .HasDatabaseName("ix_barbers_telefone");
 
-        builder.Property(b => b.CreatedAt)
-            .HasColumnName("created_at")
-            .IsRequired();
-
-        builder.Property(b => b.UpdatedAt)
-            .HasColumnName("updated_at")
-            .IsRequired();
-
-        // Relacionamentos
+        // Relationships
         builder.HasOne(b => b.Barbearia)
-            .WithMany()
+            .WithMany(bb => bb.Barbers)
             .HasForeignKey(b => b.BarbeariaId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        // Índices e constraints
-        builder.HasIndex(b => new { b.BarbeariaId, b.Telefone })
-            .IsUnique()
-            .HasDatabaseName("idx_barbers_barbearia_telefone");
-
-        builder.HasIndex(b => b.Telefone)
-            .HasDatabaseName("idx_barbers_telefone");
+        // Table name
+        builder.ToTable("barbers");
     }
 }

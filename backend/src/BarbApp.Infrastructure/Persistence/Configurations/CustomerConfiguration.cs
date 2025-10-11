@@ -9,51 +9,36 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
 {
     public void Configure(EntityTypeBuilder<Customer> builder)
     {
-        builder.ToTable("customers");
-
+        // Primary key
         builder.HasKey(c => c.Id);
-        builder.Property(c => c.Id)
-            .HasColumnName("customer_id")
-            .ValueGeneratedNever();
+        builder.Property(c => c.Id).HasColumnName("customer_id");
 
-        builder.Property(c => c.BarbeariaId)
-            .HasColumnName("barbearia_id")
-            .IsRequired();
+        // Properties
+        builder.Property(c => c.BarbeariaId).HasColumnName("barbearia_id").IsRequired();
+        builder.Property(c => c.Telefone).HasColumnName("telefone").IsRequired().HasMaxLength(11);
+        builder.Property(c => c.Name).HasColumnName("name").IsRequired().HasMaxLength(255);
+        builder.Property(c => c.IsActive).HasColumnName("is_active").IsRequired();
+        builder.Property(c => c.CreatedAt).HasColumnName("created_at").IsRequired();
+        builder.Property(c => c.UpdatedAt).HasColumnName("updated_at").IsRequired();
 
-        builder.Property(c => c.Telefone)
-            .HasColumnName("telefone")
-            .HasMaxLength(20)
-            .IsRequired();
+        // Indexes for performance
+        builder.HasIndex(c => new { c.Telefone, c.BarbeariaId })
+            .HasDatabaseName("ix_customers_telefone_barbearia_id")
+            .IsUnique();
 
-        builder.Property(c => c.Name)
-            .HasColumnName("name")
-            .HasMaxLength(255)
-            .IsRequired();
+        builder.HasIndex(c => c.BarbeariaId)
+            .HasDatabaseName("ix_customers_barbearia_id");
 
-        builder.Property(c => c.IsActive)
-            .HasColumnName("is_active")
-            .IsRequired();
+        builder.HasIndex(c => c.Telefone)
+            .HasDatabaseName("ix_customers_telefone");
 
-        builder.Property(c => c.CreatedAt)
-            .HasColumnName("created_at")
-            .IsRequired();
-
-        builder.Property(c => c.UpdatedAt)
-            .HasColumnName("updated_at")
-            .IsRequired();
-
-        // Relacionamentos
+        // Relationships
         builder.HasOne(c => c.Barbearia)
-            .WithMany()
+            .WithMany(b => b.Customers)
             .HasForeignKey(c => c.BarbeariaId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        // Índices e constraints
-        builder.HasIndex(c => new { c.BarbeariaId, c.Telefone })
-            .IsUnique()
-            .HasDatabaseName("idx_customers_barbearia_telefone");
-
-        builder.HasIndex(c => c.Telefone)
-            .HasDatabaseName("idx_customers_telefone");
+        // Table name
+        builder.ToTable("customers");
     }
 }

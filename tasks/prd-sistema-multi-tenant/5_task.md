@@ -1,7 +1,8 @@
 ---
-status: pending
+status: completed
 parallelizable: true
 blocked_by: ["4.0"]
+completed_at: 2025-10-11
 ---
 
 <task_context>
@@ -28,12 +29,12 @@ Implementar os repositórios concretos para gerenciamento de usuários de todos 
 </requirements>
 
 ## Subtarefas
-- [ ] 5.1 Implementar AdminCentralUserRepository
-- [ ] 5.2 Implementar AdminBarbeariaUserRepository com filtros de tenant
-- [ ] 5.3 Implementar BarberRepository com queries otimizadas
-- [ ] 5.4 Implementar CustomerRepository
-- [ ] 5.5 Adicionar índices e otimizações de performance
-- [ ] 5.6 Criar testes unitários para cada repositório
+- [x] 5.1 Implementar AdminCentralUserRepository ✅
+- [x] 5.2 Implementar AdminBarbeariaUserRepository com filtros de tenant ✅
+- [x] 5.3 Implementar BarberRepository com queries otimizadas ✅
+- [x] 5.4 Implementar CustomerRepository ✅
+- [x] 5.5 Adicionar índices e otimizações de performance ✅
+- [x] 5.6 Criar testes unitários para cada repositório ✅
 
 ## Sequenciamento
 - **Bloqueado por**: 4.0 (Domínio, Entidades e Interfaces)
