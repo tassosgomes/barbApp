@@ -1,5 +1,5 @@
 ---
-status: pending
+status: completed
 parallelizable: true
 blocked_by: ["4.0"]
 ---
@@ -27,11 +27,11 @@ Criar os Data Transfer Objects (DTOs) para input e output da API, incluindo vali
 </requirements>
 
 ## Subtarefas
-- [ ] 6.1 Criar DTOs de Input (Login, TrocarContexto)
-- [ ] 6.2 Criar DTOs de Output (AuthResponse, BarberInfo)
-- [ ] 6.3 Implementar validadores FluentValidation
-- [ ] 6.4 Configurar mensagens de validação
-- [ ] 6.5 Criar testes de validação
+- [x] 6.1 Criar DTOs de Input (Login, TrocarContexto)
+- [x] 6.2 Criar DTOs de Output padronizados com informações de token
+- [x] 6.3 Implementar validadores FluentValidation
+- [x] 6.4 Configurar mensagens de validação
+- [x] 6.5 Criar testes de validação
 
 ## Sequenciamento
 - **Bloqueado por**: 4.0 (Domínio, Entidades e Interfaces)
