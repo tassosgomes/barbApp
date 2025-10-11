@@ -1,5 +1,5 @@
 ---
-status: pending
+status: completed
 parallelizable: true
 blocked_by: ["4.0"]
 ---
@@ -28,12 +28,12 @@ Implementar os serviços fundamentais de segurança: geração e validação de 
 </requirements>
 
 ## Subtarefas
-- [ ] 8.1 Implementar JwtTokenGenerator
-- [ ] 8.2 Implementar PasswordHasher com BCrypt
-- [ ] 8.3 Implementar TenantContext com AsyncLocal
-- [ ] 8.4 Criar configurações de JWT (appsettings.json)
-- [ ] 8.5 Criar testes unitários para cada serviço
-- [ ] 8.6 Validar thread-safety do TenantContext
+- [x] 8.1 Implementar JwtTokenGenerator
+- [x] 8.2 Implementar PasswordHasher com BCrypt
+- [x] 8.3 Implementar TenantContext com AsyncLocal
+- [x] 8.4 Criar configurações de JWT (appsettings.json)
+- [x] 8.5 Criar testes unitários para cada serviço
+- [x] 8.6 Validar thread-safety do TenantContext
 
 ## Sequenciamento
 - **Bloqueado por**: 4.0 (Interfaces do domínio)
