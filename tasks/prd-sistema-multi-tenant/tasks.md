@@ -3,7 +3,7 @@
 ## Tarefas
 
 ### Fase 1: Fundação (Domain + Infrastructure Base)
-- [ ] 1.0 Setup e Dependências
+- [x] 1.0 Setup e Dependências
 - [ ] 2.0 Implementar Domain Layer Base
 
 ### Fase 2: Entidades e Infraestrutura de Dados

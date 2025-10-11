@@ -1,0 +1,6 @@
+@BarbApp.API_HostAddress = http://localhost:5070
+
+GET {{BarbApp.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

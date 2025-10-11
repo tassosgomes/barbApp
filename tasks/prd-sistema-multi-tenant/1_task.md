@@ -1,5 +1,5 @@
 ---
-status: pending
+status: completed
 parallelizable: false
 blocked_by: []
 ---
@@ -29,12 +29,12 @@ Configurar ambiente inicial do projeto com instalação de pacotes NuGet necess�
 
 ## Subtarefas
 
-- [ ] 1.1 Instalar System.IdentityModel.Tokens.Jwt no projeto API
-- [ ] 1.2 Instalar BCrypt.Net-Next no projeto Infrastructure
-- [ ] 1.3 Adicionar seção Jwt no appsettings.json com SecretKey, Issuer, Audience
-- [ ] 1.4 Gerar secret key segura (openssl rand -base64 32)
-- [ ] 1.5 Adicionar appsettings.Development.json ao .gitignore
-- [ ] 1.6 Documentar variáveis de ambiente necessárias
+- [x] 1.1 Instalar System.IdentityModel.Tokens.Jwt no projeto API
+- [x] 1.2 Instalar BCrypt.Net-Next no projeto Infrastructure
+- [x] 1.3 Adicionar seção Jwt no appsettings.json com SecretKey, Issuer, Audience
+- [x] 1.4 Gerar secret key segura (openssl rand -base64 32)
+- [x] 1.5 Adicionar appsettings.Development.json ao .gitignore
+- [x] 1.6 Documentar variáveis de ambiente necessárias
 
 ## Sequenciamento
 
