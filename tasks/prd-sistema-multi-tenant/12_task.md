@@ -1,5 +1,5 @@
 ---
-status: pending
+status: completed
 parallelizable: true
 blocked_by: ["11.0"]
 ---
@@ -30,14 +30,14 @@ Criar documentação completa dos endpoints usando Swagger/OpenAPI com exemplos 
 </requirements>
 
 ## Subtarefas
-- [ ] 12.1 Adicionar comentários XML em todos os controllers
-- [ ] 12.2 Criar exemplos de requisição para cada endpoint
-- [ ] 12.3 Criar exemplos de resposta (sucesso e erro)
-- [ ] 12.4 Documentar schemas de DTOs
-- [ ] 12.5 Criar guia de autenticação na documentação
-- [ ] 12.6 Adicionar descrições de códigos de status
-- [ ] 12.7 Exportar collection Postman
-- [ ] 12.8 Criar README com instruções de uso da API
+- [x] 12.1 Adicionar comentários XML em todos os controllers ✅ CONCLUÍDA
+- [x] 12.2 Criar exemplos de requisição para cada endpoint ✅ CONCLUÍDA
+- [x] 12.3 Criar exemplos de resposta (sucesso e erro) ✅ CONCLUÍDA
+- [x] 12.4 Documentar schemas de DTOs ✅ CONCLUÍDA
+- [x] 12.5 Criar guia de autenticação na documentação ✅ CONCLUÍDA
+- [x] 12.6 Adicionar descrições de códigos de status ✅ CONCLUÍDA
+- [x] 12.7 Exportar collection Postman ✅ CONCLUÍDA
+- [x] 12.8 Criar README com instruções de uso da API ✅ CONCLUÍDA
 
 ## Sequenciamento
 - **Bloqueado por**: 11.0 (Configuração de API)
@@ -152,26 +152,26 @@ public class SwaggerExamplesSchemaFilter : ISchemaFilter
         {
             schema.Example = new OpenApiObject
             {
+                ["codigo"] = new OpenApiString("ABC12345"),
                 ["email"] = new OpenApiString("admin@barbearia1.com"),
-                ["senha"] = new OpenApiString("Admin@123"),
-                ["barbeariaId"] = new OpenApiString("3fa85f64-5717-4562-b3fc-2c963f66afa6")
+                ["senha"] = new OpenApiString("Admin@123")
             };
         }
         else if (context.Type == typeof(LoginBarbeiroInput))
         {
             schema.Example = new OpenApiObject
             {
-                ["email"] = new OpenApiString("barbeiro@barbearia1.com"),
-                ["senha"] = new OpenApiString("Barbeiro@123"),
-                ["barbeariaId"] = new OpenApiString("3fa85f64-5717-4562-b3fc-2c963f66afa6")
+                ["codigo"] = new OpenApiString("ABC12345"),
+                ["telefone"] = new OpenApiString("11987654321")
             };
         }
         else if (context.Type == typeof(LoginClienteInput))
         {
             schema.Example = new OpenApiObject
             {
-                ["email"] = new OpenApiString("cliente@email.com"),
-                ["senha"] = new OpenApiString("Cliente@123")
+                ["codigo"] = new OpenApiString("ABC12345"),
+                ["telefone"] = new OpenApiString("11987654321"),
+                ["nome"] = new OpenApiString("João Silva")
             };
         }
         else if (context.Type == typeof(TrocarContextoInput))
@@ -190,6 +190,29 @@ public class SwaggerExamplesSchemaFilter : ISchemaFilter
                 ["barbeariaId"] = new OpenApiString("3fa85f64-5717-4562-b3fc-2c963f66afa6"),
                 ["nomeBarbearia"] = new OpenApiString("Barbearia Premium"),
                 ["expiresAt"] = new OpenApiDateTime(DateTime.UtcNow.AddHours(8))
+            };
+        }
+        else if (context.Type == typeof(AuthenticationOutput))
+        {
+            schema.Example = new OpenApiObject
+            {
+                ["userId"] = new OpenApiString("3fa85f64-5717-4562-b3fc-2c963f66afa6"),
+                ["name"] = new OpenApiString("João Silva"),
+                ["role"] = new OpenApiString("Barbeiro"),
+                ["barbeariaId"] = new OpenApiString("3fa85f64-5717-4562-b3fc-2c963f66afa6"),
+                ["barbeariaCode"] = new OpenApiString("ABC12345"),
+                ["barbeariaNome"] = new OpenApiString("Barbearia Premium")
+            };
+        }
+        else if (context.Type == typeof(BarberInfo))
+        {
+            schema.Example = new OpenApiObject
+            {
+                ["id"] = new OpenApiString("3fa85f64-5717-4562-b3fc-2c963f66afa6"),
+                ["nome"] = new OpenApiString("João Silva"),
+                ["telefone"] = new OpenApiString("11987654321"),
+                ["barbeariaId"] = new OpenApiString("3fa85f64-5717-4562-b3fc-2c963f66afa6"),
+                ["nomeBarbearia"] = new OpenApiString("Barbearia Premium")
             };
         }
     }
@@ -268,23 +291,104 @@ Autentica um administrador de barbearia.
 **Request Body:**
 ```json
 {
+  "codigo": "ABC12345",
   "email": "admin@barbearia1.com",
-  "senha": "Admin@123",
-  "barbeariaId": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+  "senha": "Admin@123"
+}
+```
+
+**Response 200:**
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "tipoUsuario": "AdminBarbearia",
+  "barbeariaId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+  "nomeBarbearia": "Barbearia Premium",
+  "expiresAt": "2024-01-15T18:00:00Z"
 }
 ```
 
 #### POST /api/auth/barbeiro/login
 Autentica um barbeiro.
 
+**Request Body:**
+```json
+{
+  "codigo": "ABC12345",
+  "telefone": "11987654321"
+}
+```
+
+**Response 200:**
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "tipoUsuario": "Barbeiro",
+  "barbeariaId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+  "nomeBarbearia": "Barbearia Premium",
+  "expiresAt": "2024-01-15T18:00:00Z"
+}
+```
+
 #### POST /api/auth/cliente/login
 Autentica um cliente.
+
+**Request Body:**
+```json
+{
+  "codigo": "ABC12345",
+  "telefone": "11987654321",
+  "nome": "João Silva"
+}
+```
+
+**Response 200:**
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "tipoUsuario": "Cliente",
+  "barbeariaId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+  "nomeBarbearia": "Barbearia Premium",
+  "expiresAt": "2024-01-15T18:00:00Z"
+}
+```
 
 #### GET /api/auth/barbeiros
 Lista barbeiros da barbearia do usuário autenticado. **[Requer Autenticação]**
 
+**Response 200:**
+```json
+[
+  {
+    "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+    "nome": "João Silva",
+    "telefone": "11987654321",
+    "barbeariaId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+    "nomeBarbearia": "Barbearia Premium"
+  }
+]
+```
+
 #### POST /api/auth/barbeiro/trocar-contexto
 Troca contexto de barbearia para barbeiro. **[Requer Autenticação]**
+
+**Request Body:**
+```json
+{
+  "novaBarbeariaId": "4ea95f64-5717-4562-b3fc-2c963f66afa7"
+}
+```
+
+**Response 200:**
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "tipoUsuario": "Barbeiro",
+  "barbeariaId": "4ea95f64-5717-4562-b3fc-2c963f66afa7",
+  "nomeBarbearia": "Barbearia Nova",
+  "expiresAt": "2024-01-15T18:00:00Z"
+}
+```
 
 ## Tipos de Usuário
 

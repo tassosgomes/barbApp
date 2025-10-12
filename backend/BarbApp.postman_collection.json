@@ -1,0 +1,119 @@
+{
+  "info": {
+    "name": "BarbApp API",
+    "description": "Collection para testar endpoints da BarbApp API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login Admin Central",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@barbapp.com\",\n  \"senha\": \"Admin@123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/admin-central/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "admin-central", "login"]
+            }
+          }
+        },
+        {
+          "name": "Login Admin Barbearia",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"ABC12345\",\n  \"email\": \"admin@barbearia1.com\",\n  \"senha\": \"Admin@123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/admin-barbearia/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "admin-barbearia", "login"]
+            }
+          }
+        },
+        {
+          "name": "Login Barbeiro",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"ABC12345\",\n  \"telefone\": \"11987654321\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/barbeiro/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "barbeiro", "login"]
+            }
+          }
+        },
+        {
+          "name": "Login Cliente",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"ABC12345\",\n  \"telefone\": \"11987654321\",\n  \"nome\": \"João Silva\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/cliente/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "cliente", "login"]
+            }
+          }
+        },
+        {
+          "name": "List Barbeiros",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/barbeiros",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "barbeiros"]
+            }
+          }
+        },
+        {
+          "name": "Trocar Contexto Barbeiro",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{token}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"novaBarbeariaId\": \"4ea95f64-5717-4562-b3fc-2c963f66afa7\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/barbeiro/trocar-contexto",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "barbeiro", "trocar-contexto"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000"
+    },
+    {
+      "key": "token",
+      "value": ""
+    }
+  ]
+}
