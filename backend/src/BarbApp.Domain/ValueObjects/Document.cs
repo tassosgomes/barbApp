@@ -1,11 +1,14 @@
 
 using System.Text.RegularExpressions;
 using BarbApp.Domain.Exceptions;
+using Microsoft.EntityFrameworkCore;
 
 namespace BarbApp.Domain.ValueObjects
 {
+    [Owned]
     public class Document
     {
+        [Index(IsUnique = true)]
         public string Value { get; private set; }
         public DocumentType Type { get; private set; }
 
