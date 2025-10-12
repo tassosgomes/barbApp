@@ -87,15 +87,7 @@ public class BarbershopConfiguration : IEntityTypeConfiguration<Barbershop>
             .HasForeignKey(b => b.AddressId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        // Índices
-        builder.HasIndex("Code_Value")
-            .IsUnique()
-            .HasDatabaseName("uk_barbershops_code");
-
-        builder.HasIndex("Document_Value")
-            .IsUnique()
-            .HasDatabaseName("uk_barbershops_document");
-
+        // Índices adicionais
         builder.HasIndex(b => b.Name)
             .HasDatabaseName("idx_barbershops_name");
 

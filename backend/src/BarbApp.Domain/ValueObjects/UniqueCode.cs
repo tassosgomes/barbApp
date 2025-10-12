@@ -7,7 +7,6 @@ namespace BarbApp.Domain.ValueObjects
     [Owned]
     public class UniqueCode
     {
-        [Index(IsUnique = true)]
         public string Value { get; private set; }
 
         private UniqueCode() 

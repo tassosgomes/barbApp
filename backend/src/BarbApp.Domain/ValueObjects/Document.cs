@@ -8,7 +8,6 @@ namespace BarbApp.Domain.ValueObjects
     [Owned]
     public class Document
     {
-        [Index(IsUnique = true)]
         public string Value { get; private set; }
         public DocumentType Type { get; private set; }
 
