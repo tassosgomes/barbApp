@@ -1,5 +1,6 @@
 // BarbApp.Infrastructure/Middlewares/GlobalExceptionHandlerMiddleware.cs
 using BarbApp.Domain.Exceptions;
+using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System.Net;
@@ -47,7 +48,7 @@ public class GlobalExceptionHandlerMiddleware
             UnauthorizedException => (HttpStatusCode.Unauthorized, exception.Message),
             ForbiddenException => (HttpStatusCode.Forbidden, exception.Message),
             NotFoundException => (HttpStatusCode.NotFound, exception.Message),
-            ValidationException => (HttpStatusCode.BadRequest, exception.Message),
+            FluentValidation.ValidationException => (HttpStatusCode.BadRequest, exception.Message),
             _ => (HttpStatusCode.InternalServerError, "An error occurred processing your request")
         };
 
