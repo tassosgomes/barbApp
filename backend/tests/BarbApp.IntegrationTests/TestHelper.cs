@@ -1,21 +1,25 @@
+using System.Linq;
+using System.Net.Http.Json;
+using System.Threading;
 using BarbApp.Application.DTOs;
 using BarbApp.Application.Interfaces;
 using BarbApp.Domain.Entities;
 using BarbApp.Domain.ValueObjects;
 using BarbApp.Infrastructure.Persistence;
 using BarbApp.Infrastructure.Services;
-using System.Net.Http.Json;
 
 namespace BarbApp.IntegrationTests;
 
 public static class TestHelper
 {
+    private static long _documentCounter;
+
     public static async Task<(Guid id, string email, string senha)> CreateAdminCentralAsync(
         BarbAppDbContext context,
         IPasswordHasher passwordHasher)
     {
         var email = $"admin-{Guid.NewGuid()}@test.com";
-        var senha = "Test@123";
+        const string senha = "Test@123";
 
         var admin = AdminCentralUser.Create(email, passwordHasher.Hash(senha), "Test Admin");
         await context.AdminCentralUsers.AddAsync(admin);
@@ -29,7 +33,7 @@ public static class TestHelper
             BarbAppDbContext context,
             IPasswordHasher passwordHasher)
     {
-        var document = Document.Create("12345678000190");
+        var document = Document.Create(GenerateUniqueDocument());
         var address = Address.Create("01310100", "Av. Paulista", "1000", null, "Bela Vista", "São Paulo", "SP");
         var codigo = UniqueCode.Create(GenerateUniqueCode());
         var barbearia = Barbershop.Create(
@@ -40,12 +44,12 @@ public static class TestHelper
             "joao@test.com",
             address,
             codigo,
-            "admin-user-id"
-        );
+            "admin-user-id");
+
         await context.Barbershops.AddAsync(barbearia);
 
         var email = $"admin-barb-{Guid.NewGuid()}@test.com";
-        var senha = "Test@123";
+        const string senha = "Test@123";
 
         var admin = AdminBarbeariaUser.Create(barbearia.Id, email, passwordHasher.Hash(senha), "Test Admin Barbearia");
         await context.AdminBarbeariaUsers.AddAsync(admin);
@@ -55,10 +59,9 @@ public static class TestHelper
     }
 
     public static async Task<(Guid barbeariaId, Guid barbeiroId, string telefone, string codigo)>
-        CreateBarbeiroAsync(
-            BarbAppDbContext context)
+        CreateBarbeiroAsync(BarbAppDbContext context)
     {
-        var document = Document.Create("12345678000190");
+        var document = Document.Create(GenerateUniqueDocument());
         var address = Address.Create("01310100", "Av. Paulista", "1000", null, "Bela Vista", "São Paulo", "SP");
         var codigo = UniqueCode.Create(GenerateUniqueCode());
         var barbearia = Barbershop.Create(
@@ -69,11 +72,11 @@ public static class TestHelper
             "joao@test.com",
             address,
             codigo,
-            "admin-user-id"
-        );
+            "admin-user-id");
+
         await context.Barbershops.AddAsync(barbearia);
 
-        var telefone = $"119{new Random().Next(10000000, 99999999)}";
+        var telefone = $"119{Random.Shared.Next(10000000, 99999999)}";
 
         var barbeiro = Barber.Create(barbearia.Id, telefone, "Test Barber");
         await context.Barbers.AddAsync(barbeiro);
@@ -83,10 +86,9 @@ public static class TestHelper
     }
 
     public static async Task<(Guid barbeariaId, Guid clienteId, string telefone, string nome, string codigo)>
-        CreateClienteAsync(
-            BarbAppDbContext context)
+        CreateClienteAsync(BarbAppDbContext context)
     {
-        var document = Document.Create("12345678000190");
+        var document = Document.Create(GenerateUniqueDocument());
         var address = Address.Create("01310100", "Av. Paulista", "1000", null, "Bela Vista", "São Paulo", "SP");
         var codigo = UniqueCode.Create(GenerateUniqueCode());
         var barbearia = Barbershop.Create(
@@ -97,12 +99,12 @@ public static class TestHelper
             "joao@test.com",
             address,
             codigo,
-            "admin-user-id"
-        );
+            "admin-user-id");
+
         await context.Barbershops.AddAsync(barbearia);
 
-        var telefone = $"119{new Random().Next(10000000, 99999999)}";
-        var nome = "Test Cliente";
+        var telefone = $"119{Random.Shared.Next(10000000, 99999999)}";
+        const string nome = "Test Cliente";
 
         var cliente = Customer.Create(barbearia.Id, telefone, nome);
         await context.Customers.AddAsync(cliente);
@@ -126,8 +128,14 @@ public static class TestHelper
     private static string GenerateUniqueCode()
     {
         const string chars = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
-        var random = new Random();
         return new string(Enumerable.Repeat(chars, 8)
-            .Select(s => s[random.Next(s.Length)]).ToArray());
+            .Select(s => s[Random.Shared.Next(s.Length)]).ToArray());
+    }
+
+    private static string GenerateUniqueDocument()
+    {
+        var counter = Interlocked.Increment(ref _documentCounter);
+        const long baseNumber = 10_000_000_000_000;
+        return (baseNumber + counter).ToString();
     }
 }
