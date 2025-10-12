@@ -33,7 +33,7 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
             .HasDatabaseName("ix_customers_telefone");
 
         // Relationships
-        builder.HasOne<Barbershop>()
+        builder.HasOne(c => c.Barbearia)
             .WithMany()
             .HasForeignKey(c => c.BarbeariaId)
             .OnDelete(DeleteBehavior.Cascade);

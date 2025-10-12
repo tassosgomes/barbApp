@@ -1,9 +1,11 @@
 
 using System.Text.RegularExpressions;
 using BarbApp.Domain.Exceptions;
+using Microsoft.EntityFrameworkCore;
 
 namespace BarbApp.Domain.ValueObjects
 {
+    [Owned]
     public class Document
     {
         public string Value { get; private set; }

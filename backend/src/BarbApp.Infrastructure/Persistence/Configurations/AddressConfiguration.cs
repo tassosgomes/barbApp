@@ -49,5 +49,13 @@ public class AddressConfiguration : IEntityTypeConfiguration<Address>
             .HasColumnName("state")
             .HasMaxLength(2)
             .IsRequired();
+
+        builder.Property(a => a.CreatedAt)
+            .HasColumnName("created_at")
+            .IsRequired();
+
+        builder.Property(a => a.UpdatedAt)
+            .HasColumnName("updated_at")
+            .IsRequired();
     }
 }

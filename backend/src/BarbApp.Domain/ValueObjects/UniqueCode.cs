@@ -1,8 +1,10 @@
 
 using System.Text.RegularExpressions;
+using Microsoft.EntityFrameworkCore;
 
 namespace BarbApp.Domain.ValueObjects
 {
+    [Owned]
     public class UniqueCode
     {
         public string Value { get; private set; }

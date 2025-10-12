@@ -31,6 +31,13 @@ public class TrocarContextoBarbeiroUseCaseTests
         );
     }
 
+    private static Barbershop CreateTestBarbershop(string name, UniqueCode code)
+    {
+        var document = Document.Create("12345678000190");
+        var address = Address.Create("01310100", "Av. Paulista", "1000", null, "Bela Vista", "São Paulo", "SP");
+        return Barbershop.Create(name, document, "11987654321", "Test Owner", "test@test.com", address, code, "test-user");
+    }
+
     [Fact]
     public async Task Execute_ValidBarberInNewBarbearia_ShouldReturnAuthResponse()
     {
@@ -45,7 +52,7 @@ public class TrocarContextoBarbeiroUseCaseTests
         var telefone = userId;
 
         var barbeariaCode = UniqueCode.Create("XYZ98765");
-        var newBarbearia = Barbershop.Create("Nova Barbearia", barbeariaCode);
+        var newBarbearia = CreateTestBarbershop("Nova Barbearia", barbeariaCode);
         var barber = Barber.Create(input.NovaBarbeariaId, telefone, "João Silva");
 
         // Set navigation property for the test

@@ -34,7 +34,7 @@ public class AdminBarbeariaUserConfiguration : IEntityTypeConfiguration<AdminBar
             .HasDatabaseName("ix_admin_barbearia_users_email");
 
         // Relationships
-        builder.HasOne<Barbershop>()
+        builder.HasOne(a => a.Barbearia)
             .WithMany()
             .HasForeignKey(a => a.BarbeariaId)
             .OnDelete(DeleteBehavior.Cascade);
