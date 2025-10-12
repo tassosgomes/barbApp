@@ -8,8 +8,8 @@ public class TenantContext : ITenantContext
     private static readonly AsyncLocal<TenantInfo?> _currentTenant = new();
 
     public Guid? BarbeariaId => _currentTenant.Value?.BarbeariaId;
-    public string? BarbeariaCode => _currentTenant.Value?.BarbeariaCode;
-    public bool IsAdminCentral => string.IsNullOrEmpty(_currentTenant.Value?.BarbeariaCode);
+    public string? UniqueCode => _currentTenant.Value?.UniqueCode;
+    public bool IsAdminCentral => string.IsNullOrEmpty(_currentTenant.Value?.UniqueCode);
     public string UserId => _currentTenant.Value?.UserId ?? string.Empty;
     public string Role => _currentTenant.Value?.Role ?? string.Empty;
 
@@ -20,7 +20,7 @@ public class TenantContext : ITenantContext
             UserId = userId,
             Role = role,
             BarbeariaId = barbeariaId,
-            BarbeariaCode = barbeariaCode
+            UniqueCode = barbeariaCode
         };
     }
 
@@ -32,7 +32,7 @@ public class TenantContext : ITenantContext
     private class TenantInfo
     {
         public Guid? BarbeariaId { get; init; }
-        public string? BarbeariaCode { get; init; }
+        public string? UniqueCode { get; init; }
         public string UserId { get; init; } = string.Empty;
         public string Role { get; init; } = string.Empty;
     }

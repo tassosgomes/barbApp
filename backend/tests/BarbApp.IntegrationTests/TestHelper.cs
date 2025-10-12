@@ -29,8 +29,19 @@ public static class TestHelper
             BarbAppDbContext context,
             IPasswordHasher passwordHasher)
     {
-        var codigo = BarbeariaCode.Create(GenerateUniqueCode());
-        var barbearia = Barbershop.Create($"Test Barbearia {Guid.NewGuid()}", codigo);
+        var document = Document.Create("12345678000190");
+        var address = Address.Create("01310100", "Av. Paulista", "1000", null, "Bela Vista", "São Paulo", "SP");
+        var codigo = UniqueCode.Create(GenerateUniqueCode());
+        var barbearia = Barbershop.Create(
+            $"Test Barbearia {Guid.NewGuid()}",
+            document,
+            "11987654321",
+            "João Silva",
+            "joao@test.com",
+            address,
+            codigo,
+            "admin-user-id"
+        );
         await context.Barbershops.AddAsync(barbearia);
 
         var email = $"admin-barb-{Guid.NewGuid()}@test.com";
@@ -47,8 +58,19 @@ public static class TestHelper
         CreateBarbeiroAsync(
             BarbAppDbContext context)
     {
-        var codigo = BarbeariaCode.Create(GenerateUniqueCode());
-        var barbearia = Barbershop.Create($"Test Barbearia {Guid.NewGuid()}", codigo);
+        var document = Document.Create("12345678000190");
+        var address = Address.Create("01310100", "Av. Paulista", "1000", null, "Bela Vista", "São Paulo", "SP");
+        var codigo = UniqueCode.Create(GenerateUniqueCode());
+        var barbearia = Barbershop.Create(
+            $"Test Barbearia {Guid.NewGuid()}",
+            document,
+            "11987654321",
+            "João Silva",
+            "joao@test.com",
+            address,
+            codigo,
+            "admin-user-id"
+        );
         await context.Barbershops.AddAsync(barbearia);
 
         var telefone = $"119{new Random().Next(10000000, 99999999)}";
@@ -64,8 +86,19 @@ public static class TestHelper
         CreateClienteAsync(
             BarbAppDbContext context)
     {
-        var codigo = BarbeariaCode.Create(GenerateUniqueCode());
-        var barbearia = Barbershop.Create($"Test Barbearia {Guid.NewGuid()}", codigo);
+        var document = Document.Create("12345678000190");
+        var address = Address.Create("01310100", "Av. Paulista", "1000", null, "Bela Vista", "São Paulo", "SP");
+        var codigo = UniqueCode.Create(GenerateUniqueCode());
+        var barbearia = Barbershop.Create(
+            $"Test Barbearia {Guid.NewGuid()}",
+            document,
+            "11987654321",
+            "João Silva",
+            "joao@test.com",
+            address,
+            codigo,
+            "admin-user-id"
+        );
         await context.Barbershops.AddAsync(barbearia);
 
         var telefone = $"119{new Random().Next(10000000, 99999999)}";

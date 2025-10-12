@@ -29,8 +29,19 @@ public class AdminBarbeariaUserRepositoryTests : IDisposable
     public async Task GetByEmailAndBarbeariaIdAsync_WhenUserExists_ReturnsUser()
     {
         // Arrange
-        var barbeariaCode = BarbeariaCode.Create("ABC23456");
-        var barbearia = Barbershop.Create("Barbearia Teste", barbeariaCode);
+        var document = Document.Create("12345678000190");
+        var address = Address.Create("01310100", "Av. Paulista", "1000", null, "Bela Vista", "São Paulo", "SP");
+        var barbeariaCode = UniqueCode.Create("ABC23456");
+        var barbearia = Barbershop.Create(
+            "Barbearia Teste",
+            document,
+            "11987654321",
+            "João Silva",
+            "joao@test.com",
+            address,
+            barbeariaCode,
+            "admin-user-id"
+        );
         await _context.Barbershops.AddAsync(barbearia);
         await _context.SaveChangesAsync();
 
@@ -67,9 +78,9 @@ public class AdminBarbeariaUserRepositoryTests : IDisposable
     public async Task GetByEmailAndBarbeariaIdAsync_WhenUserExistsInDifferentBarbearia_ReturnsNull()
     {
         // Arrange
-        var barbeariaCode1 = BarbeariaCode.Create("ABC23456");
+        var barbeariaCode1 = UniqueCode.Create("ABC23456");
         var barbearia1 = Barbershop.Create("Barbearia 1", barbeariaCode1);
-        var barbeariaCode2 = BarbeariaCode.Create("XYZ98765");
+        var barbeariaCode2 = UniqueCode.Create("XYZ98765");
         var barbearia2 = Barbershop.Create("Barbearia 2", barbeariaCode2);
         await _context.Barbershops.AddRangeAsync(barbearia1, barbearia2);
         await _context.SaveChangesAsync();
@@ -92,7 +103,7 @@ public class AdminBarbeariaUserRepositoryTests : IDisposable
     public async Task AddAsync_AddsUserToDatabase()
     {
         // Arrange
-        var barbeariaCode = BarbeariaCode.Create("DEF67892");
+        var barbeariaCode = UniqueCode.Create("DEF67892");
         var barbearia = Barbershop.Create("Barbearia Nova", barbeariaCode);
         await _context.Barbershops.AddAsync(barbearia);
         await _context.SaveChangesAsync();

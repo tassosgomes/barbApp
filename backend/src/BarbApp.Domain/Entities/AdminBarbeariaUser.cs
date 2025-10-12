@@ -13,7 +13,12 @@ public class AdminBarbeariaUser
     public DateTime CreatedAt { get; private set; }
     public DateTime UpdatedAt { get; private set; }
 
-    private AdminBarbeariaUser() { }
+    private AdminBarbeariaUser() 
+    {
+        Email = null!;
+        PasswordHash = null!;
+        Name = null!;
+    }
 
     public static AdminBarbeariaUser Create(
         Guid barbeariaId,

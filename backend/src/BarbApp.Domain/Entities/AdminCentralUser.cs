@@ -11,7 +11,12 @@ public class AdminCentralUser
     public DateTime CreatedAt { get; private set; }
     public DateTime UpdatedAt { get; private set; }
 
-    private AdminCentralUser() { } // EF Core
+    private AdminCentralUser() 
+    {
+        Email = null!;
+        PasswordHash = null!;
+        Name = null!;
+    } // EF Core
 
     public static AdminCentralUser Create(
         string email,

@@ -22,7 +22,7 @@ public class TestBarbAppDbContext : BarbAppDbContext
     private class TestTenantContext : ITenantContext
     {
         public Guid? BarbeariaId => Guid.Empty;
-        public string? BarbeariaCode => null;
+        public string? UniqueCode => null;
         public bool IsAdminCentral => true;
         public string UserId => "test-user";
         public string Role => "admin";

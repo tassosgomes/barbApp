@@ -11,7 +11,7 @@ public record TokenClaims(
     string UserId,
     string Role,
     Guid? BarbeariaId,
-    string? BarbeariaCode
+    string? UniqueCode
 );
 
 public record JwtToken(
