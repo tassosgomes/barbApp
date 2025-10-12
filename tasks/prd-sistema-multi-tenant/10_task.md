@@ -31,15 +31,15 @@ Implementar o AuthController com 5 endpoints REST para autenticação de diferen
 </requirements>
 
 ## Subtarefas
-- [ ] 10.1 Criar AuthController com estrutura base
-- [ ] 10.2 Implementar endpoint de login AdminCentral
-- [ ] 10.3 Implementar endpoint de login AdminBarbearia
-- [ ] 10.4 Implementar endpoint de login Barbeiro
-- [ ] 10.5 Implementar endpoint de login Cliente
-- [ ] 10.6 Implementar endpoint de listagem de barbeiros
-- [ ] 10.7 Implementar endpoint de troca de contexto
-- [ ] 10.8 Adicionar atributos de documentação Swagger
-- [ ] 10.9 Criar testes de integração para todos os endpoints
+- [x] 10.1 Criar AuthController com estrutura base
+- [x] 10.2 Implementar endpoint de login AdminCentral
+- [x] 10.3 Implementar endpoint de login AdminBarbearia
+- [x] 10.4 Implementar endpoint de login Barbeiro
+- [x] 10.5 Implementar endpoint de login Cliente
+- [x] 10.6 Implementar endpoint de listagem de barbeiros
+- [x] 10.7 Implementar endpoint de troca de contexto
+- [x] 10.8 Adicionar atributos de documentação Swagger
+- [x] 10.9 Criar testes de integração para todos os endpoints
 
 ## Sequenciamento
 - **Bloqueado por**: 7.0 (Use Cases), 6.0 (DTOs)
