@@ -1,8 +1,202 @@
-# BarbApp Backend
+# BarbApp API Documentation
+
+## Visão Geral
+API REST para sistema de gerenciamento de barbearias com suporte multi-tenant.
+
+## Base URL
+- **Development**: `http://localhost:5000`
+- **Production**: `https://api.barbapp.com`
+
+## Autenticação
+Todos os endpoints protegidos requerem autenticação JWT Bearer token.
+
+### Obtendo um Token
+1. Faça login usando um dos endpoints de autenticação
+2. Use o token retornado no header `Authorization: Bearer {token}`
+
+### Exemplo
+```bash
+# Login
+curl -X POST http://localhost:5000/api/auth/admin-central/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"admin@barbapp.com","senha":"Admin@123"}'
+
+# Resposta
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "tipoUsuario": "AdminCentral",
+  "barbeariaId": null,
+  "nomeBarbearia": "",
+  "expiresAt": "2024-01-15T18:00:00Z"
+}
+
+# Usando o token
+curl -X GET http://localhost:5000/api/auth/barbeiros \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+```
+
+## Endpoints
+
+### Autenticação
+
+#### POST /api/auth/admin-central/login
+Autentica um administrador central.
+
+**Request Body:**
+```json
+{
+  "email": "admin@barbapp.com",
+  "senha": "Admin@123"
+}
+```
+
+**Response 200:**
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "tipoUsuario": "AdminCentral",
+  "barbeariaId": null,
+  "nomeBarbearia": "",
+  "expiresAt": "2024-01-15T18:00:00Z"
+}
+```
+
+#### POST /api/auth/admin-barbearia/login
+Autentica um administrador de barbearia.
+
+**Request Body:**
+```json
+{
+  "codigo": "ABC12345",
+  "email": "admin@barbearia1.com",
+  "senha": "Admin@123"
+}
+```
+
+**Response 200:**
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "tipoUsuario": "AdminBarbearia",
+  "barbeariaId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+  "nomeBarbearia": "Barbearia Premium",
+  "expiresAt": "2024-01-15T18:00:00Z"
+}
+```
+
+#### POST /api/auth/barbeiro/login
+Autentica um barbeiro.
+
+**Request Body:**
+```json
+{
+  "codigo": "ABC12345",
+  "telefone": "11987654321"
+}
+```
+
+**Response 200:**
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "tipoUsuario": "Barbeiro",
+  "barbeariaId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+  "nomeBarbearia": "Barbearia Premium",
+  "expiresAt": "2024-01-15T18:00:00Z"
+}
+```
+
+#### POST /api/auth/cliente/login
+Autentica um cliente.
+
+**Request Body:**
+```json
+{
+  "codigo": "ABC12345",
+  "telefone": "11987654321",
+  "nome": "João Silva"
+}
+```
+
+**Response 200:**
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "tipoUsuario": "Cliente",
+  "barbeariaId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+  "nomeBarbearia": "Barbearia Premium",
+  "expiresAt": "2024-01-15T18:00:00Z"
+}
+```
+
+#### GET /api/auth/barbeiros
+Lista barbeiros da barbearia do usuário autenticado. **[Requer Autenticação]**
+
+**Response 200:**
+```json
+[
+  {
+    "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+    "nome": "João Silva",
+    "telefone": "11987654321",
+    "barbeariaId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+    "nomeBarbearia": "Barbearia Premium"
+  }
+]
+```
+
+#### POST /api/auth/barbeiro/trocar-contexto
+Troca contexto de barbearia para barbeiro. **[Requer Autenticação]**
+
+**Request Body:**
+```json
+{
+  "novaBarbeariaId": "4ea95f64-5717-4562-b3fc-2c963f66afa7"
+}
+```
+
+**Response 200:**
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "tipoUsuario": "Barbeiro",
+  "barbeariaId": "4ea95f64-5717-4562-b3fc-2c963f66afa7",
+  "nomeBarbearia": "Barbearia Nova",
+  "expiresAt": "2024-01-15T18:00:00Z"
+}
+```
+
+## Tipos de Usuário
+
+| Tipo | Descrição | Acesso |
+|------|-----------|--------|
+| AdminCentral | Administrador do sistema | Acesso total |
+| AdminBarbearia | Administrador de barbearia | Dados da barbearia |
+| Barbeiro | Profissional barbeiro | Dados da(s) barbearia(s) |
+| Cliente | Cliente do sistema | Dados pessoais e agendamentos |
+
+## Códigos de Status
+
+| Código | Descrição |
+|--------|-----------|
+| 200 | Sucesso |
+| 400 | Requisição inválida |
+| 401 | Não autenticado |
+| 403 | Sem permissão |
+| 404 | Não encontrado |
+| 500 | Erro interno |
+
+## Postman Collection
+Importe a collection do Postman: [BarbApp.postman_collection.json](./BarbApp.postman_collection.json)
+
+## Swagger UI
+Acesse a documentação interativa em: http://localhost:5000/swagger
+
+---
+
+## 🏗️ Arquitetura Técnica
 
 API REST em .NET 8 seguindo Clean Architecture para sistema multi-tenant de gestão de barbearias.
-
-## 🏗️ Arquitetura
 
 ```
 backend/

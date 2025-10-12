@@ -1,5 +1,6 @@
 using BarbApp.API;
 using BarbApp.API.Extensions;
+using BarbApp.API.Filters;
 using BarbApp.Application.UseCases;
 using BarbApp.Application.Interfaces;
 using BarbApp.Application.Interfaces.UseCases;
@@ -128,23 +129,54 @@ builder.Services.AddSwaggerGen(c =>
     c.SwaggerDoc("v1", new OpenApiInfo
     {
         Title = "BarbApp API",
-        Version = "v1",
-        Description = "API para sistema de gerenciamento de barbearias multi-tenant",
+        Version = "v1.0.0",
+        Description = @"
+            API REST para sistema de gerenciamento de barbearias multi-tenant.
+
+            ## Autenticação
+            Esta API utiliza JWT Bearer tokens para autenticação.
+
+            ### Como obter um token:
+            1. Faça login usando um dos endpoints de autenticação
+            2. Copie o token retornado no campo 'token'
+            3. Clique no botão 'Authorize' no topo desta página
+            4. Digite 'Bearer {seu_token}' no campo de entrada
+            5. Clique em 'Authorize' para salvar
+
+            ### Tipos de Usuário:
+            - **AdminCentral**: Acesso total ao sistema
+            - **AdminBarbearia**: Acesso administrativo a uma barbearia específica
+            - **Barbeiro**: Acesso a operações de barbeiro em uma ou mais barbearias
+            - **Cliente**: Acesso a funcionalidades de cliente
+
+            ## Multi-tenancy
+            O sistema suporta múltiplas barbearias isoladas.
+            Usuários AdminBarbearia e Barbeiro têm acesso restrito aos dados de suas barbearias.
+        ",
         Contact = new OpenApiContact
         {
             Name = "BarbApp Team",
-            Email = "support@barbapp.com"
+            Email = "support@barbapp.com",
+            Url = new Uri("https://barbapp.com")
+        },
+        License = new OpenApiLicense
+        {
+            Name = "MIT License",
+            Url = new Uri("https://opensource.org/licenses/MIT")
         }
     });
 
     // JWT Authentication
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
-        Description = "JWT Authorization header usando Bearer scheme. Exemplo: \"Bearer {token}\"",
+        Description = @"JWT Authorization header usando Bearer scheme.
+                      Digite 'Bearer' [espaço] e então seu token.
+                      Exemplo: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'",
         Name = "Authorization",
         In = ParameterLocation.Header,
         Type = SecuritySchemeType.ApiKey,
-        Scheme = "Bearer"
+        Scheme = "Bearer",
+        BearerFormat = "JWT"
     });
 
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
@@ -166,6 +198,12 @@ builder.Services.AddSwaggerGen(c =>
     var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
     c.IncludeXmlComments(xmlPath);
+
+    // Custom schema IDs
+    c.CustomSchemaIds(type => type.FullName);
+
+    // Add examples
+    c.SchemaFilter<SwaggerExamplesSchemaFilter>();
 });
 
 // ══════════════════════════════════════════════════════════
