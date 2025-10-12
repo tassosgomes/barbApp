@@ -183,7 +183,11 @@ public class AuthControllerIntegrationTests : IClassFixture<WebApplicationFactor
         {
             builder.ConfigureServices(services =>
             {
-                services.AddAuthentication("Test").AddScheme<AuthenticationSchemeOptions, TestAuthHandler>("Test", _ => { });
+                services.AddAuthentication(options =>
+                {
+                    options.DefaultAuthenticateScheme = "Test";
+                    options.DefaultChallengeScheme = "Test";
+                }).AddScheme<AuthenticationSchemeOptions, TestAuthHandler>("Test", _ => { });
                 services.AddSingleton(mockUseCase.Object);
             });
         }).CreateClient();
@@ -215,7 +219,11 @@ public class AuthControllerIntegrationTests : IClassFixture<WebApplicationFactor
         {
             builder.ConfigureServices(services =>
             {
-                services.AddAuthentication("Test").AddScheme<AuthenticationSchemeOptions, TestAuthHandler>("Test", _ => { });
+                services.AddAuthentication(options =>
+                {
+                    options.DefaultAuthenticateScheme = "Test";
+                    options.DefaultChallengeScheme = "Test";
+                }).AddScheme<AuthenticationSchemeOptions, TestAuthHandler>("Test", _ => { });
                 services.AddSingleton(mockUseCase.Object);
             });
         }).CreateClient();
