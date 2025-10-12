@@ -23,15 +23,27 @@ public class TenantMiddleware
         HttpContext context,
         ITenantContext tenantContext)
     {
+        _logger.LogInformation("TenantMiddleware: Starting for path {Path}", context.Request.Path);
+
         try
         {
             // Extrai informações do usuário autenticado
             if (context.User.Identity?.IsAuthenticated == true)
             {
+                _logger.LogInformation("TenantMiddleware: User is authenticated");
+
                 var userId = GetClaimValue(context, ClaimTypes.NameIdentifier);
                 var email = GetClaimValue(context, ClaimTypes.Email);
-                var userType = GetClaimValue(context, "user_type");
-                var barbeariaIdStr = GetClaimValue(context, "barbearia_id");
+                var userType = GetClaimValue(context, ClaimTypes.Role);
+                var barbeariaIdStr = GetClaimValue(context, "barbeariaId");
+
+                _logger.LogInformation(
+                    "TenantMiddleware: Claims - userId={UserId}, email={Email}, userType={UserType}, barbeariaIdStr={BarbeariaIdStr}",
+                    userId,
+                    email,
+                    userType,
+                    barbeariaIdStr
+                );
 
                 Guid? barbeariaId = null;
                 if (!string.IsNullOrEmpty(barbeariaIdStr) &&
@@ -43,6 +55,13 @@ public class TenantMiddleware
                 if (!string.IsNullOrEmpty(userId) &&
                     Guid.TryParse(userId, out var parsedUserId))
                 {
+                    _logger.LogInformation(
+                        "Setting tenant context: UserId={UserId}, Role={Role}, BarbeariaId={BarbeariaId}",
+                        parsedUserId,
+                        userType,
+                        barbeariaId
+                    );
+
                     tenantContext.SetContext(
                         parsedUserId.ToString(),
                         userType ?? string.Empty,
@@ -57,6 +76,20 @@ public class TenantMiddleware
                         barbeariaId
                     );
                 }
+                else
+                {
+                    _logger.LogWarning(
+                        "Failed to set tenant context: userId='{UserId}', parsedUserId={ParsedUserId}, userType='{UserType}', barbeariaId='{BarbeariaId}'",
+                        userId,
+                        Guid.TryParse(userId, out var _),
+                        userType,
+                        barbeariaId
+                    );
+                }
+            }
+            else
+            {
+                _logger.LogInformation("TenantMiddleware: User is not authenticated");
             }
 
             await _next(context);

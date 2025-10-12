@@ -5,22 +5,26 @@ using System.Text;
 using BarbApp.Application.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using BarbApp.Infrastructure.Middlewares;
 
 namespace BarbApp.Infrastructure.Services;
 
 public class JwtTokenGenerator : IJwtTokenGenerator
 {
-    private readonly IConfiguration _configuration;
+    private readonly JwtSettings _jwtSettings;
 
-    public JwtTokenGenerator(IConfiguration configuration)
+    public JwtTokenGenerator(JwtSettings jwtSettings)
     {
-        _configuration = configuration;
+        _jwtSettings = jwtSettings;
     }
 
     public JwtToken GenerateToken(string userId, string userType, string email, Guid? barbeariaId, string? barbeariaCode = null)
     {
         var securityKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(_configuration["Jwt:SecretKey"]!));
+            Encoding.UTF8.GetBytes(_jwtSettings.Secret))
+        {
+            KeyId = "test-key"
+        };
 
         var credentials = new SigningCredentials(
             securityKey,
@@ -44,8 +48,8 @@ public class JwtTokenGenerator : IJwtTokenGenerator
         }
 
         var token = new JwtSecurityToken(
-            issuer: _configuration["Jwt:Issuer"],
-            audience: _configuration["Jwt:Audience"],
+            issuer: _jwtSettings.Issuer,
+            audience: _jwtSettings.Audience,
             claims: claims,
             expires: DateTime.UtcNow.AddHours(24),
             signingCredentials: credentials
@@ -63,16 +67,19 @@ public class JwtTokenGenerator : IJwtTokenGenerator
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var securityKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(_configuration["Jwt:SecretKey"]!));
+                Encoding.UTF8.GetBytes(_jwtSettings.Secret))
+            {
+                KeyId = "test-key"
+            };
 
             var validationParameters = new TokenValidationParameters
             {
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = securityKey,
                 ValidateIssuer = true,
-                ValidIssuer = _configuration["Jwt:Issuer"],
+                ValidIssuer = _jwtSettings.Issuer,
                 ValidateAudience = true,
-                ValidAudience = _configuration["Jwt:Audience"],
+                ValidAudience = _jwtSettings.Audience,
                 ValidateLifetime = true,
                 ClockSkew = TimeSpan.Zero
             };
