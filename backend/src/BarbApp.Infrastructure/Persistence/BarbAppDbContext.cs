@@ -18,6 +18,7 @@ public class BarbAppDbContext : DbContext
     }
 
     public DbSet<Barbershop> Barbershops => Set<Barbershop>();
+    public DbSet<Address> Addresses => Set<Address>();
     public DbSet<AdminCentralUser> AdminCentralUsers => Set<AdminCentralUser>();
     public DbSet<AdminBarbeariaUser> AdminBarbeariaUsers => Set<AdminBarbeariaUser>();
     public DbSet<Barber> Barbers => Set<Barber>();

@@ -25,24 +25,46 @@ public class BarbershopConfiguration : IEntityTypeConfiguration<Barbershop>
             .IsRequired()
             .HasConversion(
                 v => v.Value,
-                v => BarbeariaCode.Create(v));
+                v => UniqueCode.Create(v));
 
-        builder.Property(b => b.Name)
-            .HasColumnName("name")
+        builder.Property(b => b.Document)
+            .HasColumnName("document")
+            .HasMaxLength(14)
+            .IsRequired()
+            .HasConversion(
+                v => v.Value,
+                v => Document.Create(v));
+
+        builder.Property(b => b.Phone)
+            .HasColumnName("phone")
+            .HasMaxLength(15)
+            .IsRequired();
+
+        builder.Property(b => b.OwnerName)
+            .HasColumnName("owner_name")
             .HasMaxLength(255)
             .IsRequired();
 
-        builder.Property(b => b.IsActive)
-            .HasColumnName("is_active")
+        builder.Property(b => b.Email)
+            .HasColumnName("email")
+            .HasMaxLength(255)
             .IsRequired();
 
-        builder.Property(b => b.CreatedAt)
-            .HasColumnName("created_at")
+        builder.Property(b => b.CreatedBy)
+            .HasColumnName("created_by")
+            .HasMaxLength(255)
             .IsRequired();
 
-        builder.Property(b => b.UpdatedAt)
-            .HasColumnName("updated_at")
+        builder.Property(b => b.UpdatedBy)
+            .HasColumnName("updated_by")
+            .HasMaxLength(255)
             .IsRequired();
+
+        // Address relationship
+        builder.HasOne(b => b.Address)
+            .WithOne()
+            .HasForeignKey<Barbershop>(b => b.AddressId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         // Índices
         builder.HasIndex(b => b.Code)

@@ -29,7 +29,7 @@ public class BarberRepositoryTests : IDisposable
     public async Task GetByTelefoneAndBarbeariaIdAsync_WhenBarberExists_ReturnsBarber()
     {
         // Arrange
-        var barbeariaCode = BarbeariaCode.Create("ABC23456");
+        var barbeariaCode = UniqueCode.Create("ABC23456");
         var barbearia = Barbershop.Create("Barbearia Teste", barbeariaCode);
         await _context.Barbershops.AddAsync(barbearia);
         await _context.SaveChangesAsync();
@@ -68,9 +68,9 @@ public class BarberRepositoryTests : IDisposable
     public async Task GetByTelefoneAndBarbeariaIdAsync_WhenBarberExistsInDifferentBarbearia_ReturnsNull()
     {
         // Arrange
-        var barbeariaCode1 = BarbeariaCode.Create("ABC23456");
+        var barbeariaCode1 = UniqueCode.Create("ABC23456");
         var barbearia1 = Barbershop.Create("Barbearia 1", barbeariaCode1);
-        var barbeariaCode2 = BarbeariaCode.Create("XYZ98765");
+        var barbeariaCode2 = UniqueCode.Create("XYZ98765");
         var barbearia2 = Barbershop.Create("Barbearia 2", barbeariaCode2);
         await _context.Barbershops.AddRangeAsync(barbearia1, barbearia2);
         await _context.SaveChangesAsync();
@@ -93,9 +93,9 @@ public class BarberRepositoryTests : IDisposable
     public async Task GetByBarbeariaIdAsync_ReturnsAllBarbersForBarbearia()
     {
         // Arrange
-        var barbeariaCode1 = BarbeariaCode.Create("ABC23456");
+        var barbeariaCode1 = UniqueCode.Create("ABC23456");
         var barbearia1 = Barbershop.Create("Barbearia 1", barbeariaCode1);
-        var barbeariaCode2 = BarbeariaCode.Create("XYZ98765");
+        var barbeariaCode2 = UniqueCode.Create("XYZ98765");
         var barbearia2 = Barbershop.Create("Barbearia 2", barbeariaCode2);
         await _context.Barbershops.AddRangeAsync(barbearia1, barbearia2);
         await _context.SaveChangesAsync();
@@ -138,7 +138,7 @@ public class BarberRepositoryTests : IDisposable
     public async Task AddAsync_AddsBarberToDatabase()
     {
         // Arrange
-        var barbeariaCode = BarbeariaCode.Create("DEF67892");
+        var barbeariaCode = UniqueCode.Create("DEF67892");
         var barbearia = Barbershop.Create("Barbearia Nova", barbeariaCode);
         await _context.Barbershops.AddAsync(barbearia);
         await _context.SaveChangesAsync();

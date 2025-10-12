@@ -39,7 +39,7 @@ public class CustomerRepositoryTests : IDisposable
         // Arrange
         var telefone = "11999999999";
         var barbeariaId = Guid.NewGuid();
-        var code = BarbeariaCode.Create("ABCDEFGH");
+        var code = UniqueCode.Create("ABCDEFGH");
         var barbershop = Barbershop.Create("Barbearia Test", code);
         barbershop.GetType().GetProperty("Id")?.SetValue(barbershop, barbeariaId);
 

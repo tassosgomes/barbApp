@@ -47,7 +47,7 @@ public class GlobalExceptionHandlerMiddleware
         {
             UnauthorizedException => (HttpStatusCode.Unauthorized, exception.Message),
             Domain.Exceptions.UnauthorizedAccessException => (HttpStatusCode.Unauthorized, exception.Message),
-            Domain.Exceptions.InvalidBarbeariaCodeException => (HttpStatusCode.Unauthorized, "Código da barbearia inválido"),
+            Domain.Exceptions.InvalidUniqueCodeException => (HttpStatusCode.Unauthorized, "Código da barbearia inválido"),
             ForbiddenException => (HttpStatusCode.Forbidden, exception.Message),
             NotFoundException => (HttpStatusCode.NotFound, exception.Message),
             FluentValidation.ValidationException => (HttpStatusCode.BadRequest, exception.Message),

@@ -8,13 +8,13 @@ namespace BarbApp.Application.DTOs;
 /// <param name="Name">Nome do usuário autenticado</param>
 /// <param name="Role">Papel do usuário (AdminCentral, AdminBarbearia, Barbeiro, Cliente)</param>
 /// <param name="BarbeariaId">ID da barbearia (null para AdminCentral)</param>
-/// <param name="BarbeariaCode">Código da barbearia (null para AdminCentral)</param>
+/// <param name="UniqueCode">Código da barbearia (null para AdminCentral)</param>
 /// <param name="BarbeariaNome">Nome da barbearia (null para AdminCentral)</param>
 public record AuthenticationOutput(
     string UserId,
     string Name,
     string Role,
     Guid? BarbeariaId,
-    string? BarbeariaCode,
+    string? UniqueCode,
     string? BarbeariaNome
 );

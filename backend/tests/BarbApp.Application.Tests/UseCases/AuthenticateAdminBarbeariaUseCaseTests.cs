@@ -44,8 +44,19 @@ public class AuthenticateAdminBarbeariaUseCaseTests
             Senha = "password123"
         };
 
-        var barbeariaCode = BarbeariaCode.Create("ABC23456");
-        var barbearia = Barbershop.Create("Barbearia Teste", barbeariaCode);
+        var document = Document.Create("12345678000190");
+        var address = Address.Create("01310100", "Av. Paulista", "1000", null, "Bela Vista", "São Paulo", "SP");
+        var code = UniqueCode.Create("ABC23456");
+        var barbearia = Barbershop.Create(
+            "Barbearia Teste",
+            document,
+            "11987654321",
+            "João Silva",
+            "joao@test.com",
+            address,
+            code,
+            "admin-user-id"
+        );
         var user = AdminBarbeariaUser.Create(barbearia.Id, "admin@barbearia.com", "hashedpassword", "Admin Barbearia");
 
         _barbershopRepoMock
@@ -94,7 +105,7 @@ public class AuthenticateAdminBarbeariaUseCaseTests
     }
 
     [Fact]
-    public async Task Execute_InvalidBarbeariaCode_ShouldThrowUnauthorizedAccessException()
+    public async Task Execute_InvalidUniqueCode_ShouldThrowUnauthorizedAccessException()
     {
         // Arrange
         var input = new LoginAdminBarbeariaInput
@@ -132,10 +143,20 @@ public class AuthenticateAdminBarbeariaUseCaseTests
             Senha = "password123"
         };
 
-        var barbeariaCode = BarbeariaCode.Create("ABC23456");
-        var barbearia = Barbershop.Create("Barbearia Teste", barbeariaCode);
-        // Make barbearia inactive by setting IsActive to false
-        typeof(Barbershop).GetProperty("IsActive")!.SetValue(barbearia, false);
+        var document = Document.Create("12345678000190");
+        var address = Address.Create("01310100", "Av. Paulista", "1000", null, "Bela Vista", "São Paulo", "SP");
+        var code = UniqueCode.Create("ABC23456");
+        var barbearia = Barbershop.Create(
+            "Barbearia Teste",
+            document,
+            "11987654321",
+            "João Silva",
+            "joao@test.com",
+            address,
+            code,
+            "admin-user-id"
+        );
+        barbearia.Deactivate(); // Make barbearia inactive
 
         _barbershopRepoMock
             .Setup(x => x.GetByCodeAsync(input.Codigo, It.IsAny<CancellationToken>()))
@@ -163,8 +184,19 @@ public class AuthenticateAdminBarbeariaUseCaseTests
             Senha = "password123"
         };
 
-        var barbeariaCode = BarbeariaCode.Create("ABC23456");
-        var barbearia = Barbershop.Create("Barbearia Teste", barbeariaCode);
+        var document = Document.Create("12345678000190");
+        var address = Address.Create("01310100", "Av. Paulista", "1000", null, "Bela Vista", "São Paulo", "SP");
+        var code = UniqueCode.Create("ABC23456");
+        var barbearia = Barbershop.Create(
+            "Barbearia Teste",
+            document,
+            "11987654321",
+            "João Silva",
+            "joao@test.com",
+            address,
+            code,
+            "admin-user-id"
+        );
 
         _barbershopRepoMock
             .Setup(x => x.GetByCodeAsync(input.Codigo, It.IsAny<CancellationToken>()))
@@ -198,8 +230,19 @@ public class AuthenticateAdminBarbeariaUseCaseTests
             Senha = "wrongpassword"
         };
 
-        var barbeariaCode = BarbeariaCode.Create("ABC23456");
-        var barbearia = Barbershop.Create("Barbearia Teste", barbeariaCode);
+        var document = Document.Create("12345678000190");
+        var address = Address.Create("01310100", "Av. Paulista", "1000", null, "Bela Vista", "São Paulo", "SP");
+        var code = UniqueCode.Create("ABC23456");
+        var barbearia = Barbershop.Create(
+            "Barbearia Teste",
+            document,
+            "11987654321",
+            "João Silva",
+            "joao@test.com",
+            address,
+            code,
+            "admin-user-id"
+        );
         var user = AdminBarbeariaUser.Create(barbearia.Id, "admin@barbearia.com", "hashedpassword", "Admin Barbearia");
 
         _barbershopRepoMock

@@ -19,11 +19,10 @@ public class BarbershopRepository : IBarbershopRepository
     {
         try
         {
-            var barbeariaCode = BarbApp.Domain.ValueObjects.BarbeariaCode.Create(code);
             return await _context.Barbershops
-                .FirstOrDefaultAsync(b => b.Code == barbeariaCode, cancellationToken);
+                .FirstOrDefaultAsync(b => b.Code.Value == code, cancellationToken);
         }
-        catch (BarbApp.Domain.Exceptions.InvalidBarbeariaCodeException)
+        catch (Exception)
         {
             return null;
         }

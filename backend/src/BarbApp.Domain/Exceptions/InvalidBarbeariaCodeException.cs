@@ -1,10 +1,10 @@
-// BarbApp.Domain/Exceptions/InvalidBarbeariaCodeException.cs
+// BarbApp.Domain/Exceptions/InvalidUniqueCodeException.cs
 using BarbApp.Domain.Exceptions;
 
 namespace BarbApp.Domain.Exceptions;
 
-public class InvalidBarbeariaCodeException : DomainException
+public class InvalidUniqueCodeException : DomainException
 {
-    public InvalidBarbeariaCodeException(string message)
+    public InvalidUniqueCodeException(string message)
         : base(message) { }
 }

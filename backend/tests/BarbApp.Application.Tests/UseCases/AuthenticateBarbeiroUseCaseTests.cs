@@ -40,7 +40,7 @@ public class AuthenticateBarbeiroUseCaseTests
             Telefone = "11987654321"
         };
 
-        var barbeariaCode = BarbeariaCode.Create("ABC23456");
+        var barbeariaCode = UniqueCode.Create("ABC23456");
         var barbearia = Barbershop.Create("Barbearia Teste", barbeariaCode);
         var barber = Barber.Create(barbearia.Id, "11987654321", "João Silva");
 
@@ -85,7 +85,7 @@ public class AuthenticateBarbeiroUseCaseTests
     }
 
     [Fact]
-    public async Task Execute_InvalidBarbeariaCode_ShouldThrowUnauthorizedAccessException()
+    public async Task Execute_InvalidUniqueCode_ShouldThrowUnauthorizedAccessException()
     {
         // Arrange
         var input = new LoginBarbeiroInput
@@ -120,7 +120,7 @@ public class AuthenticateBarbeiroUseCaseTests
             Telefone = "11987654321"
         };
 
-        var barbeariaCode = BarbeariaCode.Create("ABC23456");
+        var barbeariaCode = UniqueCode.Create("ABC23456");
         var barbearia = Barbershop.Create("Barbearia Teste", barbeariaCode);
 
         _barbershopRepoMock

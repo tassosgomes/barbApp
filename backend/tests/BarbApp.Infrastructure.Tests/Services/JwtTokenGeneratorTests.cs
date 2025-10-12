@@ -64,7 +64,7 @@ public class JwtTokenGeneratorTests
         claims!.UserId.Should().Be(userId);
         claims.Role.Should().Be(userType);
         claims.BarbeariaId.Should().BeNull();
-        claims.BarbeariaCode.Should().BeNull();
+        claims.UniqueCode.Should().BeNull();
     }
 
     [Fact]
@@ -87,7 +87,7 @@ public class JwtTokenGeneratorTests
         claims!.UserId.Should().Be(userId);
         claims.Role.Should().Be(userType);
         claims.BarbeariaId.Should().Be(barbeariaId);
-        claims.BarbeariaCode.Should().Be(barbeariaCode);
+        claims.UniqueCode.Should().Be(barbeariaCode);
     }
 
     [Fact]

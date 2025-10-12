@@ -16,7 +16,7 @@ public class TenantContextTests
 
         // Act & Assert
         context.BarbeariaId.Should().BeNull();
-        context.BarbeariaCode.Should().BeNull();
+        context.UniqueCode.Should().BeNull();
         context.IsAdminCentral.Should().BeTrue(); // Empty code means admin central
         context.UserId.Should().BeEmpty();
         context.Role.Should().BeEmpty();
@@ -37,7 +37,7 @@ public class TenantContextTests
 
         // Assert
         context.BarbeariaId.Should().Be(barbeariaId);
-        context.BarbeariaCode.Should().Be(barbeariaCode);
+        context.UniqueCode.Should().Be(barbeariaCode);
         context.IsAdminCentral.Should().BeFalse();
         context.UserId.Should().Be(userId);
         context.Role.Should().Be(role);
@@ -56,7 +56,7 @@ public class TenantContextTests
 
         // Assert
         context.BarbeariaId.Should().BeNull();
-        context.BarbeariaCode.Should().BeNull();
+        context.UniqueCode.Should().BeNull();
         context.IsAdminCentral.Should().BeTrue();
         context.UserId.Should().Be(userId);
         context.Role.Should().Be(role);
@@ -74,7 +74,7 @@ public class TenantContextTests
 
         // Assert
         context.BarbeariaId.Should().BeNull();
-        context.BarbeariaCode.Should().BeNull();
+        context.UniqueCode.Should().BeNull();
         context.IsAdminCentral.Should().BeTrue();
         context.UserId.Should().BeEmpty();
         context.Role.Should().BeEmpty();

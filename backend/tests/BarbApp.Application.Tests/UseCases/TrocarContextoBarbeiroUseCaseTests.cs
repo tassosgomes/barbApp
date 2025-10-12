@@ -44,7 +44,7 @@ public class TrocarContextoBarbeiroUseCaseTests
         var currentRole = "Barbeiro";
         var telefone = userId;
 
-        var barbeariaCode = BarbeariaCode.Create("XYZ98765");
+        var barbeariaCode = UniqueCode.Create("XYZ98765");
         var newBarbearia = Barbershop.Create("Nova Barbearia", barbeariaCode);
         var barber = Barber.Create(input.NovaBarbeariaId, telefone, "João Silva");
 
