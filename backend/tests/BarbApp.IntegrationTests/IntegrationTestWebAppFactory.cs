@@ -29,13 +29,13 @@ public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>, IAsy
         builder.ConfigureAppConfiguration((context, config) =>
         {
             // Configure JWT settings for testing
-            config.AddInMemoryCollection(new Dictionary<string, string>
+            config.AddInMemoryCollection(new Dictionary<string, string?>
             {
                 ["JwtSettings:Secret"] = "test-secret-key-at-least-32-characters-long-for-jwt",
                 ["JwtSettings:Issuer"] = "BarbApp-Test",
                 ["JwtSettings:Audience"] = "BarbApp-Test-Users",
                 ["JwtSettings:ExpirationMinutes"] = "60"
-            });
+            }!);
         });
 
         builder.ConfigureServices(services =>

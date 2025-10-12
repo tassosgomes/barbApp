@@ -13,7 +13,6 @@ public class AdminCentralUserRepositoryTests : IDisposable
 {
     private readonly TestBarbAppDbContext _context;
     private readonly AdminCentralUserRepository _repository;
-    private readonly Mock<ITenantContext> _tenantContextMock;
 
     public AdminCentralUserRepositoryTests()
     {
