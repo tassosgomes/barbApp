@@ -14,7 +14,6 @@ public class AdminBarbeariaUserRepositoryTests : IDisposable
 {
     private readonly TestBarbAppDbContext _context;
     private readonly AdminBarbeariaUserRepository _repository;
-    private readonly Mock<ITenantContext> _tenantContextMock;
 
     public AdminBarbeariaUserRepositoryTests()
     {
