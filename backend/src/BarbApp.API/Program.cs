@@ -35,19 +35,10 @@ builder.Host.UseSerilog();
 // ══════════════════════════════════════════════════════════
 builder.Services.AddDbContext<BarbAppDbContext>(options =>
 {
-    // Use in-memory database for integration tests
-    if (builder.Environment.EnvironmentName.Contains("Test") ||
-        AppDomain.CurrentDomain.GetAssemblies().Any(a => a.FullName?.Contains("Test") == true))
-    {
-        options.UseInMemoryDatabase("TestDb");
-    }
-    else
-    {
-        options.UseNpgsql(
-            builder.Configuration.GetConnectionString("DefaultConnection"),
-            npgsqlOptions => npgsqlOptions.MigrationsAssembly("BarbApp.Infrastructure")
-        );
-    }
+    options.UseNpgsql(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        npgsqlOptions => npgsqlOptions.MigrationsAssembly("BarbApp.Infrastructure")
+    );
 
     if (builder.Environment.IsDevelopment())
     {

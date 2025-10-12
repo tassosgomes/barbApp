@@ -40,15 +40,23 @@ public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>, IAsy
 
         builder.ConfigureServices(services =>
         {
-            // Remove existing DbContext
-            var descriptor = services.SingleOrDefault(
+            // Remove existing DbContext registration
+            var dbContextDescriptor = services.SingleOrDefault(
                 d => d.ServiceType == typeof(DbContextOptions<BarbAppDbContext>));
-            if (descriptor != null)
+            if (dbContextDescriptor != null)
             {
-                services.Remove(descriptor);
+                services.Remove(dbContextDescriptor);
             }
 
-            // Add test DbContext
+            // Remove any existing DbContext registration by implementation type
+            var dbContextServiceDescriptor = services.SingleOrDefault(
+                d => d.ServiceType == typeof(BarbAppDbContext));
+            if (dbContextServiceDescriptor != null)
+            {
+                services.Remove(dbContextServiceDescriptor);
+            }
+
+            // Add test DbContext with PostgreSQL
             services.AddDbContext<BarbAppDbContext>(options =>
             {
                 options.UseNpgsql(_dbContainer.GetConnectionString());
