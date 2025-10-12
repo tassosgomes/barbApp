@@ -1,0 +1,90 @@
+Summary
+  Generated on: 10/12/2025 - 09:53:07
+  Coverage date: 10/12/2025 - 09:51:51 - 10/12/2025 - 09:52:21
+  Parser: MultiReport (4x Cobertura)
+  Assemblies: 4
+  Classes: 62
+  Files: 58
+  Line coverage: 79.6%
+  Covered lines: 1726
+  Uncovered lines: 442
+  Coverable lines: 2168
+  Total lines: 3465
+  Branch coverage: 83.6% (164 of 196)
+  Covered branches: 164
+  Total branches: 196
+  Method coverage: 89% (188 of 211)
+  Full method coverage: 86.2% (182 of 211)
+  Covered methods: 188
+  Fully covered methods: 182
+  Total methods: 211
+
+BarbApp.API                                                                           75.4%
+  BarbApp.API.Controllers.AuthController                                               100%
+  BarbApp.API.Extensions.ValidationConfiguration                                       100%
+  BarbApp.API.Filters.SwaggerExamplesSchemaFilter                                        0%
+  Program                                                                             93.7%
+  WeatherForecast                                                                      100%
+
+BarbApp.Application                                                                   94.8%
+  BarbApp.Application.DTOs.AuthenticationOutput                                          0%
+  BarbApp.Application.DTOs.AuthResponse                                               83.3%
+  BarbApp.Application.DTOs.BarberInfo                                                 83.3%
+  BarbApp.Application.DTOs.LoginAdminBarbeariaInput                                     75%
+  BarbApp.Application.DTOs.LoginAdminCentralInput                                     66.6%
+  BarbApp.Application.DTOs.LoginBarbeiroInput                                         66.6%
+  BarbApp.Application.DTOs.LoginClienteInput                                            75%
+  BarbApp.Application.DTOs.TrocarContextoInput                                          50%
+  BarbApp.Application.Interfaces.JwtToken                                              100%
+  BarbApp.Application.Interfaces.TokenClaims                                           100%
+  BarbApp.Application.UseCases.AuthenticateAdminBarbeariaUseCase                       100%
+  BarbApp.Application.UseCases.AuthenticateAdminCentralUseCase                         100%
+  BarbApp.Application.UseCases.AuthenticateBarbeiroUseCase                             100%
+  BarbApp.Application.UseCases.AuthenticateClienteUseCase                              100%
+  BarbApp.Application.UseCases.ListBarbeirosBarbeariaUseCase                           100%
+  BarbApp.Application.UseCases.TrocarContextoBarbeiroUseCase                           100%
+  BarbApp.Application.Validators.LoginAdminBarbeariaInputValidator                     100%
+  BarbApp.Application.Validators.LoginAdminCentralInputValidator                       100%
+  BarbApp.Application.Validators.LoginBarbeiroInputValidator                           100%
+  BarbApp.Application.Validators.LoginClienteInputValidator                            100%
+  BarbApp.Application.Validators.TrocarContextoInputValidator                          100%
+
+BarbApp.Domain                                                                        97.8%
+  BarbApp.Domain.Entities.AdminBarbeariaUser                                           100%
+  BarbApp.Domain.Entities.AdminCentralUser                                             100%
+  BarbApp.Domain.Entities.Barber                                                       100%
+  BarbApp.Domain.Entities.Barbershop                                                  95.6%
+  BarbApp.Domain.Entities.Customer                                                     100%
+  BarbApp.Domain.Exceptions.BarbeariaInactiveException                                   0%
+  BarbApp.Domain.Exceptions.DomainException                                            100%
+  BarbApp.Domain.Exceptions.ForbiddenException                                         100%
+  BarbApp.Domain.Exceptions.InvalidBarbeariaCodeException                              100%
+  BarbApp.Domain.Exceptions.NotFoundException                                          100%
+  BarbApp.Domain.Exceptions.UnauthorizedAccessException                                100%
+  BarbApp.Domain.Exceptions.UnauthorizedException                                      100%
+  BarbApp.Domain.Exceptions.ValidationException                                          0%
+  BarbApp.Domain.ValueObjects.BarbeariaCode                                           94.4%
+
+BarbApp.Infrastructure                                                                74.8%
+  BarbApp.Infrastructure.Middlewares.AuthenticationConfiguration                        95%
+  BarbApp.Infrastructure.Middlewares.ErrorResponse                                      75%
+  BarbApp.Infrastructure.Middlewares.GlobalExceptionHandlerMiddleware                 97.6%
+  BarbApp.Infrastructure.Middlewares.JwtSettings                                       100%
+  BarbApp.Infrastructure.Middlewares.MiddlewareExtensions                              100%
+  BarbApp.Infrastructure.Middlewares.TenantMiddleware                                   88%
+  BarbApp.Infrastructure.Migrations.AddUserEntities                                   97.4%
+  BarbApp.Infrastructure.Migrations.BarbAppDbContextModelSnapshot                        0%
+  BarbApp.Infrastructure.Persistence.BarbAppDbContext                                  100%
+  BarbApp.Infrastructure.Persistence.Configurations.AdminBarbeariaUserConfiguration    100%
+  BarbApp.Infrastructure.Persistence.Configurations.AdminCentralUserConfiguration      100%
+  BarbApp.Infrastructure.Persistence.Configurations.BarberConfiguration                100%
+  BarbApp.Infrastructure.Persistence.Configurations.BarbershopConfiguration            100%
+  BarbApp.Infrastructure.Persistence.Configurations.CustomerConfiguration              100%
+  BarbApp.Infrastructure.Persistence.Repositories.AdminBarbeariaUserRepository         100%
+  BarbApp.Infrastructure.Persistence.Repositories.AdminCentralUserRepository           100%
+  BarbApp.Infrastructure.Persistence.Repositories.BarberRepository                     100%
+  BarbApp.Infrastructure.Persistence.Repositories.BarbershopRepository                  59%
+  BarbApp.Infrastructure.Persistence.Repositories.CustomerRepository                   100%
+  BarbApp.Infrastructure.Services.JwtTokenGenerator                                    100%
+  BarbApp.Infrastructure.Services.PasswordHasher                                        88%
+  BarbApp.Infrastructure.Services.TenantContext                                        100%

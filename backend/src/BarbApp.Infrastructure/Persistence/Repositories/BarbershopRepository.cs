@@ -1,6 +1,7 @@
 // BarbApp.Infrastructure/Persistence/Repositories/BarbershopRepository.cs
 using BarbApp.Domain.Entities;
 using BarbApp.Domain.Interfaces.Repositories;
+using BarbApp.Domain.Exceptions;
 using Microsoft.EntityFrameworkCore;
 
 namespace BarbApp.Infrastructure.Persistence.Repositories;
@@ -16,8 +17,16 @@ public class BarbershopRepository : IBarbershopRepository
 
     public async Task<Barbershop?> GetByCodeAsync(string code, CancellationToken cancellationToken = default)
     {
-        return await _context.Barbershops
-            .FirstOrDefaultAsync(b => b.Code.Value == code, cancellationToken);
+        try
+        {
+            var barbeariaCode = BarbApp.Domain.ValueObjects.BarbeariaCode.Create(code);
+            return await _context.Barbershops
+                .FirstOrDefaultAsync(b => b.Code == barbeariaCode, cancellationToken);
+        }
+        catch (BarbApp.Domain.Exceptions.InvalidBarbeariaCodeException)
+        {
+            return null;
+        }
     }
 
     public async Task<Barbershop?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)

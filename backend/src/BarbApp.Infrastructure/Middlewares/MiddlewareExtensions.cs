@@ -49,7 +49,10 @@ public static class AuthenticationConfiguration
             {
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new SymmetricSecurityKey(
-                    Encoding.UTF8.GetBytes(jwtSettings!.Secret)),
+                    Encoding.UTF8.GetBytes(jwtSettings!.Secret))
+                {
+                    KeyId = "test-key"
+                },
                 ValidateIssuer = true,
                 ValidIssuer = jwtSettings.Issuer,
                 ValidateAudience = true,
@@ -62,6 +65,8 @@ public static class AuthenticationConfiguration
             {
                 OnAuthenticationFailed = context =>
                 {
+                    // Add logging for debugging
+                    Console.WriteLine($"JWT Authentication failed: {context.Exception.Message}");
                     if (context.Exception is SecurityTokenExpiredException)
                     {
                         context.Response.Headers["Token-Expired"] = "true";
@@ -70,6 +75,7 @@ public static class AuthenticationConfiguration
                 },
                 OnChallenge = context =>
                 {
+                    Console.WriteLine($"JWT Challenge triggered: {context.AuthenticateFailure?.Message ?? "No failure details"}");
                     context.HandleResponse();
                     context.Response.StatusCode = StatusCodes.Status401Unauthorized;
                     context.Response.ContentType = "application/json";

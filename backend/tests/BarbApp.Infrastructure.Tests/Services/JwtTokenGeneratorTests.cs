@@ -1,6 +1,7 @@
 // BarbApp.Infrastructure.Tests/Services/JwtTokenGeneratorTests.cs
 using BarbApp.Application.Interfaces;
 using BarbApp.Infrastructure.Services;
+using BarbApp.Infrastructure.Middlewares;
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 using Xunit;
@@ -9,23 +10,19 @@ namespace BarbApp.Infrastructure.Tests.Services;
 
 public class JwtTokenGeneratorTests
 {
-    private readonly IConfiguration _configuration;
-    private readonly JwtTokenGenerator _generator;
+    private readonly IJwtTokenGenerator _generator;
 
     public JwtTokenGeneratorTests()
     {
-        var inMemorySettings = new Dictionary<string, string>
+        var jwtSettings = new JwtSettings
         {
-            {"Jwt:SecretKey", "my-super-secret-key-with-at-least-32-characters-for-security"},
-            {"Jwt:Issuer", "barbapp"},
-            {"Jwt:Audience", "barbapp-api"}
+            Secret = "my-super-secret-key-with-at-least-32-characters-for-security",
+            Issuer = "barbapp",
+            Audience = "barbapp-api",
+            ExpirationMinutes = 60
         };
 
-        _configuration = new ConfigurationBuilder()
-            .AddInMemoryCollection(inMemorySettings!)
-            .Build();
-
-        _generator = new JwtTokenGenerator(_configuration);
+        _generator = new JwtTokenGenerator(jwtSettings);
     }
 
     [Fact]
@@ -110,18 +107,15 @@ public class JwtTokenGeneratorTests
     public void Validate_ExpiredToken_ShouldReturnNull()
     {
         // Arrange - Create token that expires immediately
-        var inMemorySettings = new Dictionary<string, string>
+        var jwtSettings = new JwtSettings
         {
-            {"Jwt:SecretKey", "my-super-secret-key-with-at-least-32-characters-for-security"},
-            {"Jwt:Issuer", "barbapp"},
-            {"Jwt:Audience", "barbapp-api"}
+            Secret = "my-super-secret-key-with-at-least-32-characters-for-security",
+            Issuer = "barbapp",
+            Audience = "barbapp-api",
+            ExpirationMinutes = 60
         };
 
-        var config = new ConfigurationBuilder()
-            .AddInMemoryCollection(inMemorySettings!)
-            .Build();
-
-        var generator = new JwtTokenGenerator(config);
+        var generator = new JwtTokenGenerator(jwtSettings);
         var userId = Guid.NewGuid().ToString();
 
         // Manually create expired token by mocking time or using short expiration

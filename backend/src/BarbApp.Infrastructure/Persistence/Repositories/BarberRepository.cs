@@ -27,6 +27,7 @@ public class BarberRepository : IBarberRepository
     public async Task<IEnumerable<Barber>> GetByBarbeariaIdAsync(Guid barbeariaId, CancellationToken cancellationToken = default)
     {
         return await _context.Barbers
+            .Include(b => b.Barbearia)
             .Where(b => b.BarbeariaId == barbeariaId)
             .ToListAsync(cancellationToken);
     }
