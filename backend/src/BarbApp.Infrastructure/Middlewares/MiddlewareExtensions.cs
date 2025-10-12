@@ -32,13 +32,11 @@ public static class AuthenticationConfiguration
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        var jwtSettings = new JwtSettings
-        {
-            Secret = configuration["Jwt:SecretKey"] ?? throw new InvalidOperationException("Jwt:SecretKey not found"),
-            Issuer = configuration["Jwt:Issuer"] ?? throw new InvalidOperationException("Jwt:Issuer not found"),
-            Audience = configuration["Jwt:Audience"] ?? throw new InvalidOperationException("Jwt:Audience not found"),
-            ExpirationMinutes = 24 * 60 // 24 hours in minutes
-        };
+        var jwtSettings = configuration
+            .GetSection("JwtSettings")
+            .Get<JwtSettings>();
+
+        services.AddSingleton(jwtSettings!);
 
         services.AddAuthentication(options =>
         {
@@ -51,7 +49,7 @@ public static class AuthenticationConfiguration
             {
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new SymmetricSecurityKey(
-                    Encoding.UTF8.GetBytes(jwtSettings.Secret)),
+                    Encoding.UTF8.GetBytes(jwtSettings!.Secret)),
                 ValidateIssuer = true,
                 ValidIssuer = jwtSettings.Issuer,
                 ValidateAudience = true,
