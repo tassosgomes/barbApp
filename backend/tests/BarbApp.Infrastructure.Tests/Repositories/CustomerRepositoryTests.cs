@@ -25,12 +25,19 @@ public class CustomerRepositoryTests : IDisposable
         _repository = new CustomerRepository(_context);
     }
 
+    private static Barbershop CreateTestBarbershop(string name, UniqueCode code)
+    {
+        var document = Document.Create("12345678000190");
+        var address = Address.Create("01310100", "Av. Paulista", "1000", null, "Bela Vista", "São Paulo", "SP");
+        return Barbershop.Create(name, document, "11987654321", "Test Owner", "test@test.com", address, code, "test-user");
+    }
+
     [Fact]
     public async Task GetByTelefoneAndBarbeariaIdAsync_WhenCustomerExists_ReturnsCustomer()
     {
         // Arrange
         var barbeariaCode = UniqueCode.Create("ABC23456");
-        var barbearia = Barbershop.Create("Barbearia Teste", barbeariaCode);
+        var barbearia = CreateTestBarbershop("Barbearia Teste", barbeariaCode);
         await _context.Barbershops.AddAsync(barbearia);
         await _context.SaveChangesAsync();
 
@@ -69,9 +76,9 @@ public class CustomerRepositoryTests : IDisposable
     {
         // Arrange
         var barbeariaCode1 = UniqueCode.Create("ABC23456");
-        var barbearia1 = Barbershop.Create("Barbearia 1", barbeariaCode1);
+        var barbearia1 = CreateTestBarbershop("Barbearia 1", barbeariaCode1);
         var barbeariaCode2 = UniqueCode.Create("XYZ98765");
-        var barbearia2 = Barbershop.Create("Barbearia 2", barbeariaCode2);
+        var barbearia2 = CreateTestBarbershop("Barbearia 2", barbeariaCode2);
         await _context.Barbershops.AddRangeAsync(barbearia1, barbearia2);
         await _context.SaveChangesAsync();
 
@@ -94,7 +101,7 @@ public class CustomerRepositoryTests : IDisposable
     {
         // Arrange
         var barbeariaCode = UniqueCode.Create("DEF67892");
-        var barbearia = Barbershop.Create("Barbearia Nova", barbeariaCode);
+        var barbearia = CreateTestBarbershop("Barbearia Nova", barbeariaCode);
         await _context.Barbershops.AddAsync(barbearia);
         await _context.SaveChangesAsync();
 

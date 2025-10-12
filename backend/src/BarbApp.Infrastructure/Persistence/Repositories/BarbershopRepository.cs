@@ -18,23 +18,37 @@ public class BarbershopRepository : IBarbershopRepository
 
     public async Task<Barbershop?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
-        return await _context.Barbershops.FindAsync(new object[] { id }, cancellationToken);
+        return await _context.Barbershops
+            .Include(b => b.Address)
+            .FirstOrDefaultAsync(b => b.Id == id, cancellationToken);
     }
 
     public async Task<Barbershop?> GetByCodeAsync(string code, CancellationToken cancellationToken)
     {
-        return await _context.Barbershops.FirstOrDefaultAsync(b => b.Code.Value == code, cancellationToken);
+        return await _context.Barbershops
+            .Include(b => b.Address)
+            .FirstOrDefaultAsync(b => b.Code.Value == code, cancellationToken);
     }
 
     public async Task<Barbershop?> GetByDocumentAsync(string document, CancellationToken cancellationToken)
     {
-        return await _context.Barbershops.FirstOrDefaultAsync(b => b.Document.Value == document, cancellationToken);
+        return await _context.Barbershops
+            .Include(b => b.Address)
+            .FirstOrDefaultAsync(b => b.Document.Value == document, cancellationToken);
     }
 
     public async Task<PaginatedResult<Barbershop>> ListAsync(
         int page, int pageSize, string? searchTerm, bool? isActive, string? sortBy, CancellationToken cancellationToken)
     {
-        var query = _context.Barbershops.AsQueryable();
+        if (page < 1)
+            throw new ArgumentException("Page must be >= 1", nameof(page));
+
+        if (pageSize < 1 || pageSize > 100)
+            throw new ArgumentException("PageSize must be between 1 and 100", nameof(pageSize));
+
+        var query = _context.Barbershops
+            .Include(b => b.Address)
+            .AsQueryable();
 
         if (isActive.HasValue)
         {

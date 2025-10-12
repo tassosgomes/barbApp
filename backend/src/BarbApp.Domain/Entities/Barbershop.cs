@@ -53,6 +53,7 @@ namespace BarbApp.Domain.Entities
                 OwnerName = ownerName,
                 Email = email,
                 Address = address,
+                AddressId = address.Id,
                 Code = code,
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow,
@@ -76,6 +77,7 @@ namespace BarbApp.Domain.Entities
             OwnerName = ownerName;
             Email = email;
             Address = address;
+            AddressId = address.Id;
             UpdatedAt = DateTime.UtcNow;
             UpdatedBy = updatedBy;
         }

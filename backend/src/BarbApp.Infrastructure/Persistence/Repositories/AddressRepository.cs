@@ -20,11 +20,9 @@ namespace BarbApp.Infrastructure.Persistence.Repositories
             return await _context.Addresses.FindAsync(new object[] { id }, cancellationToken);
         }
 
-        public async Task<Address> AddAsync(Address address, CancellationToken cancellationToken = default)
+        public async Task AddAsync(Address address, CancellationToken cancellationToken = default)
         {
             await _context.Addresses.AddAsync(address, cancellationToken);
-            await _context.SaveChangesAsync(cancellationToken);
-            return address;
         }
     }
 }

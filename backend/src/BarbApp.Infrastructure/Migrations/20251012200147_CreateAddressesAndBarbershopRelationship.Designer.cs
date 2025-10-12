@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BarbApp.Infrastructure.Migrations
 {
     [DbContext(typeof(BarbAppDbContext))]
-    [Migration("20251012194255_Task2InfrastructureDataComplete")]
-    partial class Task2InfrastructureDataComplete
+    [Migration("20251012200147_CreateAddressesAndBarbershopRelationship")]
+    partial class CreateAddressesAndBarbershopRelationship
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -42,6 +42,10 @@ namespace BarbApp.Infrastructure.Migrations
                         .HasColumnType("character varying(255)")
                         .HasColumnName("complement");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
                     b.Property<string>("Neighborhood")
                         .IsRequired()
                         .HasMaxLength(255)
@@ -66,6 +70,10 @@ namespace BarbApp.Infrastructure.Migrations
                         .HasColumnType("character varying(255)")
                         .HasColumnName("street");
 
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
                     b.Property<string>("ZipCode")
                         .IsRequired()
                         .HasMaxLength(10)
@@ -87,9 +95,6 @@ namespace BarbApp.Infrastructure.Migrations
                     b.Property<Guid>("BarbeariaId")
                         .HasColumnType("uuid")
                         .HasColumnName("barbearia_id");
-
-                    b.Property<Guid>("BarbeariaId1")
-                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -124,8 +129,6 @@ namespace BarbApp.Infrastructure.Migrations
 
                     b.HasIndex("BarbeariaId")
                         .HasDatabaseName("ix_admin_barbearia_users_barbearia_id");
-
-                    b.HasIndex("BarbeariaId1");
 
                     b.HasIndex("Email")
                         .HasDatabaseName("ix_admin_barbearia_users_email");
@@ -193,9 +196,6 @@ namespace BarbApp.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("barbearia_id");
 
-                    b.Property<Guid>("BarbeariaId1")
-                        .HasColumnType("uuid");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
@@ -224,8 +224,6 @@ namespace BarbApp.Infrastructure.Migrations
 
                     b.HasIndex("BarbeariaId")
                         .HasDatabaseName("ix_barbers_barbearia_id");
-
-                    b.HasIndex("BarbeariaId1");
 
                     b.HasIndex("Telefone")
                         .HasDatabaseName("ix_barbers_telefone");
@@ -319,9 +317,6 @@ namespace BarbApp.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("barbearia_id");
 
-                    b.Property<Guid>("BarbeariaId1")
-                        .HasColumnType("uuid");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
@@ -351,8 +346,6 @@ namespace BarbApp.Infrastructure.Migrations
                     b.HasIndex("BarbeariaId")
                         .HasDatabaseName("ix_customers_barbearia_id");
 
-                    b.HasIndex("BarbeariaId1");
-
                     b.HasIndex("Telefone")
                         .HasDatabaseName("ix_customers_telefone");
 
@@ -365,15 +358,9 @@ namespace BarbApp.Infrastructure.Migrations
 
             modelBuilder.Entity("BarbApp.Domain.Entities.AdminBarbeariaUser", b =>
                 {
-                    b.HasOne("BarbApp.Domain.Entities.Barbershop", null)
-                        .WithMany()
-                        .HasForeignKey("BarbeariaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("BarbApp.Domain.Entities.Barbershop", "Barbearia")
                         .WithMany()
-                        .HasForeignKey("BarbeariaId1")
+                        .HasForeignKey("BarbeariaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -382,15 +369,9 @@ namespace BarbApp.Infrastructure.Migrations
 
             modelBuilder.Entity("BarbApp.Domain.Entities.Barber", b =>
                 {
-                    b.HasOne("BarbApp.Domain.Entities.Barbershop", null)
-                        .WithMany()
-                        .HasForeignKey("BarbeariaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("BarbApp.Domain.Entities.Barbershop", "Barbearia")
                         .WithMany()
-                        .HasForeignKey("BarbeariaId1")
+                        .HasForeignKey("BarbeariaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -464,15 +445,9 @@ namespace BarbApp.Infrastructure.Migrations
 
             modelBuilder.Entity("BarbApp.Domain.Entities.Customer", b =>
                 {
-                    b.HasOne("BarbApp.Domain.Entities.Barbershop", null)
-                        .WithMany()
-                        .HasForeignKey("BarbeariaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("BarbApp.Domain.Entities.Barbershop", "Barbearia")
                         .WithMany()
-                        .HasForeignKey("BarbeariaId1")
+                        .HasForeignKey("BarbeariaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

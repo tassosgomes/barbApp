@@ -11,6 +11,8 @@ namespace BarbApp.Domain.Entities
         public string Neighborhood { get; private set; }
         public string City { get; private set; }
         public string State { get; private set; }
+        public DateTime CreatedAt { get; private set; }
+        public DateTime UpdatedAt { get; private set; }
 
         private Address() 
         {
@@ -40,7 +42,9 @@ namespace BarbApp.Domain.Entities
                 Complement = complement,
                 Neighborhood = neighborhood,
                 City = city,
-                State = state
+                State = state,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
             };
         }
 
@@ -60,6 +64,7 @@ namespace BarbApp.Domain.Entities
             Neighborhood = neighborhood;
             City = city;
             State = state;
+            UpdatedAt = DateTime.UtcNow;
         }
     }
 }

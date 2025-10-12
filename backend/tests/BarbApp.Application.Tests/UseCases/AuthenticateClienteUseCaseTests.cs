@@ -30,6 +30,13 @@ public class AuthenticateClienteUseCaseTests
         );
     }
 
+    private static Barbershop CreateTestBarbershop(string name, UniqueCode code)
+    {
+        var document = Document.Create("12345678000190");
+        var address = Address.Create("01310100", "Av. Paulista", "1000", null, "Bela Vista", "São Paulo", "SP");
+        return Barbershop.Create(name, document, "11987654321", "Test Owner", "test@test.com", address, code, "test-user");
+    }
+
     [Fact]
     public async Task Execute_ExistingCustomerValidName_ShouldReturnAuthResponse()
     {
@@ -42,7 +49,7 @@ public class AuthenticateClienteUseCaseTests
         };
 
         var barbeariaCode = UniqueCode.Create("ABC23456");
-        var barbearia = Barbershop.Create("Barbearia Teste", barbeariaCode);
+        var barbearia = CreateTestBarbershop("Barbearia Teste", barbeariaCode);
         var customer = Customer.Create(barbearia.Id, "11987654321", "João Silva");
 
         _barbershopRepoMock
@@ -98,7 +105,7 @@ public class AuthenticateClienteUseCaseTests
         };
 
         var barbeariaCode = UniqueCode.Create("ABC23456");
-        var barbearia = Barbershop.Create("Barbearia Teste", barbeariaCode);
+        var barbearia = CreateTestBarbershop("Barbearia Teste", barbeariaCode);
 
         _barbershopRepoMock
             .Setup(x => x.GetByCodeAsync(input.Codigo, It.IsAny<CancellationToken>()))
@@ -185,7 +192,7 @@ public class AuthenticateClienteUseCaseTests
         };
 
         var barbeariaCode = UniqueCode.Create("ABC23456");
-        var barbearia = Barbershop.Create("Barbearia Teste", barbeariaCode);
+        var barbearia = CreateTestBarbershop("Barbearia Teste", barbeariaCode);
         var customer = Customer.Create(barbearia.Id, "11987654321", "Maria Silva"); // Different name
 
         _barbershopRepoMock
