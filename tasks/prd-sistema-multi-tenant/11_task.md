@@ -30,15 +30,15 @@ Configurar o Program.cs com toda a infraestrutura da aplicação: Dependency Inj
 </requirements>
 
 ## Subtarefas
-- [ ] 11.1 Configurar Dependency Injection (services)
-- [ ] 11.2 Configurar DbContext e migrations
-- [ ] 11.3 Configurar pipeline de middlewares
-- [ ] 11.4 Configurar CORS
-- [ ] 11.5 Configurar Swagger/OpenAPI
-- [ ] 11.6 Configurar logging estruturado
-- [ ] 11.7 Configurar health checks
-- [ ] 11.8 Criar arquivos de configuração por ambiente
-- [ ] 11.9 Testar configuração em diferentes ambientes
+- [x] 11.1 Configurar Dependency Injection (services)
+- [x] 11.2 Configurar DbContext e migrations
+- [x] 11.3 Configurar pipeline de middlewares
+- [x] 11.4 Configurar CORS
+- [x] 11.5 Configurar Swagger/OpenAPI
+- [x] 11.6 Configurar logging estruturado
+- [x] 11.7 Configurar health checks
+- [x] 11.8 Criar arquivos de configuração por ambiente
+- [x] 11.9 Testar configuração em diferentes ambientes
 
 ## Sequenciamento
 - **Bloqueado por**: 9.0 (Middlewares), 10.0 (Controllers)
