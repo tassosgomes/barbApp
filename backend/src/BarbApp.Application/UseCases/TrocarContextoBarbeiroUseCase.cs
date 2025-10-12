@@ -1,12 +1,13 @@
 // BarbApp.Application/UseCases/TrocarContextoBarbeiroUseCase.cs
 using BarbApp.Application.DTOs;
 using BarbApp.Application.Interfaces;
+using BarbApp.Application.Interfaces.UseCases;
 using BarbApp.Domain.Interfaces;
 using BarbApp.Domain.Interfaces.Repositories;
 
 namespace BarbApp.Application.UseCases;
 
-public class TrocarContextoBarbeiroUseCase
+public class TrocarContextoBarbeiroUseCase : ITrocarContextoBarbeiroUseCase
 {
     private readonly IBarberRepository _repository;
     private readonly IJwtTokenGenerator _tokenGenerator;

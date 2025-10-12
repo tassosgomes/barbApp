@@ -1,12 +1,13 @@
 // BarbApp.Application/UseCases/AuthenticateClienteUseCase.cs
 using BarbApp.Application.DTOs;
 using BarbApp.Application.Interfaces;
+using BarbApp.Application.Interfaces.UseCases;
 using BarbApp.Domain.Entities;
 using BarbApp.Domain.Interfaces.Repositories;
 
 namespace BarbApp.Application.UseCases;
 
-public class AuthenticateClienteUseCase
+public class AuthenticateClienteUseCase : IAuthenticateClienteUseCase
 {
     private readonly IBarbershopRepository _barbershopRepository;
     private readonly ICustomerRepository _repository;

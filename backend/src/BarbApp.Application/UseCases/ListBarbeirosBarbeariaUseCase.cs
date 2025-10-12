@@ -1,11 +1,12 @@
 // BarbApp.Application/UseCases/ListBarbeirosBarbeariaUseCase.cs
 using BarbApp.Application.DTOs;
 using BarbApp.Domain.Interfaces;
+using BarbApp.Application.Interfaces.UseCases;
 using BarbApp.Domain.Interfaces.Repositories;
 
 namespace BarbApp.Application.UseCases;
 
-public class ListBarbeirosBarbeariaUseCase
+public class ListBarbeirosBarbeariaUseCase : IListBarbeirosBarbeariaUseCase
 {
     private readonly IBarberRepository _repository;
     private readonly ITenantContext _tenantContext;

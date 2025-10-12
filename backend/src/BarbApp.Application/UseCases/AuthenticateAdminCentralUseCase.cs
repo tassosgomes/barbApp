@@ -1,11 +1,12 @@
 // BarbApp.Application/UseCases/AuthenticateAdminCentralUseCase.cs
 using BarbApp.Application.DTOs;
 using BarbApp.Application.Interfaces;
+using BarbApp.Application.Interfaces.UseCases;
 using BarbApp.Domain.Interfaces.Repositories;
 
 namespace BarbApp.Application.UseCases;
 
-public class AuthenticateAdminCentralUseCase
+public class AuthenticateAdminCentralUseCase : IAuthenticateAdminCentralUseCase
 {
     private readonly IAdminCentralUserRepository _repository;
     private readonly IPasswordHasher _passwordHasher;
