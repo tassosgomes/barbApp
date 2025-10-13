@@ -12,3 +12,5 @@ export { Skeleton } from "./skeleton";
 export { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "./table";
 export { Toast, ToastAction, ToastDescription, ToastProvider, ToastTitle, ToastViewport } from "./toast";
 export { Toaster } from "./toaster";
+export { ConfirmDialog } from "./confirm-dialog";
+export { ErrorBoundary } from "./error-boundary";

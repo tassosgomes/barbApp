@@ -5,7 +5,7 @@ import { EmptyState } from "@/components/barbershop/EmptyState";
 
 describe("EmptyState", () => {
   it("should render default content", () => {
-    render(<EmptyState />);
+    render(<EmptyState onAction={() => {}} />);
 
     expect(screen.getByText("Nenhuma barbearia encontrada")).toBeInTheDocument();
     expect(screen.getByText("Comece cadastrando a primeira barbearia do sistema.")).toBeInTheDocument();

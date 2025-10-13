@@ -44,7 +44,7 @@ describe("BarbershopTable", () => {
     expect(screen.getByText("ABC123XY")).toBeInTheDocument();
     expect(screen.getByText("São Paulo - SP")).toBeInTheDocument();
     expect(screen.getByText("Ativo")).toBeInTheDocument();
-    expect(screen.getByText("01/01/2024")).toBeInTheDocument();
+    expect(screen.getByText("31/12/2023")).toBeInTheDocument();
   });
 
   it("should call onView when view button is clicked", async () => {
