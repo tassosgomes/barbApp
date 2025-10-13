@@ -1,6 +1,6 @@
 # Task 2.2: Zod Validation Schemas
 
-**Status**: 🔵 Not Started
+**Status**: ✅ COMPLETED
 **Priority**: Crítica
 **Estimated Effort**: 1 day
 **Phase**: Phase 2 - Type Safety and API
@@ -13,14 +13,14 @@ These schemas provide runtime validation and type safety for form inputs.
 
 ## Acceptance Criteria
 
-- [ ] Barbershop schema with nested address validation
-- [ ] Login schema with email and password validation
-- [ ] Custom validators for Brazilian formats (phone, CEP)
-- [ ] Clear, user-friendly error messages in Portuguese
-- [ ] Schema type inference matches TypeScript types
-- [ ] All schemas exported via barrel export
-- [ ] Unit tests for all validation rules
-- [ ] Edge cases handled (empty strings, special characters, etc.)
+- [x] Barbershop schema with nested address validation
+- [x] Login schema with email and password validation
+- [x] Custom validators for Brazilian formats (phone, CEP)
+- [x] Clear, user-friendly error messages in Portuguese
+- [x] Schema type inference matches TypeScript types
+- [x] All schemas exported via barrel export
+- [x] Unit tests for all validation rules
+- [x] Edge cases handled (empty strings, special characters, etc.)
 
 ## Dependencies
 
