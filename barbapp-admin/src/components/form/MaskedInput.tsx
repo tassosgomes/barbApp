@@ -1,35 +1,33 @@
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useCallback } from 'react';
 import { Input } from '@/components/ui/input';
-import { applyPhoneMask, applyZipCodeMask } from '@/utils/formatters';
+import { applyPhoneMask, applyZipCodeMask, applyDocumentMask } from '@/utils/formatters';
 
-export type MaskType = 'phone' | 'cep';
+export type MaskType = 'phone' | 'cep' | 'document';
 
-interface MaskedInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+interface MaskedInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'> {
   mask: MaskType;
+  onChange?: (value: string) => void;
 }
 
 export const MaskedInput = forwardRef<HTMLInputElement, MaskedInputProps>(
   ({ mask, onChange, ...props }, ref) => {
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
       let maskedValue = e.target.value;
 
       if (mask === 'phone') {
         maskedValue = applyPhoneMask(e.target.value);
       } else if (mask === 'cep') {
         maskedValue = applyZipCodeMask(e.target.value);
+      } else if (mask === 'document') {
+        maskedValue = applyDocumentMask(e.target.value);
       }
 
-      // Create a synthetic event with the masked value
-      const syntheticEvent = {
-        ...e,
-        target: {
-          ...e.target,
-          value: maskedValue,
-        },
-      };
+      // Update the input value
+      e.target.value = maskedValue;
 
-      onChange?.(syntheticEvent);
-    };
+      // Call the onChange prop if provided
+      onChange?.(maskedValue);
+    }, [mask, onChange]);
 
     return (
       <Input

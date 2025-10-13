@@ -24,7 +24,7 @@ export function applyPhoneMask(value: string): string {
  * Aplicar máscara de CEP 99999-999
  */
 export function applyZipCodeMask(value: string): string {
-  const cleaned = value.replace(/\D/g, '');
+  const cleaned = value.replace(/\D/g, '').slice(0, 8); // Limit to 8 digits
 
   if (cleaned.length >= 8) {
     const match = cleaned.match(/^(\d{5})(\d{3})$/);
@@ -35,6 +35,60 @@ export function applyZipCodeMask(value: string): string {
     const match = cleaned.match(/^(\d{5})(\d{0,3})$/);
     if (match) {
       return `${match[1]}${match[2] ? `-${match[2]}` : ''}`;
+    }
+  }
+
+  return cleaned;
+}
+
+/**
+ * Aplicar máscara de documento (CPF/CNPJ)
+ * CPF: 999.999.999-99
+ * CNPJ: 99.999.999/9999-99
+ */
+export function applyDocumentMask(value: string): string {
+  const cleaned = value.replace(/\D/g, '').slice(0, 14); // Limit to 14 digits (max CNPJ)
+
+  if (cleaned.length <= 11) {
+    // CPF format
+    if (cleaned.length >= 9) {
+      const match = cleaned.match(/^(\d{3})(\d{3})(\d{3})(\d{0,2})$/);
+      if (match) {
+        return `${match[1]}.${match[2]}.${match[3]}${match[4] ? `-${match[4]}` : ''}`;
+      }
+    } else if (cleaned.length >= 6) {
+      const match = cleaned.match(/^(\d{3})(\d{3})(\d{0,3})$/);
+      if (match) {
+        return `${match[1]}.${match[2]}${match[3] ? `.${match[3]}` : ''}`;
+      }
+    } else if (cleaned.length >= 3) {
+      const match = cleaned.match(/^(\d{3})(\d{0,3})$/);
+      if (match) {
+        return `${match[1]}${match[2] ? `.${match[2]}` : ''}`;
+      }
+    }
+  } else {
+    // CNPJ format
+    if (cleaned.length >= 12) {
+      const match = cleaned.match(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{0,2})$/);
+      if (match) {
+        return `${match[1]}.${match[2]}.${match[3]}/${match[4]}${match[5] ? `-${match[5]}` : ''}`;
+      }
+    } else if (cleaned.length >= 8) {
+      const match = cleaned.match(/^(\d{2})(\d{3})(\d{3})(\d{0,4})$/);
+      if (match) {
+        return `${match[1]}.${match[2]}.${match[3]}${match[4] ? `/${match[4]}` : ''}`;
+      }
+    } else if (cleaned.length >= 5) {
+      const match = cleaned.match(/^(\d{2})(\d{3})(\d{0,3})$/);
+      if (match) {
+        return `${match[1]}.${match[2]}${match[3] ? `.${match[3]}` : ''}`;
+      }
+    } else if (cleaned.length >= 2) {
+      const match = cleaned.match(/^(\d{2})(\d{0,3})$/);
+      if (match) {
+        return `${match[1]}${match[2] ? `.${match[2]}` : ''}`;
+      }
     }
   }
 

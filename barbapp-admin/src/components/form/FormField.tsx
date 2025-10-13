@@ -35,7 +35,7 @@ export function FormField({
       {children ? (
         React.cloneElement(children as React.ReactElement, {
           id: name,
-          ...register(name),
+          ...((children as React.ReactElement).props.onChange ? {} : register(name)), // Don't override onChange if child has it
           className: error ? 'border-red-500' : '',
         })
       ) : (
