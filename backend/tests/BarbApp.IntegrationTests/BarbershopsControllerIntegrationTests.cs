@@ -1,0 +1,468 @@
+using System.Net;
+using System.Net.Http.Json;
+using BarbApp.Application.DTOs;
+using FluentAssertions;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace BarbApp.IntegrationTests;
+
+public class BarbershopsControllerIntegrationTests : IClassFixture<IntegrationTestWebAppFactory>
+{
+    private readonly HttpClient _client;
+    private readonly IntegrationTestWebAppFactory _factory;
+
+    public BarbershopsControllerIntegrationTests(IntegrationTestWebAppFactory factory)
+    {
+        _factory = factory;
+        _client = factory.CreateClient();
+
+        // Set AdminCentral JWT token for all requests
+        var token = TestHelper.GenerateAdminCentralToken(_factory.Services);
+        _client.DefaultRequestHeaders.Authorization =
+            new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+    }
+
+    [Fact]
+    public async Task CreateBarbershop_ValidData_ShouldReturn201AndCreateBarbershop()
+    {
+        // Arrange
+        var input = new
+        {
+            name = "Barbearia Teste Integração",
+            document = "12345678000195",
+            phone = "(11) 98765-4321",
+            ownerName = "João Silva",
+            email = "joao@teste.com",
+            zipCode = "01310-100",
+            street = "Av. Paulista",
+            number = "1000",
+            complement = "Sala 15",
+            neighborhood = "Bela Vista",
+            city = "São Paulo",
+            state = "SP"
+        };
+
+        // Act
+        var response = await _client.PostAsJsonAsync("/api/barbearias", input);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
+
+        var result = await response.Content.ReadFromJsonAsync<BarbershopOutput>();
+        result.Should().NotBeNull();
+        result!.Name.Should().Be("Barbearia Teste Integração");
+        result.Document.Should().Be("12345678000195");
+        result.Phone.Should().Be("11987654321");
+        result.OwnerName.Should().Be("João Silva");
+        result.Email.Should().Be("joao@teste.com");
+        result.Code.Should().NotBeNullOrEmpty();
+        result.Code.Length.Should().Be(8);
+        result.IsActive.Should().BeTrue();
+        result.Address.Should().NotBeNull();
+        result.Address.ZipCode.Should().Be("01310100");
+        result.Address.Street.Should().Be("Av. Paulista");
+        result.Address.Number.Should().Be("1000");
+        result.Address.Complement.Should().Be("Sala 15");
+        result.Address.Neighborhood.Should().Be("Bela Vista");
+        result.Address.City.Should().Be("São Paulo");
+        result.Address.State.Should().Be("SP");
+        result.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(10));
+        result.UpdatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(10));
+    }
+
+    [Fact]
+    public async Task CreateBarbershop_DuplicateDocument_ShouldReturn422()
+    {
+        // Arrange - Create first barbershop
+        var input1 = new
+        {
+            name = "Barbearia Original",
+            document = "98765432000189",
+            phone = "(11) 98765-4321",
+            ownerName = "João Silva",
+            email = "joao1@teste.com",
+            zipCode = "01310-100",
+            street = "Av. Paulista",
+            number = "1000",
+            complement = (string?)null,
+            neighborhood = "Bela Vista",
+            city = "São Paulo",
+            state = "SP"
+        };
+
+        var response1 = await _client.PostAsJsonAsync("/api/barbearias", input1);
+        response1.StatusCode.Should().Be(HttpStatusCode.Created);
+
+        // Try to create second barbershop with same document
+        var input2 = new
+        {
+            name = "Barbearia Duplicada",
+            document = "98765432000189", // Same document
+            phone = "(11) 98765-4322",
+            ownerName = "Maria Silva",
+            email = "maria@teste.com",
+            zipCode = "01310-101",
+            street = "Av. Paulista",
+            number = "1001",
+            complement = (string?)null,
+            neighborhood = "Bela Vista",
+            city = "São Paulo",
+            state = "SP"
+        };
+
+        // Act
+        var response2 = await _client.PostAsJsonAsync("/api/barbearias", input2);
+
+        // Assert
+        response2.StatusCode.Should().Be(HttpStatusCode.UnprocessableEntity);
+    }
+
+    [Fact]
+    public async Task GetBarbershop_ExistingId_ShouldReturn200AndBarbershop()
+    {
+        // Arrange - Create a barbershop first
+        var createInput = new
+        {
+            name = "Barbearia para Get",
+            document = "11223344000187",
+            phone = "(11) 98765-4323",
+            ownerName = "Carlos Silva",
+            email = "carlos@teste.com",
+            zipCode = "01310-102",
+            street = "Av. Paulista",
+            number = "1002",
+            complement = (string?)null,
+            neighborhood = "Bela Vista",
+            city = "São Paulo",
+            state = "SP"
+        };
+
+        var createResponse = await _client.PostAsJsonAsync("/api/barbearias", createInput);
+        createResponse.StatusCode.Should().Be(HttpStatusCode.Created);
+
+        var createdBarbershop = await createResponse.Content.ReadFromJsonAsync<BarbershopOutput>();
+        createdBarbershop.Should().NotBeNull();
+
+        // Act
+        var getResponse = await _client.GetAsync($"/api/barbearias/{createdBarbershop!.Id}");
+
+        // Assert
+        getResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var result = await getResponse.Content.ReadFromJsonAsync<BarbershopOutput>();
+        result.Should().NotBeNull();
+        result!.Id.Should().Be(createdBarbershop.Id);
+        result.Name.Should().Be("Barbearia para Get");
+        result.Document.Should().Be("11223344000187");
+    }
+
+    [Fact]
+    public async Task GetBarbershop_NonExistingId_ShouldReturn404()
+    {
+        // Act
+        var response = await _client.GetAsync($"/api/barbearias/{Guid.NewGuid()}");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+
+    [Fact]
+    public async Task ListBarbershops_NoFilters_ShouldReturnPaginatedResults()
+    {
+        // Arrange - Create multiple barbershops
+        var documents = new[] { "55667788000174", "99887766000153", "44332211000196", "77889955000142", "22558899000108" };
+        for (int i = 0; i < 5; i++)
+        {
+            var input = new
+            {
+                name = $"Barbearia List {i}",
+                document = documents[i],
+                phone = $"(11) 98765-432{i}",
+                ownerName = $"Proprietário {i}",
+                email = $"list{i}@teste.com",
+                zipCode = "01310-100",
+                street = "Av. Paulista",
+                number = $"10{i:00}",
+                complement = (string?)null,
+                neighborhood = "Bela Vista",
+                city = "São Paulo",
+                state = "SP"
+            };
+
+            var response = await _client.PostAsJsonAsync("/api/barbearias", input);
+            response.StatusCode.Should().Be(HttpStatusCode.Created);
+        }
+
+        // Act
+        var listResponse = await _client.GetAsync("/api/barbearias?page=1&pageSize=10");
+
+        // Assert
+        listResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var result = await listResponse.Content.ReadFromJsonAsync<PaginatedBarbershopsOutput>();
+        result.Should().NotBeNull();
+        result!.Items.Should().NotBeEmpty();
+        result.TotalCount.Should().BeGreaterThanOrEqualTo(5);
+        result.Page.Should().Be(1);
+        result.PageSize.Should().Be(10);
+        result.Items.Should().AllSatisfy(item =>
+        {
+            item.Id.Should().NotBeEmpty();
+            item.Name.Should().NotBeNullOrEmpty();
+            item.Code.Should().NotBeNullOrEmpty();
+            item.IsActive.Should().BeTrue();
+        });
+    }
+
+    [Fact]
+    public async Task ListBarbershops_WithSearchTerm_ShouldFilterResults()
+    {
+        // Arrange - Create barbershops with different names
+        var input1 = new
+        {
+            name = "Barbearia Premium",
+            document = "33445566000172",
+            phone = "(11) 98765-4325",
+            ownerName = "Premium Owner",
+            email = "premium@teste.com",
+            zipCode = "01310-100",
+            street = "Av. Paulista",
+            number = "1005",
+            complement = (string?)null,
+            neighborhood = "Bela Vista",
+            city = "São Paulo",
+            state = "SP"
+        };
+
+        var input2 = new
+        {
+            name = "Barbearia Standard",
+            document = "66778899000138",
+            phone = "(11) 98765-4326",
+            ownerName = "Standard Owner",
+            email = "standard@teste.com",
+            zipCode = "01310-100",
+            street = "Av. Paulista",
+            number = "1006",
+            complement = (string?)null,
+            neighborhood = "Bela Vista",
+            city = "São Paulo",
+            state = "SP"
+        };
+
+        var response1 = await _client.PostAsJsonAsync("/api/barbearias", input1);
+        response1.StatusCode.Should().Be(HttpStatusCode.Created);
+
+        var response2 = await _client.PostAsJsonAsync("/api/barbearias", input2);
+        response2.StatusCode.Should().Be(HttpStatusCode.Created);
+
+        // Act - Search for "Premium"
+        var searchResponse = await _client.GetAsync("/api/barbearias?searchTerm=Premium&page=1&pageSize=10");
+
+        // Assert
+        searchResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var result = await searchResponse.Content.ReadFromJsonAsync<PaginatedBarbershopsOutput>();
+        result.Should().NotBeNull();
+        result!.Items.Should().HaveCount(1);
+        result.Items[0].Name.Should().Be("Barbearia Premium");
+    }
+
+    [Fact]
+    public async Task UpdateBarbershop_ExistingId_ShouldReturn200AndUpdateBarbershop()
+    {
+        // Arrange - Create a barbershop first
+        var createInput = new
+        {
+            name = "Barbearia para Update",
+            document = "88990011000125",
+            phone = "(11) 98765-4327",
+            ownerName = "Update Owner",
+            email = "update@teste.com",
+            zipCode = "01310-100",
+            street = "Av. Paulista",
+            number = "1007",
+            complement = (string?)null,
+            neighborhood = "Bela Vista",
+            city = "São Paulo",
+            state = "SP"
+        };
+
+        var createResponse = await _client.PostAsJsonAsync("/api/barbearias", createInput);
+        createResponse.StatusCode.Should().Be(HttpStatusCode.Created);
+
+        var createdBarbershop = await createResponse.Content.ReadFromJsonAsync<BarbershopOutput>();
+        createdBarbershop.Should().NotBeNull();
+
+        var updateInput = new
+        {
+            id = createdBarbershop!.Id,
+            name = "Barbearia Atualizada",
+            phone = "(11) 98765-4328",
+            ownerName = "Updated Owner",
+            email = "updated@teste.com",
+            zipCode = "01310-101",
+            street = "Av. Brigadeiro",
+            number = "1008",
+            complement = "Apto 10",
+            neighborhood = "Jardim Paulista",
+            city = "São Paulo",
+            state = "SP"
+        };
+
+        // Act
+        var updateResponse = await _client.PutAsJsonAsync($"/api/barbearias/{createdBarbershop.Id}", updateInput);
+
+        // Assert
+        updateResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var result = await updateResponse.Content.ReadFromJsonAsync<BarbershopOutput>();
+        result.Should().NotBeNull();
+        result!.Id.Should().Be(createdBarbershop.Id);
+        result.Name.Should().Be("Barbearia Atualizada");
+        result.Phone.Should().Be("11987654328");
+        result.OwnerName.Should().Be("Updated Owner");
+        result.Email.Should().Be("updated@teste.com");
+        result.Address.ZipCode.Should().Be("01310101");
+        result.Address.Street.Should().Be("Av. Brigadeiro");
+        result.Address.Number.Should().Be("1008");
+        result.Address.Complement.Should().Be("Apto 10");
+        result.Address.Neighborhood.Should().Be("Jardim Paulista");
+        result.Document.Should().Be("88990011000125"); // Should not change
+        result.Code.Should().Be(createdBarbershop.Code); // Should not change
+    }
+
+    [Fact]
+    public async Task UpdateBarbershop_NonExistingId_ShouldReturn404()
+    {
+        // Arrange
+        var updateInput = new
+        {
+            id = Guid.NewGuid(),
+            name = "Barbearia Inexistente",
+            phone = "(11) 98765-4329",
+            ownerName = "Inexistent Owner",
+            email = "inexistent@teste.com",
+            zipCode = "01310-100",
+            street = "Av. Paulista",
+            number = "1009",
+            complement = (string?)null,
+            neighborhood = "Bela Vista",
+            city = "São Paulo",
+            state = "SP"
+        };
+
+        // Act
+        var response = await _client.PutAsJsonAsync($"/api/barbearias/{updateInput.id}", updateInput);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+
+    [Fact]
+    public async Task DeleteBarbershop_ExistingId_ShouldReturn204AndSoftDelete()
+    {
+        // Arrange - Create a barbershop first
+        var createInput = new
+        {
+            name = "Barbearia para Delete",
+            document = "00112233000141",
+            phone = "(11) 98765-4330",
+            ownerName = "Delete Owner",
+            email = "delete@teste.com",
+            zipCode = "01310-100",
+            street = "Av. Paulista",
+            number = "1010",
+            complement = (string?)null,
+            neighborhood = "Bela Vista",
+            city = "São Paulo",
+            state = "SP"
+        };
+
+        var createResponse = await _client.PostAsJsonAsync("/api/barbearias", createInput);
+        createResponse.StatusCode.Should().Be(HttpStatusCode.Created);
+
+        var createdBarbershop = await createResponse.Content.ReadFromJsonAsync<BarbershopOutput>();
+        createdBarbershop.Should().NotBeNull();
+
+        // Act
+        var deleteResponse = await _client.DeleteAsync($"/api/barbearias/{createdBarbershop!.Id}");
+
+        // Assert
+        deleteResponse.StatusCode.Should().Be(HttpStatusCode.NoContent);
+
+        // Verify it's soft deleted (not returned in list by default)
+        var listResponse = await _client.GetAsync("/api/barbearias?page=1&pageSize=100");
+        listResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var listResult = await listResponse.Content.ReadFromJsonAsync<PaginatedBarbershopsOutput>();
+        listResult.Should().NotBeNull();
+        listResult!.Items.Should().NotContain(item => item.Id == createdBarbershop.Id);
+    }
+
+    [Fact]
+    public async Task DeleteBarbershop_NonExistingId_ShouldReturn404()
+    {
+        // Act
+        var response = await _client.DeleteAsync($"/api/barbearias/{Guid.NewGuid()}");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+
+    [Fact]
+    public async Task CreateBarbershop_InvalidData_ShouldReturn400()
+    {
+        // Arrange
+        var invalidInput = new
+        {
+            name = "", // Invalid: empty name
+            document = "invalid-document",
+            phone = "invalid-phone",
+            ownerName = "João Silva",
+            email = "invalid-email",
+            zipCode = "01310100", // Invalid format
+            street = "Av. Paulista",
+            number = "1000",
+            complement = (string?)null,
+            neighborhood = "Bela Vista",
+            city = "São Paulo",
+            state = "SP"
+        };
+
+        // Act
+        var response = await _client.PostAsJsonAsync("/api/barbearias", invalidInput);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+    }
+
+    [Fact]
+    public async Task AccessBarbershops_WithoutAuth_ShouldReturn401()
+    {
+        // Arrange - Create client without auth
+        var unauthClient = _factory.CreateClient();
+
+        var input = new
+        {
+            name = "Barbearia Sem Auth",
+            document = "00224466000107",
+            phone = "(11) 98765-4331",
+            ownerName = "No Auth Owner",
+            email = "noauth@teste.com",
+            zipCode = "01310-100",
+            street = "Av. Paulista",
+            number = "1011",
+            complement = (string?)null,
+            neighborhood = "Bela Vista",
+            city = "São Paulo",
+            state = "SP"
+        };
+
+        // Act
+        var response = await unauthClient.PostAsJsonAsync("/api/barbearias", input);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+    }
+}
