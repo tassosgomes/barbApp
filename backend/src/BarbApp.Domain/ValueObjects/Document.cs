@@ -11,7 +11,7 @@ namespace BarbApp.Domain.ValueObjects
         public string Value { get; private set; }
         public DocumentType Type { get; private set; }
 
-        private Document() 
+        private Document()
         {
             Value = null!;
         } // EF Core
@@ -35,7 +35,7 @@ namespace BarbApp.Domain.ValueObjects
         }
 
         private static bool IsCnpj(string value)
-        {            
+        {
             return value.Length == 14 && Regex.IsMatch(value, @"^\d{14}$");
         }
 

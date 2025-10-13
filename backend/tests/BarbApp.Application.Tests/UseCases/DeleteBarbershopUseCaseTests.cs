@@ -6,6 +6,7 @@ using BarbApp.Domain.Exceptions;
 using BarbApp.Domain.Interfaces.Repositories;
 using BarbApp.Domain.ValueObjects;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 
@@ -15,16 +16,19 @@ public class DeleteBarbershopUseCaseTests
 {
     private readonly Mock<IBarbershopRepository> _barbershopRepositoryMock;
     private readonly Mock<IUnitOfWork> _unitOfWorkMock;
+    private readonly Mock<ILogger<DeleteBarbershopUseCase>> _loggerMock;
     private readonly DeleteBarbershopUseCase _useCase;
 
     public DeleteBarbershopUseCaseTests()
     {
         _barbershopRepositoryMock = new Mock<IBarbershopRepository>();
         _unitOfWorkMock = new Mock<IUnitOfWork>();
+        _loggerMock = new Mock<ILogger<DeleteBarbershopUseCase>>();
 
         _useCase = new DeleteBarbershopUseCase(
             _barbershopRepositoryMock.Object,
-            _unitOfWorkMock.Object);
+            _unitOfWorkMock.Object,
+            _loggerMock.Object);
     }
 
     [Fact]
