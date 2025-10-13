@@ -1,8 +1,8 @@
 import React, { forwardRef } from 'react';
 import { Input } from '@/components/ui/input';
-import { applyPhoneMask, applyZipCodeMask } from '@/utils/formatters';
+import { applyPhoneMask, applyZipCodeMask, applyDocumentMask } from '@/utils/formatters';
 
-export type MaskType = 'phone' | 'cep';
+export type MaskType = 'phone' | 'cep' | 'document';
 
 interface MaskedInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   mask: MaskType;
@@ -17,6 +17,8 @@ export const MaskedInput = forwardRef<HTMLInputElement, MaskedInputProps>(
         maskedValue = applyPhoneMask(e.target.value);
       } else if (mask === 'cep') {
         maskedValue = applyZipCodeMask(e.target.value);
+      } else if (mask === 'document') {
+        maskedValue = applyDocumentMask(e.target.value);
       }
 
       // Create a synthetic event with the masked value
