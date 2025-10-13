@@ -14,7 +14,7 @@ public class Customer
     public DateTime CreatedAt { get; private set; }
     public DateTime UpdatedAt { get; private set; }
 
-    private Customer() 
+    private Customer()
     {
         Telefone = null!;
         Name = null!;

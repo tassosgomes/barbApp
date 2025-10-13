@@ -20,7 +20,7 @@ namespace BarbApp.Domain.Entities
         public string CreatedBy { get; private set; }
         public string UpdatedBy { get; private set; }
 
-        private Barbershop() 
+        private Barbershop()
         {
             Name = null!;
             Document = null!;
@@ -48,22 +48,22 @@ namespace BarbApp.Domain.Entities
                 throw new ArgumentException("Name is required", nameof(name));
             if (name.Length > 255)
                 throw new ArgumentException("Name must be max 255 characters", nameof(name));
-            
+
             if (string.IsNullOrWhiteSpace(phone))
                 throw new ArgumentException("Phone is required", nameof(phone));
-            
+
             if (string.IsNullOrWhiteSpace(ownerName))
                 throw new ArgumentException("Owner name is required", nameof(ownerName));
             if (ownerName.Length > 255)
                 throw new ArgumentException("Owner name must be max 255 characters", nameof(ownerName));
-            
+
             if (string.IsNullOrWhiteSpace(email))
                 throw new ArgumentException("Email is required", nameof(email));
             if (email.Length > 255)
                 throw new ArgumentException("Email must be max 255 characters", nameof(email));
             if (!email.Contains("@") || !email.Contains("."))
                 throw new ArgumentException("Invalid email format", nameof(email));
-            
+
             if (string.IsNullOrWhiteSpace(createdBy))
                 throw new ArgumentException("CreatedBy is required", nameof(createdBy));
 
@@ -112,7 +112,7 @@ namespace BarbApp.Domain.Entities
         }
 
         public void Deactivate()
-        {            
+        {
             IsActive = false;
             UpdatedAt = DateTime.UtcNow;
         }
