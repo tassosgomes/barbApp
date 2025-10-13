@@ -9,7 +9,7 @@ namespace BarbApp.Domain.ValueObjects
     {
         public string Value { get; private set; }
 
-        private UniqueCode() 
+        private UniqueCode()
         {
             Value = null!;
         } // EF Core

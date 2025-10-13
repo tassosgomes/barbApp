@@ -6,6 +6,7 @@ using BarbApp.Domain.Entities;
 using BarbApp.Domain.Interfaces.Repositories;
 using BarbApp.Domain.ValueObjects;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 
@@ -14,12 +15,14 @@ namespace BarbApp.Application.Tests.UseCases;
 public class ListBarbershopsUseCaseTests
 {
     private readonly Mock<IBarbershopRepository> _barbershopRepositoryMock;
+    private readonly Mock<ILogger<ListBarbershopsUseCase>> _loggerMock;
     private readonly ListBarbershopsUseCase _useCase;
 
     public ListBarbershopsUseCaseTests()
     {
         _barbershopRepositoryMock = new Mock<IBarbershopRepository>();
-        _useCase = new ListBarbershopsUseCase(_barbershopRepositoryMock.Object);
+        _loggerMock = new Mock<ILogger<ListBarbershopsUseCase>>();
+        _useCase = new ListBarbershopsUseCase(_barbershopRepositoryMock.Object, _loggerMock.Object);
     }
 
     [Fact]

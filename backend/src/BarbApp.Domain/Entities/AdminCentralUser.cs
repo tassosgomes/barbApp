@@ -11,7 +11,7 @@ public class AdminCentralUser
     public DateTime CreatedAt { get; private set; }
     public DateTime UpdatedAt { get; private set; }
 
-    private AdminCentralUser() 
+    private AdminCentralUser()
     {
         Email = null!;
         PasswordHash = null!;

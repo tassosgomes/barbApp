@@ -58,9 +58,9 @@ public class BarbershopRepository : IBarbershopRepository
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
             var searchTermLower = searchTerm.ToLowerInvariant();
-            query = query.Where(b => 
-                b.Name.ToLower().Contains(searchTermLower) || 
-                b.Code.Value.ToLower().Contains(searchTermLower) || 
+            query = query.Where(b =>
+                b.Name.ToLower().Contains(searchTermLower) ||
+                b.Code.Value.ToLower().Contains(searchTermLower) ||
                 b.Document.Value.Contains(searchTerm));
         }
 

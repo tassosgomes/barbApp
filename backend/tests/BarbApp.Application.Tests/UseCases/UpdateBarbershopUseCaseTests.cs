@@ -7,6 +7,7 @@ using BarbApp.Domain.Exceptions;
 using BarbApp.Domain.Interfaces.Repositories;
 using BarbApp.Domain.ValueObjects;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 
@@ -17,6 +18,7 @@ public class UpdateBarbershopUseCaseTests
     private readonly Mock<IBarbershopRepository> _barbershopRepositoryMock;
     private readonly Mock<IAddressRepository> _addressRepositoryMock;
     private readonly Mock<IUnitOfWork> _unitOfWorkMock;
+    private readonly Mock<ILogger<UpdateBarbershopUseCase>> _loggerMock;
     private readonly UpdateBarbershopUseCase _useCase;
 
     public UpdateBarbershopUseCaseTests()
@@ -24,11 +26,13 @@ public class UpdateBarbershopUseCaseTests
         _barbershopRepositoryMock = new Mock<IBarbershopRepository>();
         _addressRepositoryMock = new Mock<IAddressRepository>();
         _unitOfWorkMock = new Mock<IUnitOfWork>();
+        _loggerMock = new Mock<ILogger<UpdateBarbershopUseCase>>();
 
         _useCase = new UpdateBarbershopUseCase(
             _barbershopRepositoryMock.Object,
             _addressRepositoryMock.Object,
-            _unitOfWorkMock.Object);
+            _unitOfWorkMock.Object,
+            _loggerMock.Object);
     }
 
     [Fact]

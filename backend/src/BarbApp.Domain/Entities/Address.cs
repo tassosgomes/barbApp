@@ -14,7 +14,7 @@ namespace BarbApp.Domain.Entities
         public DateTime CreatedAt { get; private set; }
         public DateTime UpdatedAt { get; private set; }
 
-        private Address() 
+        private Address()
         {
             ZipCode = null!;
             Street = null!;
