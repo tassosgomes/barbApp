@@ -35,7 +35,7 @@ export function BarbershopForm({ register, errors, setValue }: BarbershopFormPro
           <MaskedInput
             mask="document"
             placeholder="999.999.999-99 ou 99.999.999/9999-99"
-            onChange={(e) => setValue('document', e.target.value)}
+            onChange={(value) => setValue('document', value)}
           />
         </FormField>
 
@@ -68,7 +68,7 @@ export function BarbershopForm({ register, errors, setValue }: BarbershopFormPro
           <MaskedInput
             mask="phone"
             placeholder="(99) 99999-9999"
-            onChange={(e) => setValue('phone', e.target.value)}
+            onChange={(value) => setValue('phone', value)}
           />
         </FormField>
       </div>
@@ -87,7 +87,7 @@ export function BarbershopForm({ register, errors, setValue }: BarbershopFormPro
           <MaskedInput
             mask="cep"
             placeholder="99999-999"
-            onChange={(e) => setValue('address.zipCode', e.target.value)}
+            onChange={(value) => setValue('address.zipCode', value)}
           />
         </FormField>
 
