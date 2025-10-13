@@ -1,6 +1,6 @@
 # Task 2.3: Axios Configuration and Barbershop Service
 
-**Status**: 🔵 Not Started
+**Status**: ✅ Completed
 **Priority**: Crítica
 **Estimated Effort**: 1 day
 **Phase**: Phase 2 - Type Safety and API
@@ -56,7 +56,7 @@ import axios from 'axios';
  * Axios instance configured with base URL and interceptors
  */
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5070/api',
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
@@ -422,3 +422,29 @@ Verify these endpoints match backend:
 
 After completion:
 → Proceed to **Task 3.1**: Login Page Implementation
+
+---
+
+## Completion Notes
+
+**Completed on**: $(date)
+**Implementation Summary**:
+- Axios HTTP client configured with JWT token interceptor and 401 error handler
+- Complete barbershop service with all CRUD operations (getAll, getById, create, update, deactivate, reactivate)
+- Error handling utilities for user-friendly Portuguese error messages
+- Vitest configuration with jsdom environment and path aliases
+- Integration tests with mocked API calls (15/15 tests passing)
+- All acceptance criteria met and verified
+
+**Files Created/Modified**:
+- `src/services/api.ts` - Axios configuration with interceptors
+- `src/services/barbershop.service.ts` - Complete CRUD service implementation
+- `src/services/index.ts` - Barrel exports for services
+- `src/utils/errorHandler.ts` - API error handling utility
+- `src/utils/index.ts` - Barrel exports for utilities
+- `src/__tests__/integration/services/barbershop.service.test.ts` - Integration tests
+- `src/__tests__/setup.ts` - Test environment setup
+- `vitest.config.ts` - Test configuration
+- `package.json` - Added test dependencies
+
+**Git Commit**: `feat/task-2-3-axios-barbershop-service` (9589cb8)
