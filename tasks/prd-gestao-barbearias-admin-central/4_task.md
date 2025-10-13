@@ -1,5 +1,5 @@
 ---
-status: pending
+status: completed
 parallelizable: false
 blocked_by: ["3.0"]
 ---
@@ -26,12 +26,12 @@ Esta tarefa consiste em expor a lógica de negócio implementada na camada de ap
 - Configurar e documentar a API usando Swagger/OpenAPI.
 
 ## Subtarefas
-- [ ] 4.1 **Implementar Controller**: Criar `BarbershopsController.cs` e injetar os casos de uso.
-- [ ] 4.2 **Criar Endpoints**: Implementar os métodos para `POST`, `PUT`, `GET` (single e list) e `DELETE`.
-- [ ] 4.3 **Configurar Autorização**: Adicionar o atributo `[Authorize(Roles = "AdminCentral")]` ao controller ou aos endpoints.
-- [ ] 4.4 **Middleware de Exceções**: Criar um middleware que capture exceções (`NotFoundException`, `ValidationException`, etc.) e retorne os status codes corretos (404, 400, 422, etc.).
-- [ ] 4.5 **Configurar DI**: Registrar todas as dependências (repositórios, use cases, serviços) no `Program.cs`.
-- [ ] 4.6 **Documentação da API**: Configurar o Swagger e adicionar documentação (XML comments) aos endpoints para descrever o que eles fazem, seus parâmetros e respostas.
+- [x] 4.1 **Implementar Controller**: Criar `BarbershopsController.cs` e injetar os casos de uso.
+- [x] 4.2 **Criar Endpoints**: Implementar os métodos para `POST`, `PUT`, `GET` (single e list) e `DELETE`.
+- [x] 4.3 **Configurar Autorização**: Adicionar o atributo `[Authorize(Roles = "AdminCentral")]` ao controller ou aos endpoints.
+- [x] 4.4 **Middleware de Exceções**: Criar um middleware que capture exceções (`NotFoundException`, `ValidationException`, etc.) e retorne os status codes corretos (404, 400, 422, etc.).
+- [x] 4.5 **Configurar DI**: Registrar todas as dependências (repositórios, use cases, serviços) no `Program.cs`.
+- [x] 4.6 **Documentação da API**: Configurar o Swagger e adicionar documentação (XML comments) aos endpoints para descrever o que eles fazem, seus parâmetros e respostas.
 
 ## Detalhes de Implementação
 - **Localização**: `BarbApp.API`
@@ -44,3 +44,6 @@ Esta tarefa consiste em expor a lógica de negócio implementada na camada de ap
 - A autorização está bloqueando o acesso para usuários não autorizados.
 - O tratamento de exceções está convertendo erros em respostas HTTP significativas.
 - A API está documentada no Swagger e pode ser testada manualmente através da UI do Swagger.
+
+## Status da Tarefa
+**✅ CONCLUÍDA** - Implementação validada e aprovada para deploy
