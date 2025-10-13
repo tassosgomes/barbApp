@@ -18,6 +18,15 @@ Object.defineProperty(window, 'localStorage', {
 delete (window as unknown as Record<string, unknown>).location;
 (window as unknown as Record<string, unknown>).location = { href: '' } as Location;
 
+// Suppress DataCloneError warnings from Vitest (related to Axios serialization)
+const originalWarn = console.warn;
+console.warn = (...args) => {
+  if (args[0]?.includes?.('DataCloneError') || args[0]?.includes?.('could not be cloned')) {
+    return; // Suppress these specific warnings
+  }
+  originalWarn.apply(console, args);
+};
+
 afterEach(() => {
   cleanup();
   vi.clearAllMocks();

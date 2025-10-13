@@ -12,6 +12,8 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: ['./src/__tests__/setup.ts'],
+    // Suppress console warnings during tests
+    silent: true,
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],

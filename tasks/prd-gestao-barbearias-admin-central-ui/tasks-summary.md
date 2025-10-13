@@ -59,7 +59,7 @@ Acessibilidade, performance e documentação
 ### Phase 3: Authentication (Days 4-6)
 - [ ] **Task 3.1**: Login Page Implementation (Crítica, 1 dia)
 - [ ] **Task 3.2**: Auth Hooks and Protected Routes (Crítica, 0.5 dia)
-- [ ] **Task 3.3**: API Interceptors and Session Management (Crítica, 0.5 dia)
+- [x] **Task 3.3**: API Interceptors and Session Management (Crítica, 0.5 dia)
 
 ### Phase 4: Routing and Layout (Day 6)
 - [ ] **Task 4.1**: React Router Configuration (Crítica, 0.5 dia)
