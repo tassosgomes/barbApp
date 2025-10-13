@@ -119,7 +119,7 @@ export const loginSchema = z.object({
     .toLowerCase()
     .trim(),
 
-  password: z
+  senha: z
     .string()
     .min(6, 'Senha deve ter no mínimo 6 caracteres')
     .max(100, 'Senha deve ter no máximo 100 caracteres'),
