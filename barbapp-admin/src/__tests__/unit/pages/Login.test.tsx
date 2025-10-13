@@ -83,7 +83,7 @@ describe('Login Page', () => {
       });
       expect(mockToast).toHaveBeenCalledWith({
         title: 'Login realizado com sucesso!',
-        description: 'Bem-vindo, Admin',
+        description: 'Bem-vindo ao sistema!',
       });
       expect(mockNavigate).toHaveBeenCalledWith('/barbearias');
     });

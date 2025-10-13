@@ -31,7 +31,7 @@ export function Login() {
 
       toast({
         title: 'Login realizado com sucesso!',
-        description: `Bem-vindo, ${response.data.user.name}`,
+        description: `Bem-vindo ao sistema!`,
       });
 
       navigate('/barbearias');
