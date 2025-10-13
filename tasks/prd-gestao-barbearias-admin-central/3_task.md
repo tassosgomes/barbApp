@@ -1,5 +1,5 @@
 ---
-status: pending
+status: completed
 parallelizable: false
 blocked_by: ["2.0"]
 ---
@@ -27,12 +27,12 @@ Esta é a fase onde a lógica de negócio da aplicação é implementada. Inclui
 - Criar testes unitários para todos os casos de uso e serviços.
 
 ## Subtarefas
-- [ ] 3.1 **Criar DTOs**: Implementar `CreateBarbershopInput`, `UpdateBarbershopInput`, `BarbershopOutput`, etc.
-- [ ] 3.2 **Implementar Validadores**: Criar classes de validação com FluentValidation para os inputs de criação e atualização.
-- [ ] 3.3 **Implementar Casos de Uso**: Criar as classes de use case para cada operação, injetando as dependências necessárias (repositórios, serviços).
-- [ ] 3.4 **Implementar `UniqueCodeGenerator`**: Desenvolver o serviço que gera códigos únicos, incluindo a lógica de verificação de duplicidade e retry.
-- [ ] 3.5 **Implementar `UnitOfWork`**: Criar a interface `IUnitOfWork` e sua implementação para gerenciar as transações do `DbContext`.
-- [ ] 3.6 **Testes Unitários da Aplicação**: Escrever e passar testes para todos os casos de uso, cobrindo cenários de sucesso e de erro (com mocks para os repositórios).
+- [x] 3.1 **Criar DTOs**: Implementar `CreateBarbershopInput`, `UpdateBarbershopInput`, `BarbershopOutput`, etc.
+- [x] 3.2 **Implementar Validadores**: Criar classes de validação com FluentValidation para os inputs de criação e atualização.
+- [x] 3.3 **Implementar Casos de Uso**: Criar as classes de use case para cada operação, injetando as dependências necessárias (repositórios, serviços).
+- [x] 3.4 **Implementar `UniqueCodeGenerator`**: Desenvolver o serviço que gera códigos únicos, incluindo a lógica de verificação de duplicidade e retry.
+- [x] 3.5 **Implementar `UnitOfWork`**: Criar a interface `IUnitOfWork` e sua implementação para gerenciar as transações do `DbContext`.
+- [x] 3.6 **Testes Unitários da Aplicação**: Escrever e passar testes para todos os casos de uso, cobrindo cenários de sucesso e de erro (com mocks para os repositórios).
 
 ## Detalhes de Implementação
 - **Localização**: `BarbApp.Application`, `BarbApp.Infrastructure`, `BarbApp.Application.Tests`
