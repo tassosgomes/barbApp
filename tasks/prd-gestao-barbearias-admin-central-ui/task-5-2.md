@@ -1,16 +1,16 @@
 # Task 5.2: Custom Form Components
 
-**Status**: 🔵 Not Started | **Priority**: Alta | **Effort**: 0.5 day | **Phase**: 5 - Reusable Components
+**Status**: ✅ Completed | **Priority**: Alta | **Effort**: 0.5 day | **Phase**: 5 - Reusable Components
 
 ## Description
 Create reusable form components: FormField wrapper, MaskedInput for Brazilian formats (CEP, phone), and SelectField wrapper.
 
 ## Acceptance Criteria
-- [ ] FormField component with label, input, error message
-- [ ] MaskedInput for phone (99) 99999-9999 and CEP 99999-999
-- [ ] SelectField wrapper with consistent styling
-- [ ] Components accept react-hook-form props
-- [ ] Unit tests for mask formatting
+- [x] FormField component with label, input, error message
+- [x] MaskedInput for phone (99) 99999-9999 and CEP 99999-999
+- [x] SelectField wrapper with consistent styling
+- [x] Components accept react-hook-form props
+- [x] Unit tests for mask formatting
 
 ## Dependencies
 **Blocking**: Task 5.1 (shadcn/ui)
