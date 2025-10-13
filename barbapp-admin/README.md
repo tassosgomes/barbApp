@@ -1,73 +1,129 @@
-# React + TypeScript + Vite
+# BarbApp Admin
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Painel administrativo do sistema BarbApp para gestão centralizada de barbearias e barbeiros.
 
-Currently, two official plugins are available:
+## Tecnologias
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **React 18** - Biblioteca JavaScript para interfaces de usuário
+- **TypeScript** - JavaScript com tipagem estática
+- **Vite** - Build tool e dev server ultrarrápido
+- **TailwindCSS** - Framework CSS utilitário
+- **React Router** - Roteamento para aplicações React
+- **React Hook Form** - Gerenciamento de formulários
+- **Zod** - Validação de schemas TypeScript
+- **Axios** - Cliente HTTP para requisições API
+- **Radix UI** - Componentes primitivos acessíveis
+- **Lucide React** - Ícones modernos
 
-## React Compiler
+## Scripts Disponíveis
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```bash
+# Iniciar servidor de desenvolvimento
+npm run dev
 
-## Expanding the ESLint configuration
+# Build para produção
+npm run build
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+# Preview do build de produção
+npm run preview
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+# Executar linting
+npm run lint
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+# Formatar código com Prettier
+npm run format
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+# Executar testes unitários
+npm run test
+
+# Executar testes com interface visual
+npm run test:ui
+
+# Executar testes com coverage
+npm run test:coverage
+
+# Executar testes E2E com Playwright
+npm run test:e2e
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Estrutura do Projeto
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
 ```
+src/
+├── components/     # Componentes reutilizáveis
+├── pages/         # Páginas da aplicação
+├── hooks/         # Hooks customizados
+├── lib/           # Utilitários e configurações
+├── types/         # Definições de tipos TypeScript
+└── styles/        # Estilos globais
+```
+
+## Desenvolvimento
+
+1. Instale as dependências:
+   ```bash
+   npm install
+   ```
+
+2. Inicie o servidor de desenvolvimento:
+   ```bash
+   npm run dev
+   ```
+
+3. Acesse [http://localhost:3000](http://localhost:3000) no navegador.
+
+## Build
+
+Para gerar os arquivos de produção:
+
+```bash
+npm run build
+```
+
+Os arquivos serão gerados na pasta `dist/`.
+
+## Testes
+
+### Unitários
+```bash
+npm run test
+```
+
+### E2E
+```bash
+npm run test:e2e
+```
+
+## Configuração
+
+### Variáveis de Ambiente
+
+Crie um arquivo `.env` baseado no `.env.example`:
+
+```env
+VITE_API_URL=http://localhost:5000/api
+VITE_APP_NAME=BarbApp Admin
+```
+
+### ESLint
+
+O projeto utiliza ESLint para manter a qualidade do código. Para executar:
+
+```bash
+npm run lint
+```
+
+### Prettier
+
+Para formatar o código:
+
+```bash
+npm run format
+```
+
+## Contribuição
+
+1. Siga os padrões de código definidos no `rules/code-standard.md`
+2. Mantenha os commits seguindo o padrão em `rules/git-commit.md`
+3. Execute os testes antes de fazer commit
+4. Atualize a documentação quando necessário
