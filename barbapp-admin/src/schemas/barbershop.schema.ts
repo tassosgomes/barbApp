@@ -14,6 +14,11 @@ const phoneRegex = /^\(\d{2}\) \d{5}-\d{4}$/;
  */
 const zipCodeRegex = /^\d{5}-\d{3}$/;
 
+/**
+ * Brazilian document format: CPF (999.999.999-99) or CNPJ (99.999.999/9999-99)
+ */
+const documentRegex = /^(\d{3}\.\d{3}\.\d{3}-\d{2}|\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2})$/;
+
 // ===========================
 // ADDRESS SCHEMA
 // ===========================
@@ -70,6 +75,17 @@ export const barbershopSchema = z.object({
     .string()
     .min(3, 'Nome deve ter no mínimo 3 caracteres')
     .max(100, 'Nome deve ter no máximo 100 caracteres')
+    .trim(),
+
+  document: z
+    .string()
+    .regex(documentRegex, 'Documento inválido. Formato esperado: CPF (999.999.999-99) ou CNPJ (99.999.999/9999-99)')
+    .trim(),
+
+  ownerName: z
+    .string()
+    .min(3, 'Nome do proprietário deve ter no mínimo 3 caracteres')
+    .max(100, 'Nome do proprietário deve ter no máximo 100 caracteres')
     .trim(),
 
   email: z

@@ -6,6 +6,8 @@ describe('Barbershop Schema', () => {
     it('should validate complete barbershop data', () => {
       const validData = {
         name: 'Barbearia Teste',
+        document: '12.345.678/0001-99',
+        ownerName: 'João Silva',
         email: 'teste@barbapp.com',
         phone: '(11) 99999-9999',
         address: {
@@ -23,12 +25,16 @@ describe('Barbershop Schema', () => {
       expect(result.success).toBe(true);
       if (result.success) {
         expect(result.data.name).toBe('Barbearia Teste');
+        expect(result.data.document).toBe('12.345.678/0001-99');
+        expect(result.data.ownerName).toBe('João Silva');
       }
     });
 
     it('should transform state to uppercase', () => {
       const data = {
         name: 'Test',
+        document: '123.456.789-01',
+        ownerName: 'Test Owner',
         email: 'test@test.com',
         phone: '(11) 99999-9999',
         address: {
@@ -53,6 +59,8 @@ describe('Barbershop Schema', () => {
     it('should fail validation for short name', () => {
       const invalidData = {
         name: 'AB', // too short
+        document: '12.345.678/0001-99',
+        ownerName: 'João Silva',
         email: 'test@test.com',
         phone: '(11) 99999-9999',
         address: {
@@ -75,6 +83,8 @@ describe('Barbershop Schema', () => {
     it('should fail validation for invalid email', () => {
       const invalidData = {
         name: 'Test Name',
+        document: '12.345.678/0001-99',
+        ownerName: 'João Silva',
         email: 'invalid-email', // invalid format
         phone: '(11) 99999-9999',
         address: {
@@ -97,6 +107,8 @@ describe('Barbershop Schema', () => {
     it('should fail validation for invalid phone format', () => {
       const invalidData = {
         name: 'Test Name',
+        document: '12.345.678/0001-99',
+        ownerName: 'João Silva',
         email: 'test@test.com',
         phone: '11999999999', // missing formatting
         address: {
@@ -116,9 +128,11 @@ describe('Barbershop Schema', () => {
       }
     });
 
-    it('should fail validation for invalid CEP format', () => {
+    it('should fail validation for invalid document format', () => {
       const invalidData = {
         name: 'Test Name',
+        document: '12345678901', // invalid format
+        ownerName: 'João Silva',
         email: 'test@test.com',
         phone: '(11) 99999-9999',
         address: {
@@ -127,17 +141,38 @@ describe('Barbershop Schema', () => {
           neighborhood: 'Area',
           city: 'City',
           state: 'SP',
-          zipCode: '01000000', // missing dash
+          zipCode: '01000-000',
         },
       };
 
       const result = barbershopSchema.safeParse(invalidData);
       expect(result.success).toBe(false);
       if (!result.success) {
-        const zipCodeError = result.error.issues.find((issue) =>
-          issue.path.includes('zipCode')
-        );
-        expect(zipCodeError?.message).toContain('CEP inválido');
+        expect(result.error.issues[0].message).toContain('Documento inválido');
+      }
+    });
+
+    it('should fail validation for short owner name', () => {
+      const invalidData = {
+        name: 'Test Name',
+        document: '12.345.678/0001-99',
+        ownerName: 'AB', // too short
+        email: 'test@test.com',
+        phone: '(11) 99999-9999',
+        address: {
+          street: 'Street',
+          number: '123',
+          neighborhood: 'Area',
+          city: 'City',
+          state: 'SP',
+          zipCode: '01000-000',
+        },
+      };
+
+      const result = barbershopSchema.safeParse(invalidData);
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.issues[0].message).toContain('Nome do proprietário deve ter no mínimo 3 caracteres');
       }
     });
   });
