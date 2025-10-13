@@ -12,34 +12,57 @@ const api = axios.create({
 });
 
 /**
- * Request interceptor: Add JWT token to all requests
+ * Request interceptor: Add JWT token to all requests and log requests
  */
 api.interceptors.request.use(
   (config) => {
+    // Add token if available
     const token = localStorage.getItem('auth_token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+
+    // Log request
+    console.log(`API Request: ${config.method?.toUpperCase()} ${config.url}`);
+
     return config;
   },
   (error) => {
+    console.error('API Request Error:', error);
     return Promise.reject(error);
   }
 );
 
 /**
- * Response interceptor: Handle global errors
- * - 401: Clear token and redirect to login
+ * Response interceptor: Handle global errors and log responses
+ * - 401: Clear token, set session expiry flag, and redirect to login
  * - Other errors: Pass through for component-level handling
  */
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // Log successful response
+    console.log(`API Response: ${response.status} ${response.config.method?.toUpperCase()} ${response.config.url}`);
+    return response;
+  },
   (error) => {
+    // Log error response
+    if (error.response) {
+      console.error(`API Error Response: ${error.response.status} ${error.config?.method?.toUpperCase()} ${error.config?.url}`, error.response.data);
+    } else if (error.request) {
+      console.error('API Network Error:', error.message);
+    } else {
+      console.error('API Error:', error.message);
+    }
+
     if (error.response?.status === 401) {
-      // Unauthorized - clear token and redirect
+      // Unauthorized - clear token, set expiry flag, and redirect
       localStorage.removeItem('auth_token');
+      sessionStorage.setItem('session_expired', 'true');
       window.location.href = '/login';
     }
+
+    // TODO: Future - Implement token refresh logic for 401 errors when token is expired but refresh token is available
+
     return Promise.reject(error);
   }
 );
