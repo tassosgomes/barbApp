@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { barbershopService } from '@/services/barbershop.service';
 import type { Barbershop, BarbershopFilters, PaginatedResponse } from '@/types';
 
@@ -7,6 +7,14 @@ export function useBarbershops(filters: BarbershopFilters) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
+  // Memoize filters to prevent unnecessary re-renders
+  const memoizedFilters = useMemo(() => filters, [
+    filters.pageNumber,
+    filters.pageSize,
+    filters.searchTerm,
+    filters.isActive
+  ]);
+
   useEffect(() => {
     let cancelled = false;
 
@@ -14,7 +22,7 @@ export function useBarbershops(filters: BarbershopFilters) {
       try {
         setLoading(true);
         setError(null);
-        const response = await barbershopService.getAll(filters);
+        const response = await barbershopService.getAll(memoizedFilters);
         if (!cancelled) {
           setData(response);
         }
@@ -34,7 +42,7 @@ export function useBarbershops(filters: BarbershopFilters) {
     return () => {
       cancelled = true;
     };
-  }, [filters]);
+  }, [memoizedFilters]);
 
   return { data, loading, error };
 }
