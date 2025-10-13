@@ -50,6 +50,9 @@ public class GlobalExceptionHandlerMiddleware
             Domain.Exceptions.InvalidUniqueCodeException => (HttpStatusCode.Unauthorized, "Código da barbearia inválido"),
             ForbiddenException => (HttpStatusCode.Forbidden, exception.Message),
             NotFoundException => (HttpStatusCode.NotFound, exception.Message),
+            DuplicateDocumentException => (HttpStatusCode.UnprocessableEntity, exception.Message),
+            InvalidDocumentException => (HttpStatusCode.BadRequest, exception.Message),
+            BarbeariaInactiveException => (HttpStatusCode.UnprocessableEntity, exception.Message),
             FluentValidation.ValidationException => (HttpStatusCode.BadRequest, exception.Message),
             _ => (HttpStatusCode.InternalServerError, "An error occurred processing your request")
         };
