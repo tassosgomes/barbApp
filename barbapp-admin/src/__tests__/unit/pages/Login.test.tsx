@@ -77,7 +77,7 @@ describe('Login Page', () => {
     await user.click(screen.getByRole('button', { name: /entrar/i }));
 
     await waitFor(() => {
-      expect(api.post).toHaveBeenCalledWith('/auth/admin-central', {
+      expect(api.post).toHaveBeenCalledWith('/auth/admin-central/login', {
         email: 'admin@test.com',
         password: 'password123',
       });

@@ -26,7 +26,7 @@ export function Login() {
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
     try {
-      const response = await api.post('/auth/admin-central', data);
+      const response = await api.post('/auth/admin-central/login', data);
       localStorage.setItem('auth_token', response.data.token);
 
       toast({
