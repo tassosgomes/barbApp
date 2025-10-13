@@ -53,7 +53,7 @@ describe('barbershopService', () => {
       hasNextPage: false,
     };
 
-    (mockApi.get as any).mockResolvedValueOnce({ data: mockResponse });
+    (mockApi.get as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ data: mockResponse });
 
     const result = await barbershopService.getAll({ pageNumber: 1, pageSize: 20 });
 
@@ -89,7 +89,7 @@ describe('barbershopService', () => {
       updatedAt: '2024-01-01T00:00:00Z',
     };
 
-    (mockApi.get as any).mockResolvedValueOnce({ data: mockResponse });
+    (mockApi.get as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ data: mockResponse });
 
     const result = await barbershopService.getById('1');
 
@@ -131,7 +131,7 @@ describe('barbershopService', () => {
       },
     };
 
-    (mockApi.post as any).mockResolvedValueOnce({ data: mockResponse });
+    (mockApi.post as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ data: mockResponse });
 
     const result = await barbershopService.create(mockRequest);
 
@@ -143,12 +143,12 @@ describe('barbershopService', () => {
   it('should handle error responses', async () => {
     const { default: mockApi } = await import('@/services/api');
     const error = new Error('API Error');
-    (error as any).response = {
+    (error as unknown as { response: { data: { message: string }; status: number } }).response = {
       data: { message: 'Barbearia não encontrada' },
       status: 404,
     };
 
-    (mockApi.get as any).mockRejectedValueOnce(error);
+    (mockApi.get as ReturnType<typeof vi.fn>).mockRejectedValueOnce(error);
 
     await expect(barbershopService.getById('invalid-id')).rejects.toThrow();
   });

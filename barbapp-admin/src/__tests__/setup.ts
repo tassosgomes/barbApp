@@ -15,8 +15,8 @@ Object.defineProperty(window, 'localStorage', {
 });
 
 // Mock window.location
-delete (window as any).location;
-window.location = { href: '' } as any;
+delete (window as unknown as Record<string, unknown>).location;
+(window as unknown as Record<string, unknown>).location = { href: '' } as Location;
 
 afterEach(() => {
   cleanup();
