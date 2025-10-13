@@ -54,12 +54,15 @@ builder.Services.AddScoped<IAdminCentralUserRepository, AdminCentralUserReposito
 builder.Services.AddScoped<IAdminBarbeariaUserRepository, AdminBarbeariaUserRepository>();
 builder.Services.AddScoped<IBarberRepository, BarberRepository>();
 builder.Services.AddScoped<IBarbershopRepository, BarbershopRepository>();
+builder.Services.AddScoped<IAddressRepository, AddressRepository>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 
 // Security Services
 builder.Services.AddSingleton<IPasswordHasher, PasswordHasher>();
 builder.Services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
 builder.Services.AddScoped<ITenantContext, TenantContext>();
+builder.Services.AddScoped<IUniqueCodeGenerator, UniqueCodeGenerator>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 // JWT Settings
 builder.Services.Configure<JwtSettings>(
@@ -74,6 +77,11 @@ builder.Services.AddScoped<IAuthenticateBarbeiroUseCase, AuthenticateBarbeiroUse
 builder.Services.AddScoped<IAuthenticateClienteUseCase, AuthenticateClienteUseCase>();
 builder.Services.AddScoped<IListBarbeirosBarbeariaUseCase, ListBarbeirosBarbeariaUseCase>();
 builder.Services.AddScoped<ITrocarContextoBarbeiroUseCase, TrocarContextoBarbeiroUseCase>();
+builder.Services.AddScoped<ICreateBarbershopUseCase, CreateBarbershopUseCase>();
+builder.Services.AddScoped<IUpdateBarbershopUseCase, UpdateBarbershopUseCase>();
+builder.Services.AddScoped<IDeleteBarbershopUseCase, DeleteBarbershopUseCase>();
+builder.Services.AddScoped<IGetBarbershopUseCase, GetBarbershopUseCase>();
+builder.Services.AddScoped<IListBarbershopsUseCase, ListBarbershopsUseCase>();
 
 // ══════════════════════════════════════════════════════════
 // AUTHENTICATION & AUTHORIZATION
