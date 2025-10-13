@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Login - Barbearia SaaS</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#135bec",
+            "background-light": "#f6f6f8",
+            "background-dark": "#101622",
+            "text-light": "#101622",
+            "text-dark": "#f6f6f8",
+            "subtle-light": "#e7e7e9",
+            "subtle-dark": "#1c2431",
+            "placeholder-light": "#6b7280",
+            "placeholder-dark": "#9ca3af",
+          },
+          fontFamily: {
+            "display": ["Inter"]
+          },
+          borderRadius: {
+            "DEFAULT": "0.5rem",
+            "lg": "0.75rem",
+            "xl": "1rem",
+            "full": "9999px"
+          },
+        },
+      },
+    }
+  </script>
+<style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display">
+<div class="flex items-center justify-center min-h-screen">
+<div class="w-full max-w-md p-8 space-y-8 bg-background-light dark:bg-background-dark">
+<div class="text-center">
+<h1 class="text-3xl font-bold text-text-light dark:text-text-dark">Bem-vindo de volta</h1>
+<p class="mt-2 text-sm text-text-light/70 dark:text-text-dark/70">Faça login para gerenciar sua barbearia.</p>
+</div>
+<form class="space-y-6">
+<div>
+<label class="sr-only" for="email">E-mail</label>
+<input autocomplete="email" class="relative block w-full px-3 py-4 text-text-light dark:text-text-dark bg-subtle-light dark:bg-subtle-dark placeholder-placeholder-light dark:placeholder-placeholder-dark border border-transparent rounded-DEFAULT focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" id="email" name="email" placeholder="E-mail" required="" type="email"/>
+</div>
+<div>
+<label class="sr-only" for="password">Senha</label>
+<input autocomplete="current-password" class="relative block w-full px-3 py-4 text-text-light dark:text-text-dark bg-subtle-light dark:bg-subtle-dark placeholder-placeholder-light dark:placeholder-placeholder-dark border border-transparent rounded-DEFAULT focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" id="password" name="password" placeholder="Senha" required="" type="password"/>
+</div>
+<div class="flex items-center justify-end">
+<div class="text-sm">
+<a class="font-medium text-primary hover:text-primary/80" href="#">
+              Esqueceu a senha?
+            </a>
+</div>
+</div>
+<div>
+<button class="group relative flex justify-center w-full px-4 py-3 text-sm font-semibold text-white bg-primary border border-transparent rounded-DEFAULT hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary focus:ring-offset-background-light dark:focus:ring-offset-background-dark" type="submit">
+            Entrar
+          </button>
+</div>
+</form>
+</div>
+</div>
+
+</body></html>

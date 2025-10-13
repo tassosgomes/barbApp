@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Confirmation Modal</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com/" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#135bec",
+            "background-light": "#f6f6f8",
+            "background-dark": "#101622",
+          },
+          fontFamily: {
+            "display": ["Inter"]
+          },
+          borderRadius: {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+        },
+      },
+    }
+  </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display">
+<div class="fixed inset-0 bg-background-dark/80 flex items-center justify-center p-4">
+<div class="bg-background-light dark:bg-background-dark rounded-xl shadow-2xl w-full max-w-md">
+<div class="p-6 text-center">
+<div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/20">
+<span class="material-symbols-outlined text-primary text-3xl">warning</span>
+</div>
+<h2 class="mt-4 text-xl font-bold text-gray-900 dark:text-white">Confirmar Desativação</h2>
+<p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+          Você está prestes a desativar a barbearia <strong class="text-gray-800 dark:text-gray-200">The Sharp Edge</strong> (Código: <strong class="text-gray-800 dark:text-gray-200">12345</strong>).
+        </p>
+<p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+          Esta ação impedirá novos agendamentos e ocultará a barbearia dos resultados de pesquisa. Tem certeza que deseja prosseguir?
+        </p>
+</div>
+<div class="flex gap-2 bg-gray-50 dark:bg-black/20 p-4 rounded-b-xl">
+<button class="w-full rounded-lg bg-gray-200 dark:bg-white/10 px-4 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-white/20 transition-colors">
+          Cancelar
+        </button>
+<button class="w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white hover:bg-primary/90 transition-colors">
+          Confirmar desativação
+        </button>
+</div>
+</div>
+</div>
+
+</body></html>

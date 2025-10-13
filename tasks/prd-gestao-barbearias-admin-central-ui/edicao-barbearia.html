@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Stitch Design</title>
+<link href="data:image/x-icon;base64," rel="icon" type="image/x-icon"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#135bec",
+              "background-light": "#f6f6f8",
+              "background-dark": "#101622",
+              "content-light": "#E0E0E0",
+              "content-dark": "#232F48",
+              "muted-light": "#A1A1A1",
+              "muted-dark": "#92A4C9",
+              "border-light": "#E5E7EB",
+              "border-dark": "#232F48"
+            },
+            fontFamily: {
+              "display": ["Inter", "sans-serif"]
+            },
+            borderRadius: {
+              "DEFAULT": "0.5rem",
+              "lg": "0.75rem",
+              "xl": "1rem",
+              "full": "9999px"
+            },
+          },
+        },
+      }
+    </script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display">
+<div class="flex min-h-screen w-full flex-col">
+<header class="flex items-center justify-between whitespace-nowrap border-b border-border-light dark:border-border-dark px-10 py-4">
+<div class="flex items-center gap-4 text-slate-900 dark:text-white">
+<svg class="h-6 w-6 text-primary" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_6_535)">
+<path clip-rule="evenodd" d="M47.2426 24L24 47.2426L0.757355 24L24 0.757355L47.2426 24ZM12.2426 21H35.7574L24 9.24264L12.2426 21Z" fill="currentColor" fill-rule="evenodd"></path>
+</g>
+<defs>
+<clipPath id="clip0_6_535">
+<rect fill="white" height="48" width="48"></rect>
+</clipPath>
+</defs>
+</svg>
+<h2 class="text-lg font-bold">BarberApp</h2>
+</div>
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary" href="#">Dashboard</a>
+<a class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary" href="#">Clientes</a>
+<a class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary" href="#">Serviços</a>
+<a class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary" href="#">Agendamentos</a>
+<a class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary" href="#">Relatórios</a>
+</nav>
+<div class="flex items-center gap-4">
+<button class="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-background-light dark:bg-content-dark text-slate-600 dark:text-white hover:bg-slate-200 dark:hover:bg-slate-700">
+<span class="material-symbols-outlined"> notifications </span>
+</button>
+<div class="h-10 w-10 rounded-full bg-cover bg-center" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAPJ_nHiQrTrne8AVul90ty5vTtMiBQU1MW_t8918OuCBKXTgtGn-ciMw4Mq-G0sn2_59TqpDmUhjKtb2C204fM64rJ5LUKOh4ALle7ubCmg6yLvZcRSSEBrBK1-HYIwkZ0a0FERibYzMgMKnTv4SPA-nQuVPVQt8amKMg2QNDxsKBKK1Vpzzf1GLyWtISfyRDxEKjnHvWvI6R7QbKtbfNDOAvtINech17_7MVfeN0nVc2bFBWkDwe8MDTIvNtDmeVv21miPNyfYe8");'></div>
+</div>
+</header>
+<main class="flex flex-1 justify-center py-10 px-4 sm:px-6 lg:px-8">
+<div class="w-full max-w-2xl space-y-8">
+<div>
+<h1 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Editar Barbearia</h1>
+<p class="mt-2 text-sm text-slate-600 dark:text-slate-400">Atualize as informações da barbearia. Campos marcados com cadeado não podem ser alterados.</p>
+</div>
+<form action="#" class="space-y-6" method="POST">
+<div class="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
+<div class="sm:col-span-3">
+<label class="block text-sm font-medium leading-6 text-slate-900 dark:text-slate-300" for="name">Nome</label>
+<div class="mt-2">
+<input class="block w-full rounded-lg border-0 bg-white/5 dark:bg-content-dark py-2.5 px-4 text-slate-900 dark:text-white shadow-sm ring-1 ring-inset ring-border-light dark:ring-border-dark focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6" id="name" name="name" type="text" value="Barbearia do Zé"/>
+</div>
+</div>
+<div class="sm:col-span-3">
+<label class="block text-sm font-medium leading-6 text-slate-900 dark:text-slate-300" for="phone">Telefone</label>
+<div class="mt-2">
+<input class="block w-full rounded-lg border-0 bg-white/5 dark:bg-content-dark py-2.5 px-4 text-slate-900 dark:text-white shadow-sm ring-1 ring-inset ring-border-light dark:ring-border-dark focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6" id="phone" name="phone" type="tel" value="(11) 98765-4321"/>
+</div>
+</div>
+<div class="sm:col-span-3">
+<label class="block text-sm font-medium leading-6 text-slate-900 dark:text-slate-300" for="owner">Proprietário</label>
+<div class="mt-2">
+<input class="block w-full rounded-lg border-0 bg-white/5 dark:bg-content-dark py-2.5 px-4 text-slate-900 dark:text-white shadow-sm ring-1 ring-inset ring-border-light dark:ring-border-dark focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6" id="owner" name="owner" type="text" value="José da Silva"/>
+</div>
+</div>
+<div class="sm:col-span-3">
+<label class="block text-sm font-medium leading-6 text-slate-900 dark:text-slate-300" for="email">Email</label>
+<div class="mt-2">
+<input class="block w-full rounded-lg border-0 bg-white/5 dark:bg-content-dark py-2.5 px-4 text-slate-900 dark:text-white shadow-sm ring-1 ring-inset ring-border-light dark:ring-border-dark focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6" id="email" name="email" type="email" value="contato@barbeariadoze.com"/>
+</div>
+</div>
+<div class="sm:col-span-3">
+<label class="block text-sm font-medium leading-6 text-slate-900 dark:text-slate-300" for="code">Código</label>
+<div class="relative mt-2">
+<input class="block w-full rounded-lg border-0 bg-slate-100 dark:bg-slate-800 py-2.5 pl-4 pr-10 text-slate-500 dark:text-slate-400 shadow-sm ring-1 ring-inset ring-border-light dark:ring-border-dark sm:text-sm sm:leading-6" id="code" name="code" readonly="" type="text" value="BARBERZE01"/>
+<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+<span class="material-symbols-outlined text-slate-400 dark:text-slate-500"> lock </span>
+</div>
+</div>
+</div>
+<div class="sm:col-span-3">
+<label class="block text-sm font-medium leading-6 text-slate-900 dark:text-slate-300" for="document">Documento</label>
+<div class="relative mt-2">
+<input class="block w-full rounded-lg border-0 bg-slate-100 dark:bg-slate-800 py-2.5 pl-4 pr-10 text-slate-500 dark:text-slate-400 shadow-sm ring-1 ring-inset ring-border-light dark:ring-border-dark sm:text-sm sm:leading-6" id="document" name="document" readonly="" type="text" value="12.345.678/0001-90"/>
+<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+<span class="material-symbols-outlined text-slate-400 dark:text-slate-500"> lock </span>
+</div>
+</div>
+</div>
+<div class="sm:col-span-2">
+<label class="block text-sm font-medium leading-6 text-slate-900 dark:text-slate-300" for="zip">CEP</label>
+<div class="mt-2">
+<input class="block w-full rounded-lg border-0 bg-white/5 dark:bg-content-dark py-2.5 px-4 text-slate-900 dark:text-white shadow-sm ring-1 ring-inset ring-border-light dark:ring-border-dark focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6" id="zip" name="zip" type="text" value="01234-567"/>
+</div>
+</div>
+<div class="sm:col-span-4">
+<label class="block text-sm font-medium leading-6 text-slate-900 dark:text-slate-300" for="street">Rua</label>
+<div class="mt-2">
+<input class="block w-full rounded-lg border-0 bg-white/5 dark:bg-content-dark py-2.5 px-4 text-slate-900 dark:text-white shadow-sm ring-1 ring-inset ring-border-light dark:ring-border-dark focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6" id="street" name="street" type="text" value="Rua das Tesouras"/>
+</div>
+</div>
+<div class="sm:col-span-2">
+<label class="block text-sm font-medium leading-6 text-slate-900 dark:text-slate-300" for="number">Número</label>
+<div class="mt-2">
+<input class="block w-full rounded-lg border-0 bg-white/5 dark:bg-content-dark py-2.5 px-4 text-slate-900 dark:text-white shadow-sm ring-1 ring-inset ring-border-light dark:ring-border-dark focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6" id="number" name="number" type="text" value="123"/>
+</div>
+</div>
+<div class="sm:col-span-4">
+<label class="block text-sm font-medium leading-6 text-slate-900 dark:text-slate-300" for="complement">Complemento</label>
+<div class="mt-2">
+<input class="block w-full rounded-lg border-0 bg-white/5 dark:bg-content-dark py-2.5 px-4 text-slate-900 dark:text-white shadow-sm ring-1 ring-inset ring-border-light dark:ring-border-dark focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6" id="complement" name="complement" type="text" value="Sala 1"/>
+</div>
+</div>
+<div class="sm:col-span-2">
+<label class="block text-sm font-medium leading-6 text-slate-900 dark:text-slate-300" for="neighborhood">Bairro</label>
+<div class="mt-2">
+<input class="block w-full rounded-lg border-0 bg-white/5 dark:bg-content-dark py-2.5 px-4 text-slate-900 dark:text-white shadow-sm ring-1 ring-inset ring-border-light dark:ring-border-dark focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6" id="neighborhood" name="neighborhood" type="text" value="Centro"/>
+</div>
+</div>
+<div class="sm:col-span-2">
+<label class="block text-sm font-medium leading-6 text-slate-900 dark:text-slate-300" for="city">Cidade</label>
+<div class="mt-2">
+<input class="block w-full rounded-lg border-0 bg-white/5 dark:bg-content-dark py-2.5 px-4 text-slate-900 dark:text-white shadow-sm ring-1 ring-inset ring-border-light dark:ring-border-dark focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6" id="city" name="city" type="text" value="São Paulo"/>
+</div>
+</div>
+<div class="sm:col-span-2">
+<label class="block text-sm font-medium leading-6 text-slate-900 dark:text-slate-300" for="state">Estado</label>
+<div class="mt-2">
+<input class="block w-full rounded-lg border-0 bg-white/5 dark:bg-content-dark py-2.5 px-4 text-slate-900 dark:text-white shadow-sm ring-1 ring-inset ring-border-light dark:ring-border-dark focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6" id="state" name="state" type="text" value="SP"/>
+</div>
+</div>
+</div>
+<div class="flex justify-end gap-4 pt-4">
+<button class="rounded-lg bg-background-light dark:bg-content-dark px-4 py-2 text-sm font-semibold text-slate-900 dark:text-white shadow-sm ring-1 ring-inset ring-border-light dark:ring-border-dark hover:bg-slate-100 dark:hover:bg-slate-700" type="button">Cancelar</button>
+<button class="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary/80" type="submit">Salvar Alterações</button>
+</div>
+</form>
+</div>
+</main>
+</div>
+
+</body></html>

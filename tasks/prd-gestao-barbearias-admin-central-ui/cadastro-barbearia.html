@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Stitch Design</title>
+<link href="data:image/x-icon;base64," rel="icon" type="image/x-icon"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#135bec",
+              "background-light": "#f6f6f8",
+              "background-dark": "#101622",
+            },
+            fontFamily: {
+              "display": ["Inter"]
+            },
+            borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+          },
+        },
+      }
+    </script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-gray-800 dark:text-gray-200">
+<div class="flex min-h-screen w-full flex-col">
+<header class="flex items-center justify-between whitespace-nowrap border-b border-gray-200 dark:border-gray-800 px-10 py-3">
+<div class="flex items-center gap-4">
+<div class="h-8 w-8 text-primary">
+<svg fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_6_535)">
+<path clip-rule="evenodd" d="M47.2426 24L24 47.2426L0.757355 24L24 0.757355L47.2426 24ZM12.2426 21H35.7574L24 9.24264L12.2426 21Z" fill="currentColor" fill-rule="evenodd"></path>
+</g>
+<defs>
+<clipPath id="clip0_6_535">
+<rect fill="white" height="48" width="48"></rect>
+</clipPath>
+</defs>
+</svg>
+</div>
+<h2 class="text-lg font-bold text-gray-900 dark:text-white">BarberApp</h2>
+</div>
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors" href="#">Dashboard</a>
+<a class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors" href="#">Agenda</a>
+<a class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors" href="#">Clientes</a>
+<a class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors" href="#">Serviços</a>
+<a class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors" href="#">Relatórios</a>
+</nav>
+<div class="flex items-center gap-4">
+<div class="h-10 w-10 rounded-full bg-cover bg-center" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDn8RK9pobVtR0W6uUBU4f0J3idR9VdBe_ShV6VyUmKsWPmOWDx4MRqCC3_fI8zUxcqDWOcvkITpKU9ZEXgJfPeO9R0RUO-LVv389W1IU7eLUHCH17OS32iUTw4B-MNEiLuHICBCgNYt88l6Tv0yUbryEXXGZ5j4EPVdPvD19u5ugJL0AKrbKLzXvLblIheRWffXyOrceh9vyfqDEaIquOb_-F1TkORoA68XcDCWi3L-CtGhXWErlHWlhSDVd3Te92gxTgJST0tcd0");'></div>
+</div>
+</header>
+<main class="flex flex-1 justify-center py-12 px-4 sm:px-6 lg:px-8">
+<div class="w-full max-w-2xl space-y-8">
+<div>
+<h1 class="text-3xl font-extrabold text-gray-900 dark:text-white">Cadastrar Barbearia</h1>
+<p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Preencha os campos abaixo para registrar uma nova barbearia.</p>
+</div>
+<form action="#" class="mt-8 space-y-6" method="POST">
+<div class="space-y-6 rounded-lg bg-background-light dark:bg-background-dark p-6 shadow-sm ring-1 ring-gray-200 dark:ring-gray-800">
+<div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+<div class="col-span-1 md:col-span-2">
+<label class="block text-sm font-medium text-gray-700 dark:text-gray-300" for="barbershop-name">Nome da Barbearia *</label>
+<input class="mt-1 block w-full rounded border-gray-300 bg-white dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:placeholder:text-gray-500 focus:border-primary focus:ring-primary" id="barbershop-name" name="barbershop-name" placeholder="Ex: Barber Shop do Zé" required="" type="text"/>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 dark:text-gray-300" for="document">Documento (CNPJ ou CPF) *</label>
+<input class="mt-1 block w-full rounded border-gray-300 bg-white dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:placeholder:text-gray-500 focus:border-primary focus:ring-primary" id="document" name="document" placeholder="00.000.000/0000-00" required="" type="text"/>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 dark:text-gray-300" for="phone">Telefone de Contato *</label>
+<input class="mt-1 block w-full rounded border-gray-300 bg-white dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:placeholder:text-gray-500 focus:border-primary focus:ring-primary" id="phone" name="phone" placeholder="(11) 99999-9999" required="" type="tel"/>
+</div>
+<div class="col-span-1 md:col-span-2">
+<label class="block text-sm font-medium text-gray-700 dark:text-gray-300" for="email">Email *</label>
+<input class="mt-1 block w-full rounded border-gray-300 bg-white dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:placeholder:text-gray-500 focus:border-primary focus:ring-primary" id="email" name="email" placeholder="contato@barbershop.com" required="" type="email"/>
+</div>
+<div class="col-span-1 md:col-span-2">
+<label class="block text-sm font-medium text-gray-700 dark:text-gray-300" for="owner">Proprietário *</label>
+<input class="mt-1 block w-full rounded border-gray-300 bg-white dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:placeholder:text-gray-500 focus:border-primary focus:ring-primary" id="owner" name="owner" placeholder="Nome completo do proprietário" required="" type="text"/>
+</div>
+</div>
+<div class="border-t border-gray-200 dark:border-gray-800 pt-6">
+<h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-white">Endereço</h3>
+<div class="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-6">
+<div class="sm:col-span-2">
+<label class="block text-sm font-medium text-gray-700 dark:text-gray-300" for="zip">CEP *</label>
+<input class="mt-1 block w-full rounded border-gray-300 bg-white dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:placeholder:text-gray-500 focus:border-primary focus:ring-primary" id="zip" name="zip" placeholder="00000-000" required="" type="text"/>
+</div>
+<div class="sm:col-span-4">
+<label class="block text-sm font-medium text-gray-700 dark:text-gray-300" for="street">Rua *</label>
+<input class="mt-1 block w-full rounded border-gray-300 bg-white dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:placeholder:text-gray-500 focus:border-primary focus:ring-primary" id="street" name="street" required="" type="text"/>
+</div>
+<div class="sm:col-span-2">
+<label class="block text-sm font-medium text-gray-700 dark:text-gray-300" for="number">Número *</label>
+<input class="mt-1 block w-full rounded border-gray-300 bg-white dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:placeholder:text-gray-500 focus:border-primary focus:ring-primary" id="number" name="number" required="" type="text"/>
+</div>
+<div class="sm:col-span-4">
+<label class="block text-sm font-medium text-gray-700 dark:text-gray-300" for="complement">Complemento</label>
+<input class="mt-1 block w-full rounded border-gray-300 bg-white dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:placeholder:text-gray-500 focus:border-primary focus:ring-primary" id="complement" name="complement" type="text"/>
+</div>
+<div class="sm:col-span-2">
+<label class="block text-sm font-medium text-gray-700 dark:text-gray-300" for="neighborhood">Bairro *</label>
+<input class="mt-1 block w-full rounded border-gray-300 bg-white dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:placeholder:text-gray-500 focus:border-primary focus:ring-primary" id="neighborhood" name="neighborhood" required="" type="text"/>
+</div>
+<div class="sm:col-span-2">
+<label class="block text-sm font-medium text-gray-700 dark:text-gray-300" for="city">Cidade *</label>
+<input class="mt-1 block w-full rounded border-gray-300 bg-white dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:placeholder:text-gray-500 focus:border-primary focus:ring-primary" id="city" name="city" required="" type="text"/>
+</div>
+<div class="sm:col-span-2">
+<label class="block text-sm font-medium text-gray-700 dark:text-gray-300" for="state">Estado *</label>
+<input class="mt-1 block w-full rounded border-gray-300 bg-white dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:placeholder:text-gray-500 focus:border-primary focus:ring-primary" id="state" name="state" placeholder="SP" required="" type="text"/>
+</div>
+</div>
+</div>
+</div>
+<div class="flex justify-end">
+<button class="flex justify-center rounded border border-transparent bg-primary py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-background-dark" type="submit">
+                Salvar
+              </button>
+</div>
+</form>
+<div class="mt-12 rounded-lg bg-background-light dark:bg-background-dark p-6 shadow-sm ring-1 ring-gray-200 dark:ring-gray-800">
+<h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-white">Cadastro Realizado com Sucesso!</h3>
+<div class="mt-4 flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
+<div>
+<p class="text-sm text-gray-600 dark:text-gray-400">Seu código único para acesso:</p>
+<p class="text-2xl font-bold text-primary">BARBER-123456</p>
+</div>
+<button class="inline-flex items-center gap-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-background-dark" type="button">
+<span class="material-symbols-outlined text-base">content_copy</span>
+                    Copiar Código
+                </button>
+</div>
+</div>
+</div>
+</main>
+</div>
+
+</body></html>

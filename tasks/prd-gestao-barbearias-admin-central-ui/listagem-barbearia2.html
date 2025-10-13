@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>BarberApp - Barbearias</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#135bec",
+            "background-light": "#f6f6f8",
+            "background-dark": "#101622",
+          },
+          fontFamily: {
+            "display": ["Inter"]
+          },
+          borderRadius: {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+        },
+      },
+    }
+  </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-gray-800 dark:text-gray-200">
+<div class="flex flex-col min-h-screen">
+<header class="bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm sticky top-0 z-10 border-b border-gray-200/50 dark:border-gray-800/50">
+<div class="container mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex h-16 items-center justify-between">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-2 text-gray-900 dark:text-white">
+<span class="material-symbols-outlined text-primary text-2xl">content_cut</span>
+<h1 class="text-xl font-bold">BarberApp</h1>
+</div>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors" href="#">Dashboard</a>
+<a class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors" href="#">Clientes</a>
+<a class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors" href="#">Serviços</a>
+<a class="text-sm font-medium text-primary dark:text-primary font-semibold" href="#">Barbearias</a>
+<a class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors" href="#">Agendamentos</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAlfrcRW9XS7mN0FqxVsrzwpjJ6SXNOnadzCO-my_Lq--kKIsFg51mqBhUjmykE3k8texfehMyfsqpKpuahr8MbSuRVdp0CVec4XooVtRuEyS0NiNMVgVLQl9TexQlsjLi_yUfIS8XHHCwNJqcHIHaZEnxcGo-tqDYd4cN1U_kuuO-Q8rZELEWMkhvyic96U1l7d6b02omzMI62n4EwIPjfD5TjXabfl_1gT8yHlcOAMGZO-CTMYZGx9qQJS-FCCI53cwQJ6iSYLuE");'></div>
+</div>
+</div>
+</div>
+</header>
+<main class="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+<div class="flex flex-col gap-8">
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+<h2 class="text-3xl font-bold text-gray-900 dark:text-white">Barbearias</h2>
+<button class="flex items-center justify-center gap-2 h-10 px-4 rounded-lg bg-primary text-white text-sm font-medium">
+<span class="material-symbols-outlined">add</span>
+            Nova Barbearia
+          </button>
+</div>
+<div class="bg-background-light dark:bg-background-dark/50 rounded-lg p-4 sm:p-6 flex flex-col gap-4 border border-gray-200/50 dark:border-gray-800/50">
+<div class="flex flex-col md:flex-row gap-4">
+<div class="relative flex-grow">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500">search</span>
+<input class="w-full h-10 pl-10 pr-4 rounded-lg border border-gray-300 dark:border-gray-700 bg-background-light dark:bg-background-dark focus:ring-2 focus:ring-primary focus:border-primary outline-none text-sm" placeholder="Buscar por nome, código ou cidade..." type="text"/>
+</div>
+<div class="flex gap-2">
+<select class="h-10 rounded-lg border border-gray-300 dark:border-gray-700 bg-background-light dark:bg-background-dark focus:ring-2 focus:ring-primary focus:border-primary outline-none text-sm text-gray-600 dark:text-gray-300">
+<option>Todas</option>
+<option>Ativas</option>
+<option>Inativas</option>
+</select>
+<select class="h-10 rounded-lg border border-gray-300 dark:border-gray-700 bg-background-light dark:bg-background-dark focus:ring-2 focus:ring-primary focus:border-primary outline-none text-sm text-gray-600 dark:text-gray-300">
+<option>Ordenar por Nome</option>
+<option>Ordenar por Data de Criação</option>
+</select>
+</div>
+</div>
+</div>
+<div class="overflow-x-auto">
+<div class="inline-block min-w-full align-middle">
+<div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 rounded-lg">
+<table class="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
+<thead class="bg-gray-50 dark:bg-gray-800/50">
+<tr>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider" scope="col">Nome</th>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider" scope="col">Código</th>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider" scope="col">Cidade/UF</th>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider" scope="col">Status</th>
+<th class="relative px-6 py-3" scope="col">
+<span class="sr-only">Ações</span>
+</th>
+</tr>
+</thead>
+<tbody class="bg-background-light dark:bg-background-dark divide-y divide-gray-200 dark:divide-gray-800">
+<tr>
+<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">Barbearia Central</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">BC123</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">São Paulo/SP</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300">
+                        Ativa
+                      </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+<button class="text-primary hover:text-primary/80"><span class="material-symbols-outlined text-base">edit</span></button>
+<button class="text-yellow-500 hover:text-yellow-400"><span class="material-symbols-outlined text-base">toggle_off</span></button>
+<button class="text-gray-400 hover:text-gray-300"><span class="material-symbols-outlined text-base">content_copy</span></button>
+</td>
+</tr>
+<tr>
+<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">Barbearia do Bairro</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">BB456</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">Rio de Janeiro/RJ</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300">
+                        Inativa
+                      </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+<button class="text-primary hover:text-primary/80"><span class="material-symbols-outlined text-base">edit</span></button>
+<button class="text-green-500 hover:text-green-400"><span class="material-symbols-outlined text-base">toggle_on</span></button>
+<button class="text-gray-400 hover:text-gray-300"><span class="material-symbols-outlined text-base">content_copy</span></button>
+</td>
+</tr>
+<tr>
+<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">Barbearia Moderna</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">BM789</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">Belo Horizonte/MG</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300">
+                        Ativa
+                      </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+<button class="text-primary hover:text-primary/80"><span class="material-symbols-outlined text-base">edit</span></button>
+<button class="text-yellow-500 hover:text-yellow-400"><span class="material-symbols-outlined text-base">toggle_off</span></button>
+<button class="text-gray-400 hover:text-gray-300"><span class="material-symbols-outlined text-base">content_copy</span></button>
+</td>
+</tr>
+<tr>
+<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">Barbearia Clássica</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">BC012</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">Porto Alegre/RS</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300">
+                        Ativa
+                      </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+<button class="text-primary hover:text-primary/80"><span class="material-symbols-outlined text-base">edit</span></button>
+<button class="text-yellow-500 hover:text-yellow-400"><span class="material-symbols-outlined text-base">toggle_off</span></button>
+<button class="text-gray-400 hover:text-gray-300"><span class="material-symbols-outlined text-base">content_copy</span></button>
+</td>
+</tr>
+<tr>
+<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">Barbearia Elegante</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">BE345</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">Curitiba/PR</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300">
+                        Inativa
+                      </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+<button class="text-primary hover:text-primary/80"><span class="material-symbols-outlined text-base">edit</span></button>
+<button class="text-green-500 hover:text-green-400"><span class="material-symbols-outlined text-base">toggle_on</span></button>
+<button class="text-gray-400 hover:text-gray-300"><span class="material-symbols-outlined text-base">content_copy</span></button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<nav aria-label="Pagination" class="flex items-center justify-between border-t border-gray-200 dark:border-gray-800 px-4 sm:px-0 pt-4">
+<div class="hidden sm:block">
+<p class="text-sm text-gray-700 dark:text-gray-400">
+              Mostrando <span class="font-medium">1</span> a <span class="font-medium">10</span> de <span class="font-medium">20</span> resultados
+            </p>
+</div>
+<div class="flex-1 flex justify-between sm:justify-end">
+<a class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-700 text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 bg-background-light dark:bg-background-dark hover:bg-gray-50 dark:hover:bg-gray-800" href="#">
+              Anterior
+            </a>
+<a class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-700 text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 bg-background-light dark:bg-background-dark hover:bg-gray-50 dark:hover:bg-gray-800" href="#">
+              Próximo
+            </a>
+</div>
+</nav>
+</div>
+</main>
+</div>
+
+</body></html>
