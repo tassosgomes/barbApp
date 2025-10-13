@@ -1,1 +1,1 @@
-export {};
+export { handleApiError } from './errorHandler';
