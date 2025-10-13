@@ -1,5 +1,5 @@
 ---
-status: pending
+status: completed
 parallelizable: false
 blocked_by: ["4.0"]
 ---
@@ -25,12 +25,12 @@ Esta fase é crucial para garantir que todos os componentes do sistema funcionem
 - Validar os casos de erro, como criação de documento duplicado e acesso não autorizado.
 
 ## Subtarefas
-- [ ] 5.1 **Configurar TestContainers**: Adicionar o pacote TestContainers.PostgreSql e configurar a classe base de testes para iniciar e parar o contêiner do banco de dados.
-- [ ] 5.2 **Configurar `WebApplicationFactory`**: Usar `WebApplicationFactory` para hospedar a API em memória e sobrescrever a conexão do banco de dados para apontar para o TestContainer.
-- [ ] 5.3 **Implementar Teste de Criação**: Criar um teste para o endpoint `POST /api/barbearias`, validando a resposta 201 e a persistência correta dos dados no banco.
-- [ ] 5.4 **Implementar Teste de Listagem e Paginação**: Criar um teste que insere múltiplos registros e verifica se a paginação, filtros e ordenação do endpoint `GET /api/barbearias` funcionam.
-- [ ] 5.5 **Implementar Teste de Atualização e Exclusão**: Criar testes para os endpoints `PUT` e `DELETE`, verificando se os dados são atualizados e removidos (ou desativados) corretamente.
-- [ ] 5.6 **Implementar Testes de Erro**: Criar testes para cenários como tentar criar uma barbearia com um CNPJ duplicado (esperando 422) ou acessar um endpoint sem o token de Admin (esperando 401/403).
+- [x] 5.1 **Configurar TestContainers**: Adicionar o pacote TestContainers.PostgreSql e configurar a classe base de testes para iniciar e parar o contêiner do banco de dados.
+- [x] 5.2 **Configurar `WebApplicationFactory`**: Usar `WebApplicationFactory` para hospedar a API em memória e sobrescrever a conexão do banco de dados para apontar para o TestContainer.
+- [x] 5.3 **Implementar Teste de Criação**: Criar um teste para o endpoint `POST /api/barbearias`, validando a resposta 201 e a persistência correta dos dados no banco.
+- [x] 5.4 **Implementar Teste de Listagem e Paginação**: Criar um teste que insere múltiplos registros e verifica se a paginação, filtros e ordenação do endpoint `GET /api/barbearias` funcionam.
+- [x] 5.5 **Implementar Teste de Atualização e Exclusão**: Criar testes para os endpoints `PUT` e `DELETE`, verificando se os dados são atualizados e removidos (ou desativados) corretamente.
+- [x] 5.6 **Implementar Testes de Erro**: Criar testes para cenários como tentar criar uma barbearia com um CNPJ duplicado (esperando 422) ou acessar um endpoint sem o token de Admin (esperando 401/403).
 
 ## Detalhes de Implementação
 - **Localização**: `BarbApp.IntegrationTests`

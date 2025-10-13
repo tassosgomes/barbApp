@@ -7,6 +7,7 @@ using BarbApp.Domain.Entities;
 using BarbApp.Domain.ValueObjects;
 using BarbApp.Infrastructure.Persistence;
 using BarbApp.Infrastructure.Services;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BarbApp.IntegrationTests;
 
@@ -123,6 +124,17 @@ public static class TestHelper
 
         var authResponse = await response.Content.ReadFromJsonAsync<AuthResponse>();
         return authResponse!.Token;
+    }
+
+    public static string GenerateAdminCentralToken(IServiceProvider services)
+    {
+        var jwtGenerator = services.GetRequiredService<IJwtTokenGenerator>();
+        var token = jwtGenerator.GenerateToken(
+            userId: Guid.NewGuid().ToString(),
+            userType: "AdminCentral",
+            email: "admin@test.com",
+            barbeariaId: null);
+        return token.Value;
     }
 
     private static string GenerateUniqueCode()
