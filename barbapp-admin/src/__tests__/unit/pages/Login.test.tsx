@@ -79,7 +79,7 @@ describe('Login Page', () => {
     await waitFor(() => {
       expect(api.post).toHaveBeenCalledWith('/auth/admin-central/login', {
         email: 'admin@test.com',
-        password: 'password123',
+        senha: 'password123',
       });
       expect(mockToast).toHaveBeenCalledWith({
         title: 'Login realizado com sucesso!',

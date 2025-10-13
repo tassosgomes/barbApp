@@ -79,16 +79,16 @@ export function Login() {
 
           {/* Password Field */}
           <div>
-            <Label htmlFor="password">Senha</Label>
+            <Label htmlFor="senha">Senha</Label>
             <div className="relative">
               <Input
-                id="password"
+                id="senha"
                 type={showPassword ? 'text' : 'password'}
                 autoComplete="current-password"
-                {...register('password')}
-                className={errors.password ? 'border-red-500' : ''}
-                aria-invalid={errors.password ? 'true' : 'false'}
-                aria-describedby={errors.password ? 'password-error' : undefined}
+                {...register('senha')}
+                className={errors.senha ? 'border-red-500' : ''}
+                aria-invalid={errors.senha ? 'true' : 'false'}
+                aria-describedby={errors.senha ? 'senha-error' : undefined}
               />
               <button
                 type="button"
@@ -99,9 +99,9 @@ export function Login() {
                 {showPassword ? '🙈' : '👁️'}
               </button>
             </div>
-            {errors.password && (
-              <p id="password-error" className="mt-1 text-sm text-red-500">
-                {errors.password.message}
+            {errors.senha && (
+              <p id="senha-error" className="mt-1 text-sm text-red-500">
+                {errors.senha.message}
               </p>
             )}
           </div>
