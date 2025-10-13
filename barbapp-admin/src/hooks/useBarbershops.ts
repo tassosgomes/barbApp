@@ -8,12 +8,7 @@ export function useBarbershops(filters: BarbershopFilters) {
   const [error, setError] = useState<Error | null>(null);
 
   // Memoize filters to prevent unnecessary re-renders
-  const memoizedFilters = useMemo(() => filters, [
-    filters.pageNumber,
-    filters.pageSize,
-    filters.searchTerm,
-    filters.isActive
-  ]);
+  const memoizedFilters = useMemo(() => filters, [filters]);
 
   useEffect(() => {
     let cancelled = false;
