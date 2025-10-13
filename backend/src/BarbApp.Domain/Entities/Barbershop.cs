@@ -44,14 +44,37 @@ namespace BarbApp.Domain.Entities
             string createdBy)
         {
             // Validações de domínio
+            if (string.IsNullOrWhiteSpace(name))
+                throw new ArgumentException("Name is required", nameof(name));
+            if (name.Length > 255)
+                throw new ArgumentException("Name must be max 255 characters", nameof(name));
+            
+            if (string.IsNullOrWhiteSpace(phone))
+                throw new ArgumentException("Phone is required", nameof(phone));
+            
+            if (string.IsNullOrWhiteSpace(ownerName))
+                throw new ArgumentException("Owner name is required", nameof(ownerName));
+            if (ownerName.Length > 255)
+                throw new ArgumentException("Owner name must be max 255 characters", nameof(ownerName));
+            
+            if (string.IsNullOrWhiteSpace(email))
+                throw new ArgumentException("Email is required", nameof(email));
+            if (email.Length > 255)
+                throw new ArgumentException("Email must be max 255 characters", nameof(email));
+            if (!email.Contains("@") || !email.Contains("."))
+                throw new ArgumentException("Invalid email format", nameof(email));
+            
+            if (string.IsNullOrWhiteSpace(createdBy))
+                throw new ArgumentException("CreatedBy is required", nameof(createdBy));
+
             var barbershop = new Barbershop
             {
                 Id = Guid.NewGuid(),
-                Name = name,
+                Name = name.Trim(),
                 Document = document,
                 Phone = phone,
-                OwnerName = ownerName,
-                Email = email,
+                OwnerName = ownerName.Trim(),
+                Email = email.ToLowerInvariant().Trim(),
                 Address = address,
                 AddressId = address.Id,
                 Code = code,
