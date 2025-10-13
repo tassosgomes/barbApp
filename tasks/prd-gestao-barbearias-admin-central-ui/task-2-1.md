@@ -1,6 +1,6 @@
 # Task 2.1: TypeScript Types and Interfaces
 
-**Status**: 🔵 Not Started
+**Status**: ✅ Completed
 **Priority**: Crítica
 **Estimated Effort**: 0.5 day
 **Phase**: Phase 2 - Type Safety and API
@@ -13,14 +13,14 @@ These types provide compile-time safety and IDE autocomplete for the entire appl
 
 ## Acceptance Criteria
 
-- [ ] Barbershop interface with all fields defined
-- [ ] Address interface with complete address structure
-- [ ] Auth types (LoginRequest, LoginResponse, User)
-- [ ] API response wrapper types (ApiResponse, PaginatedResponse)
-- [ ] Filter and query parameter types
-- [ ] All types exported via barrel export
-- [ ] No TypeScript errors in type definitions
-- [ ] JSDoc comments for complex types
+- [x] Barbershop interface with all fields defined
+- [x] Address interface with complete address structure
+- [x] Auth types (LoginRequest, LoginResponse, User)
+- [x] API response wrapper types (ApiResponse, PaginatedResponse)
+- [x] Filter and query parameter types
+- [x] All types exported via barrel export
+- [x] No TypeScript errors in type definitions
+- [x] JSDoc comments for complex types
 
 ## Dependencies
 
