@@ -182,7 +182,7 @@ describe('Login Schema', () => {
   it('should validate correct login credentials', () => {
     const validData = {
       email: 'admin@barbapp.com',
-      password: 'SecurePass123',
+      senha: 'SecurePass123',
     };
 
     const result = loginSchema.safeParse(validData);
@@ -192,7 +192,7 @@ describe('Login Schema', () => {
   it('should fail validation for short password', () => {
     const invalidData = {
       email: 'admin@barbapp.com',
-      password: '12345', // too short
+      senha: '12345', // too short
     };
 
     const result = loginSchema.safeParse(invalidData);
