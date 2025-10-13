@@ -24,7 +24,7 @@ export function applyPhoneMask(value: string): string {
  * Aplicar máscara de CEP 99999-999
  */
 export function applyZipCodeMask(value: string): string {
-  const cleaned = value.replace(/\D/g, '');
+  const cleaned = value.replace(/\D/g, '').slice(0, 8); // Limit to 8 digits
 
   if (cleaned.length >= 8) {
     const match = cleaned.match(/^(\d{5})(\d{3})$/);
@@ -47,7 +47,7 @@ export function applyZipCodeMask(value: string): string {
  * CNPJ: 99.999.999/9999-99
  */
 export function applyDocumentMask(value: string): string {
-  const cleaned = value.replace(/\D/g, '');
+  const cleaned = value.replace(/\D/g, '').slice(0, 14); // Limit to 14 digits (max CNPJ)
 
   if (cleaned.length <= 11) {
     // CPF format
