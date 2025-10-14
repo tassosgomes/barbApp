@@ -1,15 +1,59 @@
-import { UseFormRegister, FieldErrors, UseFormSetValue } from 'react-hook-form';
+import { useEffect } from 'react';
+import { UseFormRegister, FieldErrors, UseFormSetValue, UseFormWatch } from 'react-hook-form';
 import { BarbershopFormData } from '@/schemas/barbershop.schema';
 import { FormField } from '@/components/form/FormField';
 import { MaskedInput } from '@/components/form/MaskedInput';
+import { useViaCep } from '@/hooks/useViaCep';
+import { useToast } from '@/hooks/use-toast';
+import { Loader2 } from 'lucide-react';
 
 interface BarbershopFormProps {
   register: UseFormRegister<BarbershopFormData>;
   errors: FieldErrors<BarbershopFormData>;
   setValue: UseFormSetValue<BarbershopFormData>;
+  watch: UseFormWatch<BarbershopFormData>;
 }
 
-export function BarbershopForm({ register, errors, setValue }: BarbershopFormProps) {
+export function BarbershopForm({ register, errors, setValue, watch }: BarbershopFormProps) {
+  const { searchCep, loading, error, data, clearError } = useViaCep();
+  const { toast } = useToast();
+  const zipCode = watch('address.zipCode');
+
+  // Auto-search address when CEP has 8 digits
+  useEffect(() => {
+    const cepDigits = zipCode?.replace(/\D/g, '');
+    
+    if (cepDigits && cepDigits.length === 8) {
+      searchCep(zipCode);
+    }
+  }, [zipCode, searchCep]);
+
+  // Fill form when address data is received
+  useEffect(() => {
+    if (data) {
+      setValue('address.street', data.street);
+      setValue('address.neighborhood', data.neighborhood);
+      setValue('address.city', data.city);
+      setValue('address.state', data.state);
+
+      toast({
+        title: 'Endereço encontrado',
+        description: 'Os campos foram preenchidos automaticamente.',
+      });
+    }
+  }, [data, setValue, toast]);
+
+  // Show error toast
+  useEffect(() => {
+    if (error) {
+      toast({
+        title: 'Erro ao buscar CEP',
+        description: error,
+        variant: 'destructive',
+      });
+      clearError();
+    }
+  }, [error, toast, clearError]);
   return (
     <div className="space-y-6">
       {/* Informações Gerais */}
@@ -84,11 +128,21 @@ export function BarbershopForm({ register, errors, setValue }: BarbershopFormPro
           register={register}
           required
         >
-          <MaskedInput
-            mask="cep"
-            placeholder="99999-999"
-            onChange={(value) => setValue('address.zipCode', value)}
-          />
+          <div className="relative">
+            <MaskedInput
+              mask="cep"
+              placeholder="99999-999"
+              onChange={(value) => setValue('address.zipCode', value)}
+            />
+            {loading && (
+              <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+              </div>
+            )}
+          </div>
+          <p className="text-xs text-muted-foreground mt-1">
+            Digite o CEP para preencher o endereço automaticamente
+          </p>
         </FormField>
 
         <div className="grid grid-cols-3 gap-4">

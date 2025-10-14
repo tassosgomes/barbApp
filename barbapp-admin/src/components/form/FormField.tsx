@@ -33,11 +33,15 @@ export function FormField({
         {required && <span className="text-red-500 ml-1">*</span>}
       </Label>
       {children ? (
-        React.cloneElement(children as React.ReactElement, {
-          id: name,
-          ...((children as React.ReactElement).props.onChange ? {} : register(name)), // Don't override onChange if child has it
-          className: error ? 'border-red-500' : '',
-        })
+        React.isValidElement(children) ? (
+          React.cloneElement(children, {
+            id: name,
+            ...(children.props?.onChange ? {} : register(name)), // Don't override onChange if child has it
+            className: error ? 'border-red-500' : '',
+          })
+        ) : (
+          children
+        )
       ) : (
         <Input
           id={name}
