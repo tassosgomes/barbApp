@@ -2,6 +2,10 @@ import '@testing-library/jest-dom/vitest';
 import { cleanup } from '@testing-library/react';
 import { afterEach, vi } from 'vitest';
 
+// Set environment variables for tests
+process.env.VITE_API_URL = 'http://localhost:5070/api';
+process.env.VITE_APP_NAME = 'BarbApp Admin';
+
 // Mock localStorage
 const localStorageMock = {
   getItem: vi.fn(),

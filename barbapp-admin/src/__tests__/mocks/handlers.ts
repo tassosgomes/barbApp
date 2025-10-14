@@ -5,8 +5,11 @@ const mockBarbershops = [
   {
     id: '1',
     name: 'Barbearia Teste',
-    email: 'teste@barbapp.com',
+    document: '12.345.678/0001-90',
     phone: '(11) 99999-9999',
+    ownerName: 'João Silva',
+    email: 'teste@barbapp.com',
+    code: 'ABC123XY',
     address: {
       street: 'Rua Teste',
       number: '123',
@@ -23,8 +26,11 @@ const mockBarbershops = [
   {
     id: '2',
     name: 'Barbearia Inativa',
-    email: 'inativa@barbapp.com',
+    document: '98.765.432/0001-10',
     phone: '(11) 88888-8888',
+    ownerName: 'Maria Silva',
+    email: 'inativa@barbapp.com',
+    code: 'DEF456ZW',
     address: {
       street: 'Rua Inativa',
       number: '456',
@@ -43,7 +49,7 @@ const mockBarbershops = [
 // Mock handlers
 export const handlers = [
   // GET /api/barbearias - List barbershops
-  http.get('http://localhost:5000/api/barbearias', ({ request }) => {
+  http.get('*/api/barbearias', ({ request }) => {
     const url = new URL(request.url);
     const pageNumber = parseInt(url.searchParams.get('pageNumber') || '1');
     const pageSize = parseInt(url.searchParams.get('pageSize') || '20');
@@ -87,7 +93,7 @@ export const handlers = [
   }),
 
   // GET /api/barbearias/:id - Get barbershop by ID
-  http.get('http://localhost:5000/api/barbearias/:id', ({ params }) => {
+  http.get('*/api/barbearias/:id', ({ params }) => {
     const { id } = params;
     const barbershop = mockBarbershops.find((b) => b.id === id);
 
@@ -99,11 +105,25 @@ export const handlers = [
   }),
 
   // POST /api/barbearias - Create barbershop
-  http.post('http://localhost:5000/api/barbearias', async ({ request }) => {
+  http.post('*/api/barbearias', async ({ request }) => {
     const body = await request.json() as any;
     const newBarbershop = {
       id: Date.now().toString(),
-      ...body,
+      name: body.name,
+      document: body.document,
+      phone: body.phone,
+      ownerName: body.ownerName,
+      email: body.email,
+      code: `NEW${Date.now().toString().slice(-6)}AB`,
+      address: {
+        zipCode: body.zipCode,
+        street: body.street,
+        number: body.number,
+        complement: body.complement || '',
+        neighborhood: body.neighborhood,
+        city: body.city,
+        state: body.state,
+      },
       isActive: true,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
@@ -114,7 +134,7 @@ export const handlers = [
   }),
 
   // PUT /api/barbearias/:id - Update barbershop
-  http.put('http://localhost:5000/api/barbearias/:id', async ({ request, params }) => {
+  http.put('*/api/barbearias/:id', async ({ request, params }) => {
     const { id } = params;
     const body = await request.json() as any;
     const index = mockBarbershops.findIndex((b) => b.id === id);
@@ -125,7 +145,19 @@ export const handlers = [
 
     mockBarbershops[index] = {
       ...mockBarbershops[index],
-      ...body,
+      name: body.name,
+      phone: body.phone,
+      ownerName: body.ownerName,
+      email: body.email,
+      address: {
+        zipCode: body.zipCode,
+        street: body.street,
+        number: body.number,
+        complement: body.complement || '',
+        neighborhood: body.neighborhood,
+        city: body.city,
+        state: body.state,
+      },
       updatedAt: new Date().toISOString(),
     };
 
@@ -133,7 +165,7 @@ export const handlers = [
   }),
 
   // PUT /api/barbearias/:id/desativar - Deactivate barbershop
-  http.put('http://localhost:5000/api/barbearias/:id/desativar', ({ params }) => {
+  http.put('*/api/barbearias/:id/desativar', ({ params }) => {
     const { id } = params;
     const barbershop = mockBarbershops.find((b) => b.id === id);
 
@@ -148,7 +180,7 @@ export const handlers = [
   }),
 
   // PUT /api/barbearias/:id/reativar - Reactivate barbershop
-  http.put('http://localhost:5000/api/barbearias/:id/reativar', ({ params }) => {
+  http.put('*/api/barbearias/:id/reativar', ({ params }) => {
     const { id } = params;
     const barbershop = mockBarbershops.find((b) => b.id === id);
 
@@ -163,7 +195,7 @@ export const handlers = [
   }),
 
   // POST /api/auth/admin-central - Login
-  http.post('http://localhost:5000/api/auth/admin-central', async ({ request }) => {
+  http.post('*/api/auth/admin-central', async ({ request }) => {
     const body = await request.json() as any;
 
     // Mock successful login

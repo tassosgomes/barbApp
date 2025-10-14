@@ -20,6 +20,21 @@ using Sentry.AspNetCore;
 var builder = WebApplication.CreateBuilder(args);
 
 // ══════════════════════════════════════════════════════════
+// TESTING ENVIRONMENT DEFAULTS
+// ══════════════════════════════════════════════════════════
+if (builder.Environment.IsEnvironment("Testing"))
+{
+    builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
+    {
+        ["JwtSettings:Secret"] = "test-secret-key-at-least-32-characters-long-for-jwt",
+        ["JwtSettings:Issuer"] = "BarbApp-Test",
+        ["JwtSettings:Audience"] = "BarbApp-Test-Users",
+        ["JwtSettings:ExpirationMinutes"] = "60",
+        ["Sentry:Dsn"] = string.Empty
+    }!);
+}
+
+// ══════════════════════════════════════════════════════════
 // LOGGING CONFIGURATION
 // ══════════════════════════════════════════════════════════
 Log.Logger = new LoggerConfiguration()
@@ -34,27 +49,30 @@ builder.Host.UseSerilog();
 // ══════════════════════════════════════════════════════════
 // SENTRY CONFIGURATION
 // ══════════════════════════════════════════════════════════
-builder.WebHost.UseSentry(options =>
+if (!builder.Environment.IsEnvironment("Testing"))
 {
-    string? Get(string key, string envKey)
+    builder.WebHost.UseSentry(options =>
     {
-        var v = builder.Configuration[key];
-        var isPlaceholder = !string.IsNullOrWhiteSpace(v) && v.TrimStart().StartsWith("${") && v.TrimEnd().EndsWith("}");
-        if (string.IsNullOrWhiteSpace(v) || isPlaceholder)
-            v = Environment.GetEnvironmentVariable(envKey);
-        return string.IsNullOrWhiteSpace(v) ? null : v;
-    }
+        string? Get(string key, string envKey)
+        {
+            var v = builder.Configuration[key];
+            var isPlaceholder = !string.IsNullOrWhiteSpace(v) && v.TrimStart().StartsWith("${") && v.TrimEnd().EndsWith("}");
+            if (string.IsNullOrWhiteSpace(v) || isPlaceholder)
+                v = Environment.GetEnvironmentVariable(envKey);
+            return string.IsNullOrWhiteSpace(v) ? null : v;
+        }
 
-    options.Dsn = Get("Sentry:Dsn", "SENTRY_DSN");
-    options.Environment = Get("Sentry:Environment", "SENTRY_ENVIRONMENT") ?? builder.Environment.EnvironmentName;
-    options.Release = Get("Sentry:Release", "SENTRY_RELEASE");
+        options.Dsn = Get("Sentry:Dsn", "SENTRY_DSN");
+        options.Environment = Get("Sentry:Environment", "SENTRY_ENVIRONMENT") ?? builder.Environment.EnvironmentName;
+        options.Release = Get("Sentry:Release", "SENTRY_RELEASE");
 
-    var tracesSampleRateStr = Get("Sentry:TracesSampleRate", "SENTRY_TRACES_SAMPLE_RATE");
-    options.TracesSampleRate = double.TryParse(tracesSampleRateStr, out var rate) ? rate : 0.05;
+        var tracesSampleRateStr = Get("Sentry:TracesSampleRate", "SENTRY_TRACES_SAMPLE_RATE");
+        options.TracesSampleRate = double.TryParse(tracesSampleRateStr, out var rate) ? rate : 0.05;
 
-    options.SendDefaultPii = false; // segurança por padrão
-    options.IsGlobalModeEnabled = true; // captura fora do contexto de request
-});
+        options.SendDefaultPii = false; // segurança por padrão
+        options.IsGlobalModeEnabled = true; // captura fora do contexto de request
+    });
+}
 
 // ══════════════════════════════════════════════════════════
 // DATABASE CONFIGURATION

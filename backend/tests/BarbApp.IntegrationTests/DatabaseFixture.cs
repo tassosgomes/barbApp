@@ -2,6 +2,7 @@ using BarbApp.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Testcontainers.PostgreSql;
 using Xunit;
+using BarbApp.Infrastructure.Services;
 
 namespace BarbApp.IntegrationTests;
 
@@ -45,7 +46,7 @@ public class DatabaseFixture : IAsyncLifetime
         var optionsBuilder = new DbContextOptionsBuilder<BarbAppDbContext>();
         optionsBuilder.UseNpgsql(ConnectionString);
 
-        //using var context = new BarbAppDbContext(optionsBuilder.Options);
-        //context.Database.Migrate();
+        using var context = new BarbAppDbContext(optionsBuilder.Options, new TenantContext());
+        context.Database.Migrate();
     }
 }
