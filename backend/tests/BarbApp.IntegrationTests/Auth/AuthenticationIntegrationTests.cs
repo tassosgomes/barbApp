@@ -5,19 +5,70 @@ using BarbApp.Application.Interfaces;
 using BarbApp.Infrastructure.Persistence;
 using BarbApp.Infrastructure.Services;
 using FluentAssertions;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BarbApp.IntegrationTests.Auth;
 
-public class AuthenticationIntegrationTests : IClassFixture<IntegrationTestWebAppFactory>
+[Collection(nameof(IntegrationTestCollection))]
+public class AuthenticationIntegrationTests
 {
     private readonly HttpClient _client;
-    private readonly IntegrationTestWebAppFactory _factory;
+    private readonly WebApplicationFactory<Program> _factory;
+    private readonly DatabaseFixture _dbFixture;
+    private static bool _dbInitialized;
+    private static readonly object _initLock = new();
 
-    public AuthenticationIntegrationTests(IntegrationTestWebAppFactory factory)
+    public AuthenticationIntegrationTests(DatabaseFixture dbFixture)
     {
-        _factory = factory;
-        _client = factory.CreateClient();
+        _dbFixture = dbFixture;
+
+        // Initialize database once
+        if (!_dbInitialized)
+        {
+            lock (_initLock)
+            {
+                if (!_dbInitialized)
+                {
+                    _dbFixture.RunMigrations();
+                    _dbInitialized = true;
+                }
+            }
+        }
+
+        // Create factory with inline configuration
+        _factory = new WebApplicationFactory<Program>()
+            .WithWebHostBuilder(builder =>
+            {
+                builder.ConfigureAppConfiguration((context, config) =>
+                {
+                    config.AddInMemoryCollection(new Dictionary<string, string?>
+                    {
+                        ["JwtSettings:Secret"] = "test-secret-key-at-least-32-characters-long-for-jwt",
+                        ["JwtSettings:Issuer"] = "BarbApp-Test",
+                        ["JwtSettings:Audience"] = "BarbApp-Test-Users",
+                        ["JwtSettings:ExpirationMinutes"] = "60"
+                    }!);
+                });
+
+                builder.ConfigureServices(services =>
+                {
+                    // Remove existing DbContext
+                    var descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(DbContextOptions<BarbAppDbContext>));
+                    if (descriptor != null) services.Remove(descriptor);
+
+                    // Add test DbContext
+                    services.AddDbContext<BarbAppDbContext>(options =>
+                        options.UseNpgsql(_dbFixture.ConnectionString));
+                });
+
+                builder.UseEnvironment("Testing");
+            });
+
+        _client = _factory.CreateClient();
     }
 
     [Fact]

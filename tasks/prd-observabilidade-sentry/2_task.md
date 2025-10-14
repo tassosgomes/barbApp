@@ -1,5 +1,5 @@
 ---
-status: pending
+status: completed
 parallelizable: false
 blocked_by: ["1.0"]
 ---
@@ -25,10 +25,10 @@ Capturar exceções no `GlobalExceptionHandlerMiddleware` e criar `SentryScopeEn
 - Evitar PII (email opcional; seguir política de scrub)
 
 ## Subtarefas
-- [ ] 2.1 Alterar `GlobalExceptionHandlerMiddleware` para capturar no Sentry
-- [ ] 2.2 Implementar `SentryScopeEnrichmentMiddleware`
-- [ ] 2.3 Registrar middleware (após Auth, antes dos controllers)
-- [ ] 2.4 Validar tags em eventos de erro gerados localmente
+- [x] 2.1 Alterar `GlobalExceptionHandlerMiddleware` para capturar no Sentry
+- [x] 2.2 Implementar `SentryScopeEnrichmentMiddleware`
+- [x] 2.3 Registrar middleware (após Auth, antes dos controllers)
+- [x] 2.4 Validar tags em eventos de erro gerados localmente
 
 ## Sequenciamento
 - Bloqueado por: 1.0

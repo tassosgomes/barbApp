@@ -277,6 +277,7 @@ app.UseAuthorization();
 
 // Tenant middleware (after authentication)
 app.UseTenantMiddleware();
+app.UseSentryScopeEnrichment();
 
 // Controllers
 app.MapControllers();

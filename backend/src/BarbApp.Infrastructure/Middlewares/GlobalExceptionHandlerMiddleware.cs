@@ -3,6 +3,7 @@ using BarbApp.Domain.Exceptions;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Sentry;
 using System.Net;
 using System.Text.Json;
 
@@ -35,6 +36,8 @@ public class GlobalExceptionHandlerMiddleware
 
     private async Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
+        SentrySdk.CaptureException(exception);
+
         _logger.LogError(
             exception,
             "An unhandled exception occurred: {Message}",

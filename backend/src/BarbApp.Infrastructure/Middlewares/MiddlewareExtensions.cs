@@ -24,6 +24,12 @@ public static class MiddlewareExtensions
     {
         return builder.UseMiddleware<GlobalExceptionHandlerMiddleware>();
     }
+
+    public static IApplicationBuilder UseSentryScopeEnrichment(
+        this IApplicationBuilder builder)
+    {
+        return builder.UseMiddleware<SentryScopeEnrichmentMiddleware>();
+    }
 }
 
 public static class AuthenticationConfiguration
