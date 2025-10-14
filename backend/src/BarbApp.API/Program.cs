@@ -80,6 +80,8 @@ builder.Services.AddScoped<ITrocarContextoBarbeiroUseCase, TrocarContextoBarbeir
 builder.Services.AddScoped<ICreateBarbershopUseCase, CreateBarbershopUseCase>();
 builder.Services.AddScoped<IUpdateBarbershopUseCase, UpdateBarbershopUseCase>();
 builder.Services.AddScoped<IDeleteBarbershopUseCase, DeleteBarbershopUseCase>();
+builder.Services.AddScoped<IDeactivateBarbershopUseCase, DeactivateBarbershopUseCase>();
+builder.Services.AddScoped<IReactivateBarbershopUseCase, ReactivateBarbershopUseCase>();
 builder.Services.AddScoped<IGetBarbershopUseCase, GetBarbershopUseCase>();
 builder.Services.AddScoped<IListBarbershopsUseCase, ListBarbershopsUseCase>();
 
