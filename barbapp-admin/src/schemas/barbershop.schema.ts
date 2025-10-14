@@ -109,6 +109,17 @@ export const barbershopSchema = z.object({
 export type BarbershopFormData = z.infer<typeof barbershopSchema>;
 
 // ===========================
+// EDIT BARBERSHOP SCHEMA (without document)
+// ===========================
+
+export const barbershopEditSchema = barbershopSchema.omit({ document: true });
+
+/**
+ * Type inference from edit schema - matches UpdateBarbershopRequest
+ */
+export type BarbershopEditFormData = z.infer<typeof barbershopEditSchema>;
+
+// ===========================
 // LOGIN SCHEMA
 // ===========================
 
