@@ -125,12 +125,14 @@ public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>
         const string audience = "BarbApp-Test-Users";
 
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
+    securityKey.KeyId = "test-key"; // match API signing key identifier
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
         var claims = new List<Claim>
         {
             new(ClaimTypes.NameIdentifier, userId),
             new(ClaimTypes.Email, email),
+            new(ClaimTypes.Role, userType),
             new("userType", userType)
         };
 
