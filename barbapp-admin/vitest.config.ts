@@ -24,14 +24,22 @@ export default defineConfig({
         '**/*.config.ts',
         '**/types/**',
         '**/main.tsx',
+        '**/*.d.ts',
+        '**/index.ts', // Re-export files
+        'src/routes/**', // Router config tested via E2E
+        'src/lib/utils.ts', // shadcn/ui utility
+        'src/components/ui/toast.tsx', // shadcn/ui component
+        'src/components/ui/toaster.tsx', // shadcn/ui component
+        'src/components/ui/form.tsx', // shadcn/ui component
+        'src/hooks/use-toast.ts', // shadcn/ui hook
+        'src/App.tsx', // App wrapper tested via integration
       ],
-      // Thresholds disabled during setup phase - will be enabled once tests are written
-      // thresholds: {
-      //   lines: 70,
-      //   functions: 70,
-      //   branches: 70,
-      //   statements: 70,
-      // },
+      thresholds: {
+        lines: 70,
+        functions: 70,
+        branches: 70,
+        statements: 70,
+      },
     },
   },
   resolve: {
