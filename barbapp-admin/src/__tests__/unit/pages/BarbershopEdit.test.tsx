@@ -25,7 +25,7 @@ vi.mock('react-router-dom', () => ({
 
 // Mock the form component
 vi.mock('@/components/barbershop/BarbershopEditForm', () => ({
-  BarbershopEditForm: ({ readOnlyData }: any) => (
+  BarbershopEditForm: ({ readOnlyData }: any) => ( // eslint-disable-line @typescript-eslint/no-explicit-any
     <div data-testid="edit-form">
       <div>Code: {readOnlyData.code}</div>
       <div>Document: {readOnlyData.document}</div>
@@ -64,7 +64,7 @@ describe('BarbershopEdit', () => {
   });
 
   it('should load barbershop data on mount', async () => {
-    (barbershopService.getById as any).mockResolvedValue(mockBarbershop);
+    (barbershopService.getById as any).mockResolvedValue(mockBarbershop); // eslint-disable-line @typescript-eslint/no-explicit-any
 
     render(<BarbershopEdit />);
 
@@ -77,7 +77,7 @@ describe('BarbershopEdit', () => {
   });
 
   it('should show loading state initially', () => {
-    (barbershopService.getById as any).mockImplementation(() => new Promise(() => {}));
+    (barbershopService.getById as any).mockImplementation(() => new Promise(() => {})); // eslint-disable-line @typescript-eslint/no-explicit-any
 
     render(<BarbershopEdit />);
 
@@ -85,7 +85,7 @@ describe('BarbershopEdit', () => {
   });
 
   it('should render edit form with correct title', async () => {
-    (barbershopService.getById as any).mockResolvedValue(mockBarbershop);
+    (barbershopService.getById as any).mockResolvedValue(mockBarbershop); // eslint-disable-line @typescript-eslint/no-explicit-any
 
     render(<BarbershopEdit />);
 

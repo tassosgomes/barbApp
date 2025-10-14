@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useBarbershops, useDebounce } from '@/hooks';
 import { BarbershopTable } from '@/components/barbershop/BarbershopTable';
@@ -25,13 +25,16 @@ export function BarbershopList() {
   // Debounce da busca
   const debouncedSearch = useDebounce(searchTerm, 300);
 
-  // Buscar dados
-  const { data, loading, error } = useBarbershops({
+  // Memoizar filtros para evitar re-renders desnecessários
+  const filters = useMemo(() => ({
     searchTerm: debouncedSearch,
     isActive: statusFilter === 'all' ? undefined : statusFilter === 'true',
     pageNumber: currentPage,
     pageSize,
-  });
+  }), [debouncedSearch, statusFilter, currentPage]);
+
+  // Buscar dados
+  const { data, loading, error, refetch } = useBarbershops(filters);
 
   // Modal de confirmação
   const [deactivateModalOpen, setDeactivateModalOpen] = useState(false);
@@ -65,8 +68,8 @@ export function BarbershopList() {
         description: `${selectedBarbershop.name} foi desativada.`,
       });
       setDeactivateModalOpen(false);
-      // Refetch data (trigger useEffect)
-      setCurrentPage(currentPage); // Force re-render
+      // Refetch data after successful deactivation
+      refetch();
     } catch {
       toast({
         title: 'Erro ao desativar barbearia',
@@ -86,6 +89,8 @@ export function BarbershopList() {
         title: 'Barbearia reativada com sucesso!',
         description: `${barbershop?.name} foi reativada.`,
       });
+      // Refetch data after successful reactivation
+      refetch();
     } catch {
       toast({
         title: 'Erro ao reativar barbearia',

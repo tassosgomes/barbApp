@@ -35,7 +35,7 @@ export function BarbershopEdit() {
           phone: data.phone,
           address: data.address,
         });
-      } catch (error) {
+      } catch (_error) { // eslint-disable-line @typescript-eslint/no-unused-vars
         toast({
           title: 'Erro ao carregar barbearia',
           description: 'Não foi possível carregar os dados da barbearia.',
@@ -84,7 +84,7 @@ export function BarbershopEdit() {
         description: 'As alterações foram salvas.',
       });
       navigate('/barbearias');
-    } catch (error) {
+    } catch (_error) { // eslint-disable-line @typescript-eslint/no-unused-vars
       toast({
         title: 'Erro ao atualizar barbearia',
         description: 'Verifique os dados e tente novamente.',

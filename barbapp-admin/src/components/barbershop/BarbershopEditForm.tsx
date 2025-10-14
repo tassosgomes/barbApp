@@ -4,6 +4,7 @@ import { BarbershopEditFormData } from '@/schemas/barbershop.schema';
 import { FormField, ReadOnlyField, MaskedInput } from '@/components/form';
 import { useViaCep } from '@/hooks/useViaCep';
 import { useToast } from '@/hooks/use-toast';
+import { applyDocumentMask } from '@/utils/formatters';
 import { Loader2 } from 'lucide-react';
 
 interface BarbershopEditFormProps {
@@ -21,6 +22,7 @@ export function BarbershopEditForm({ register, errors, setValue, watch, readOnly
   const { searchCep, loading, error, data, clearError } = useViaCep();
   const { toast } = useToast();
   const zipCode = watch('address.zipCode');
+  const phone = watch('phone');
 
   // Auto-search address when CEP has 8 digits
   useEffect(() => {
@@ -71,7 +73,7 @@ export function BarbershopEditForm({ register, errors, setValue, watch, readOnly
 
         <ReadOnlyField
           label="Documento (CPF/CNPJ)"
-          value={readOnlyData.document}
+          value={applyDocumentMask(readOnlyData.document)}
         />
       </div>
 
@@ -117,6 +119,7 @@ export function BarbershopEditForm({ register, errors, setValue, watch, readOnly
           <MaskedInput
             mask="phone"
             placeholder="(99) 99999-9999"
+            value={phone || ''}
             onChange={(value) => setValue('phone', value)}
           />
         </FormField>
@@ -137,6 +140,7 @@ export function BarbershopEditForm({ register, errors, setValue, watch, readOnly
             <MaskedInput
               mask="cep"
               placeholder="99999-999"
+              value={zipCode || ''}
               onChange={(value) => setValue('address.zipCode', value)}
             />
             {loading && (
