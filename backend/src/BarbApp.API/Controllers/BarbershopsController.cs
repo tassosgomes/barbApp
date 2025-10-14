@@ -14,6 +14,8 @@ public class BarbershopsController : ControllerBase
     private readonly ICreateBarbershopUseCase _createBarbershopUseCase;
     private readonly IUpdateBarbershopUseCase _updateBarbershopUseCase;
     private readonly IDeleteBarbershopUseCase _deleteBarbershopUseCase;
+    private readonly IDeactivateBarbershopUseCase _deactivateBarbershopUseCase;
+    private readonly IReactivateBarbershopUseCase _reactivateBarbershopUseCase;
     private readonly IGetBarbershopUseCase _getBarbershopUseCase;
     private readonly IListBarbershopsUseCase _listBarbershopsUseCase;
     private readonly ILogger<BarbershopsController> _logger;
@@ -22,6 +24,8 @@ public class BarbershopsController : ControllerBase
         ICreateBarbershopUseCase createBarbershopUseCase,
         IUpdateBarbershopUseCase updateBarbershopUseCase,
         IDeleteBarbershopUseCase deleteBarbershopUseCase,
+        IDeactivateBarbershopUseCase deactivateBarbershopUseCase,
+        IReactivateBarbershopUseCase reactivateBarbershopUseCase,
         IGetBarbershopUseCase getBarbershopUseCase,
         IListBarbershopsUseCase listBarbershopsUseCase,
         ILogger<BarbershopsController> logger)
@@ -29,6 +33,8 @@ public class BarbershopsController : ControllerBase
         _createBarbershopUseCase = createBarbershopUseCase;
         _updateBarbershopUseCase = updateBarbershopUseCase;
         _deleteBarbershopUseCase = deleteBarbershopUseCase;
+        _deactivateBarbershopUseCase = deactivateBarbershopUseCase;
+        _reactivateBarbershopUseCase = reactivateBarbershopUseCase;
         _getBarbershopUseCase = getBarbershopUseCase;
         _listBarbershopsUseCase = listBarbershopsUseCase;
         _logger = logger;
@@ -181,6 +187,56 @@ public class BarbershopsController : ControllerBase
         await _deleteBarbershopUseCase.ExecuteAsync(id, HttpContext.RequestAborted);
 
         _logger.LogInformation("Barbershop deleted successfully with ID: {Id}", id);
+
+        return NoContent();
+    }
+
+    /// <summary>
+    /// Desativa uma barbearia (soft delete)
+    /// </summary>
+    /// <param name="id">ID da barbearia a ser desativada</param>
+    /// <returns>Sem conteúdo</returns>
+    /// <response code="204">Barbearia desativada com sucesso</response>
+    /// <response code="401">Usuário não autenticado</response>
+    /// <response code="403">Usuário não tem permissão para desativar barbearias</response>
+    /// <response code="404">Barbearia não encontrada</response>
+    [HttpPut("{id:guid}/desativar")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DeactivateBarbershop(Guid id)
+    {
+        _logger.LogInformation("Deactivating barbershop with ID: {Id}", id);
+
+        await _deactivateBarbershopUseCase.ExecuteAsync(id, HttpContext.RequestAborted);
+
+        _logger.LogInformation("Barbershop deactivated successfully with ID: {Id}", id);
+
+        return NoContent();
+    }
+
+    /// <summary>
+    /// Reativa uma barbearia
+    /// </summary>
+    /// <param name="id">ID da barbearia a ser reativada</param>
+    /// <returns>Sem conteúdo</returns>
+    /// <response code="204">Barbearia reativada com sucesso</response>
+    /// <response code="401">Usuário não autenticado</response>
+    /// <response code="403">Usuário não tem permissão para reativar barbearias</response>
+    /// <response code="404">Barbearia não encontrada</response>
+    [HttpPut("{id:guid}/reativar")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> ReactivateBarbershop(Guid id)
+    {
+        _logger.LogInformation("Reactivating barbershop with ID: {Id}", id);
+
+        await _reactivateBarbershopUseCase.ExecuteAsync(id, HttpContext.RequestAborted);
+
+        _logger.LogInformation("Barbershop reactivated successfully with ID: {Id}", id);
 
         return NoContent();
     }
