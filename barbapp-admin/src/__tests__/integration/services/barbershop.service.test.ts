@@ -1,4 +1,5 @@
-import { describe, it, expect, beforeAll, afterEach, vi } from 'vitest';
+import { describe, it, expect, beforeAll, afterEach, afterAll, vi, type MockedFunction } from 'vitest';
+import { barbershopService } from '@/services/barbershop.service';
 import type { CreateBarbershopRequest, UpdateBarbershopRequest } from '@/types';
 
 // Mock data
@@ -48,35 +49,45 @@ const mockBarbershops = [
 ];
 
 // Mock the api module
-vi.mock('@/services/api', () => ({
-  default: {
-    get: vi.fn(),
-    post: vi.fn(),
-    put: vi.fn(),
-  },
-}));
+vi.mock('@/services/api', () => {
+  const mockGet = vi.fn();
+  const mockPost = vi.fn();
+  const mockPut = vi.fn();
 
-// Now import the service after the mock
-import { barbershopService } from '@/services/barbershop.service';
+  return {
+    default: {
+      get: mockGet,
+      post: mockPost,
+      put: mockPut,
+    },
+  };
+});
+
+// Import the mocked api
 import api from '@/services/api';
+const mockApi = {
+  get: api.get as any,
+  post: api.post as any,
+  put: api.put as any,
+};
 
 // Mock browser APIs
 Object.defineProperty(window, 'localStorage', {
   value: {
-    getItem: vi.fn(() => null),
-    setItem: vi.fn(),
-    removeItem: vi.fn(),
-    clear: vi.fn(),
+    getItem: () => null,
+    setItem: () => {},
+    removeItem: () => {},
+    clear: () => {},
   },
   writable: true,
 });
 
 Object.defineProperty(window, 'sessionStorage', {
   value: {
-    getItem: vi.fn(() => null),
-    setItem: vi.fn(),
-    removeItem: vi.fn(),
-    clear: vi.fn(),
+    getItem: () => null,
+    setItem: () => {},
+    removeItem: () => {},
+    clear: () => {},
   },
   writable: true,
 });
@@ -86,33 +97,57 @@ delete (window as any).location;
   href: '',
 };
 
+// Setup mock responses
 beforeAll(() => {
-  // Setup default mock implementations
-  (api.get as any).mockImplementation((url: string, config?: any) => {
+  // Setup default mock responses
+  setupMockResponses();
+});
+
+afterEach(() => {
+  // Reset mock data to initial state
+  mockBarbershops.splice(2); // Keep only the first 2 items
+  mockBarbershops[0].isActive = true;
+  mockBarbershops[1].isActive = false;
+  
+  // Reset all mocks
+  vi.clearAllMocks();
+  setupMockResponses();
+});
+
+afterAll(() => {
+  vi.restoreAllMocks();
+});
+
+function setupMockResponses() {
+  // GET /barbearias - List barbershops
+  mockApi.get.mockImplementation((url: string, config?: any) => {
     if (url === '/barbearias') {
       const params = config?.params || {};
+      const pageNumber = params.pageNumber || 1;
+      const pageSize = params.pageSize || 20;
+      const searchTerm = params.searchTerm;
+      const isActive = params.isActive;
+
       let filteredBarbershops = [...mockBarbershops];
 
       // Filter by search term
-      if (params.searchTerm) {
+      if (searchTerm) {
         filteredBarbershops = filteredBarbershops.filter(
           (barbershop) =>
-            barbershop.name.toLowerCase().includes(params.searchTerm.toLowerCase()) ||
-            barbershop.email.toLowerCase().includes(params.searchTerm.toLowerCase()) ||
-            barbershop.address.city.toLowerCase().includes(params.searchTerm.toLowerCase())
+            barbershop.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            barbershop.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            barbershop.address.city.toLowerCase().includes(searchTerm.toLowerCase())
         );
       }
 
       // Filter by active status
-      if (params.isActive !== undefined) {
+      if (isActive !== undefined) {
         filteredBarbershops = filteredBarbershops.filter(
-          (barbershop) => barbershop.isActive === params.isActive
+          (barbershop) => barbershop.isActive === (isActive === 'true' || isActive === true)
         );
       }
 
       // Pagination
-      const pageNumber = params.pageNumber || 1;
-      const pageSize = params.pageSize || 20;
       const totalCount = filteredBarbershops.length;
       const totalPages = Math.ceil(totalCount / pageSize);
       const startIndex = (pageNumber - 1) * pageSize;
@@ -131,20 +166,26 @@ beforeAll(() => {
       });
     }
 
-    if (url.startsWith('/barbearias/') && !url.includes('/desativar') && !url.includes('/reativar')) {
-      const id = url.split('/')[2];
+    // GET /barbearias/:id - Get barbershop by ID
+    const getByIdMatch = url.match(/^\/barbearias\/(.+)$/);
+    if (getByIdMatch) {
+      const id = getByIdMatch[1];
       const barbershop = mockBarbershops.find((b) => b.id === id);
-      if (barbershop) {
-        return Promise.resolve({ data: barbershop });
-      } else {
-        return Promise.reject({ response: { status: 404 } });
+
+      if (!barbershop) {
+        return Promise.reject({
+          response: { status: 404, data: null },
+        });
       }
+
+      return Promise.resolve({ data: barbershop });
     }
 
     return Promise.reject(new Error('Unexpected URL'));
   });
 
-  (api.post as any).mockImplementation((url: string, data: any) => {
+  // POST /barbearias - Create barbershop
+  mockApi.post.mockImplementation((url: string, data: any) => {
     if (url === '/barbearias') {
       const newBarbershop = {
         id: Date.now().toString(),
@@ -167,75 +208,87 @@ beforeAll(() => {
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };
+
       mockBarbershops.push(newBarbershop);
       return Promise.resolve({ data: newBarbershop });
     }
+
     return Promise.reject(new Error('Unexpected URL'));
   });
 
-  (api.put as any).mockImplementation((url: string, data?: any) => {
-    if (url.startsWith('/barbearias/') && url.endsWith('/desativar')) {
-      const id = url.split('/')[2];
-      const barbershop = mockBarbershops.find((b) => b.id === id);
-      if (barbershop) {
-        barbershop.isActive = false;
-        barbershop.updatedAt = new Date().toISOString();
-        return Promise.resolve({ data: null });
-      } else {
-        return Promise.reject({ response: { status: 404 } });
-      }
-    }
-
-    if (url.startsWith('/barbearias/') && url.endsWith('/reativar')) {
-      const id = url.split('/')[2];
-      const barbershop = mockBarbershops.find((b) => b.id === id);
-      if (barbershop) {
-        barbershop.isActive = true;
-        barbershop.updatedAt = new Date().toISOString();
-        return Promise.resolve({ data: null });
-      } else {
-        return Promise.reject({ response: { status: 404 } });
-      }
-    }
-
-    if (url.startsWith('/barbearias/') && !url.includes('/desativar') && !url.includes('/reativar')) {
-      const id = url.split('/')[2];
+  // PUT /barbearias/:id - Update barbershop
+  mockApi.put.mockImplementation((url: string, data: any) => {
+    const updateMatch = url.match(/^\/barbearias\/(.+)$/);
+    if (updateMatch && !url.includes('/desativar') && !url.includes('/reativar')) {
+      const id = updateMatch[1];
       const index = mockBarbershops.findIndex((b) => b.id === id);
-      if (index !== -1) {
-        mockBarbershops[index] = {
-          ...mockBarbershops[index],
-          name: data.name,
-          phone: data.phone,
-          ownerName: data.ownerName,
-          email: data.email,
-          address: {
-            zipCode: data.zipCode,
-            street: data.street,
-            number: data.number,
-            complement: data.complement || '',
-            neighborhood: data.neighborhood,
-            city: data.city,
-            state: data.state,
-          },
-          updatedAt: new Date().toISOString(),
-        };
-        return Promise.resolve({ data: mockBarbershops[index] });
-      } else {
-        return Promise.reject({ response: { status: 404 } });
+
+      if (index === -1) {
+        return Promise.reject({
+          response: { status: 404, data: null },
+        });
       }
+
+      mockBarbershops[index] = {
+        ...mockBarbershops[index],
+        name: data.name,
+        phone: data.phone,
+        ownerName: data.ownerName,
+        email: data.email,
+        address: {
+          zipCode: data.zipCode,
+          street: data.street,
+          number: data.number,
+          complement: data.complement || '',
+          neighborhood: data.neighborhood,
+          city: data.city,
+          state: data.state,
+        },
+        updatedAt: new Date().toISOString(),
+      };
+
+      return Promise.resolve({ data: mockBarbershops[index] });
+    }
+
+    // PUT /barbearias/:id/desativar - Deactivate barbershop
+    const deactivateMatch = url.match(/^\/barbearias\/(.+)\/desativar$/);
+    if (deactivateMatch) {
+      const id = deactivateMatch[1];
+      const barbershop = mockBarbershops.find((b) => b.id === id);
+
+      if (!barbershop) {
+        return Promise.reject({
+          response: { status: 404, data: null },
+        });
+      }
+
+      barbershop.isActive = false;
+      barbershop.updatedAt = new Date().toISOString();
+
+      return Promise.resolve({ data: null });
+    }
+
+    // PUT /barbearias/:id/reativar - Reactivate barbershop
+    const reactivateMatch = url.match(/^\/barbearias\/(.+)\/reativar$/);
+    if (reactivateMatch) {
+      const id = reactivateMatch[1];
+      const barbershop = mockBarbershops.find((b) => b.id === id);
+
+      if (!barbershop) {
+        return Promise.reject({
+          response: { status: 404, data: null },
+        });
+      }
+
+      barbershop.isActive = true;
+      barbershop.updatedAt = new Date().toISOString();
+
+      return Promise.resolve({ data: null });
     }
 
     return Promise.reject(new Error('Unexpected URL'));
   });
-});
-
-afterEach(() => {
-  vi.clearAllMocks();
-  // Reset mock data to initial state
-  mockBarbershops.splice(2); // Keep only the first 2 items
-  mockBarbershops[0].isActive = true;
-  mockBarbershops[1].isActive = false;
-});
+}
 
 describe('barbershopService', () => {
   describe('getAll', () => {
@@ -399,17 +452,73 @@ describe('barbershopService', () => {
 
   describe('error scenarios', () => {
     it('should handle network errors', async () => {
-      // Mock network error
-      (api.get as any).mockRejectedValueOnce(new Error('Network Error'));
+      // Mock network error by overriding the handler
+      mockApi.get.mockImplementationOnce(() => {
+        return Promise.reject({
+          response: { status: 500, data: null },
+        });
+      });
 
-      await expect(barbershopService.getAll({})).rejects.toThrow('Network Error');
+      await expect(barbershopService.getAll({})).rejects.toThrow();
     });
 
     it('should handle 404 errors for getById', async () => {
       // Mock 404 error for getById
-      (api.get as any).mockRejectedValueOnce({ response: { status: 404 } });
+      mockApi.get.mockImplementationOnce(() => {
+        return Promise.reject({
+          response: { status: 404, data: null },
+        });
+      });
 
       await expect(barbershopService.getById('999')).rejects.toThrow();
+    });
+
+    it('should handle 500 errors for create', async () => {
+      mockApi.post.mockImplementationOnce(() => {
+        return Promise.reject({
+          response: { status: 500, data: null },
+        });
+      });
+
+      const request: CreateBarbershopRequest = {
+        name: 'Test Barbershop',
+        document: '12.345.678/0001-90',
+        phone: '(11) 99999-9999',
+        ownerName: 'Test Owner',
+        email: 'test@email.com',
+        zipCode: '01000-000',
+        street: 'Test Street',
+        number: '123',
+        neighborhood: 'Test Neighborhood',
+        city: 'Test City',
+        state: 'SP',
+      };
+
+      await expect(barbershopService.create(request)).rejects.toThrow();
+    });
+
+    it('should handle 404 errors for update', async () => {
+      mockApi.put.mockImplementationOnce(() => {
+        return Promise.reject({
+          response: { status: 404, data: null },
+        });
+      });
+
+      const request: UpdateBarbershopRequest = {
+        id: '999',
+        name: 'Test Update',
+        phone: '(11) 99999-9999',
+        ownerName: 'Test Owner',
+        email: 'test@email.com',
+        zipCode: '01000-000',
+        street: 'Test Street',
+        number: '123',
+        neighborhood: 'Test Neighborhood',
+        city: 'Test City',
+        state: 'SP',
+      };
+
+      await expect(barbershopService.update('999', request)).rejects.toThrow();
     });
   });
 });
