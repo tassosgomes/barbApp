@@ -15,6 +15,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Serilog;
+using Sentry.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,6 +30,31 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 
 builder.Host.UseSerilog();
+
+// ══════════════════════════════════════════════════════════
+// SENTRY CONFIGURATION
+// ══════════════════════════════════════════════════════════
+builder.WebHost.UseSentry(options =>
+{
+    string? Get(string key, string envKey)
+    {
+        var v = builder.Configuration[key];
+        var isPlaceholder = !string.IsNullOrWhiteSpace(v) && v.TrimStart().StartsWith("${") && v.TrimEnd().EndsWith("}");
+        if (string.IsNullOrWhiteSpace(v) || isPlaceholder)
+            v = Environment.GetEnvironmentVariable(envKey);
+        return string.IsNullOrWhiteSpace(v) ? null : v;
+    }
+
+    options.Dsn = Get("Sentry:Dsn", "SENTRY_DSN");
+    options.Environment = Get("Sentry:Environment", "SENTRY_ENVIRONMENT") ?? builder.Environment.EnvironmentName;
+    options.Release = Get("Sentry:Release", "SENTRY_RELEASE");
+
+    var tracesSampleRateStr = Get("Sentry:TracesSampleRate", "SENTRY_TRACES_SAMPLE_RATE");
+    options.TracesSampleRate = double.TryParse(tracesSampleRateStr, out var rate) ? rate : 0.05;
+
+    options.SendDefaultPii = false; // segurança por padrão
+    options.IsGlobalModeEnabled = true; // captura fora do contexto de request
+});
 
 // ══════════════════════════════════════════════════════════
 // DATABASE CONFIGURATION

@@ -285,6 +285,32 @@ openssl rand -base64 32
 
 Veja mais em: [../docs/environment-variables.md](../docs/environment-variables.md)
 
+### Observabilidade (Sentry)
+
+SDK do Sentry inicializado via `UseSentry` no host. Configure via `appsettings.json` (seção `Sentry`) ou variáveis de ambiente. Por padrão, dados PII não são enviados (`SendDefaultPii = false`) e o modo global está habilitado (`IsGlobalModeEnabled = true`).
+
+- Variáveis esperadas (ambiente):
+  - `SENTRY_DSN` (obrigatório em ambientes que reportam)
+  - `SENTRY_ENVIRONMENT` (opcional; default: `ASPNETCORE_ENVIRONMENT`)
+  - `SENTRY_RELEASE` (recomendado; definido pelo CI/CD)
+  - `SENTRY_TRACES_SAMPLE_RATE` (opcional; default: `0.05`)
+
+- appsettings (`src/BarbApp.API/appsettings.json`):
+  - `Sentry:Dsn`, `Sentry:Environment`, `Sentry:Release`, `Sentry:TracesSampleRate`
+  - Exemplo:
+    ```json
+    {
+      "Sentry": {
+        "Dsn": "${SENTRY_DSN}",
+        "Environment": "${ASPNETCORE_ENVIRONMENT}",
+        "Release": "${SENTRY_RELEASE}",
+        "TracesSampleRate": 0.05
+      }
+    }
+    ```
+
+Precedência de configuração: variáveis de ambiente sobrescrevem `appsettings`. Se usar `.env`, mapeie `Sentry__Dsn`, `Sentry__Environment` etc., ou exporte `SENTRY_*` (suportado pelo código de bootstrap).
+
 ## 🧪 Testes
 
 ### Estrutura de Testes
