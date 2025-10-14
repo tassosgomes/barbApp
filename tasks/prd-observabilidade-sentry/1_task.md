@@ -1,5 +1,4 @@
----
-status: pending
+status: completed
 parallelizable: true
 blocked_by: []
 ---
@@ -26,11 +25,11 @@ Adicionar e configurar o SDK do Sentry no backend (.NET 8, ASP.NET Core) via `Us
 - Documentar variáveis esperadas (ex.: `SENTRY_DSN`, `SENTRY_RELEASE`)
 
 ## Subtarefas
-- [ ] 1.1 Adicionar `Sentry.AspNetCore` e restaurar dependências
-- [ ] 1.2 Configurar `UseSentry` em `backend/src/BarbApp.API/Program.cs`
-- [ ] 1.3 Adicionar seção `Sentry` em `appsettings.json` com placeholders
-- [ ] 1.4 Mapear leitura por `IConfiguration` (env > appsettings)
-- [ ] 1.5 Documentar variáveis e flags no README do backend
+- [x] 1.1 Adicionar `Sentry.AspNetCore` e restaurar dependências
+- [x] 1.2 Configurar `UseSentry` em `backend/src/BarbApp.API/Program.cs`
+- [x] 1.3 Adicionar seção `Sentry` em `appsettings.json` com placeholders
+- [x] 1.4 Mapear leitura por `IConfiguration` (env > appsettings)
+- [x] 1.5 Documentar variáveis e flags no README do backend
 
 ## Sequenciamento
 - Bloqueado por: —
@@ -46,3 +45,9 @@ Adicionar e configurar o SDK do Sentry no backend (.NET 8, ASP.NET Core) via `Us
 - Eventos de erro não tratados são enviados quando ocorrerem
 - Nenhum dado PII padrão é enviado (configuração segura por default)
 
+- [x] 1.0 Backend - Bootstrap Sentry SDK e configuração ✅ CONCLUÍDA
+  - [x] 1.1 Implementação completada
+  - [x] 1.2 Definição da tarefa, PRD e tech spec validados
+  - [x] 1.3 Análise de regras e conformidade verificadas
+  - [x] 1.4 Revisão de código completada
+  - [x] 1.5 Pronto para deploy
