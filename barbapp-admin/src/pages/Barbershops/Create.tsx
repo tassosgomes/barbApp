@@ -16,7 +16,7 @@ export function BarbershopCreate() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [createdBarbershop, setCreatedBarbershop] = useState<Barbershop | null>(null);
 
-  const { register, handleSubmit, formState: { errors }, setValue } = useForm<BarbershopFormData>({
+  const { register, handleSubmit, formState: { errors }, setValue, watch } = useForm<BarbershopFormData>({
     resolver: zodResolver(barbershopSchema),
   });
 
@@ -92,6 +92,7 @@ export function BarbershopCreate() {
           register={register}
           errors={errors}
           setValue={setValue}
+          watch={watch}
         />
 
         <div className="flex gap-4">
