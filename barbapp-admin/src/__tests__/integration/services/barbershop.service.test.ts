@@ -152,4 +152,50 @@ describe('barbershopService', () => {
 
     await expect(barbershopService.getById('invalid-id')).rejects.toThrow();
   });
+
+  it('should deactivate barbershop', async () => {
+    const { default: mockApi } = await import('@/services/api');
+
+    (mockApi.put as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ data: null });
+
+    await barbershopService.deactivate('1');
+
+    expect(mockApi.put).toHaveBeenCalledWith('/barbearias/1/desativar');
+  });
+
+  it('should reactivate barbershop', async () => {
+    const { default: mockApi } = await import('@/services/api');
+
+    (mockApi.put as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ data: null });
+
+    await barbershopService.reactivate('1');
+
+    expect(mockApi.put).toHaveBeenCalledWith('/barbearias/1/reativar');
+  });
+
+  it('should handle deactivate error', async () => {
+    const { default: mockApi } = await import('@/services/api');
+    const error = new Error('Deactivate Error');
+    (error as unknown as { response: { data: { message: string }; status: number } }).response = {
+      data: { message: 'Barbearia não pode ser desativada' },
+      status: 400,
+    };
+
+    (mockApi.put as ReturnType<typeof vi.fn>).mockRejectedValueOnce(error);
+
+    await expect(barbershopService.deactivate('1')).rejects.toThrow();
+  });
+
+  it('should handle reactivate error', async () => {
+    const { default: mockApi } = await import('@/services/api');
+    const error = new Error('Reactivate Error');
+    (error as unknown as { response: { data: { message: string }; status: number } }).response = {
+      data: { message: 'Barbearia não pode ser reativada' },
+      status: 400,
+    };
+
+    (mockApi.put as ReturnType<typeof vi.fn>).mockRejectedValueOnce(error);
+
+    await expect(barbershopService.reactivate('1')).rejects.toThrow();
+  });
 });
