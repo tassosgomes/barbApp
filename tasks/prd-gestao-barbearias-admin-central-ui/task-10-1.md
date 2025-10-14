@@ -1,20 +1,20 @@
 # Task 10.1: Deactivate and Reactivate Functionality
 
-**Status**: 🔵 Not Started | **Priority**: Média | **Effort**: 1 day | **Phase**: 10 - Additional Features
+**Status**: ✅ Completed | **Priority**: Média | **Effort**: 1 day | **Phase**: 10 - Additional Features
 
 ## Description
 Implement complete deactivate and reactivate functionality with confirmation modals and status updates across all pages.
 
 ## Acceptance Criteria
-- [ ] Deactivate action opens confirmation modal with consequences
-- [ ] Reactivate action opens confirmation modal
-- [ ] Modal shows barbershop name and code
-- [ ] Confirm button calls service method
-- [ ] Success: Toast notification, update UI status
-- [ ] Error: Display error message, keep modal open
-- [ ] List page updates item status immediately
-- [ ] Details page updates status and action button
-- [ ] Integration tests for both flows
+- [x] Deactivate action opens confirmation modal with consequences
+- [x] Reactivate action opens confirmation modal
+- [x] Modal shows barbershop name and code
+- [x] Confirm button calls service method
+- [x] Success: Toast notification, update UI status
+- [x] Error: Display error message, keep modal open
+- [x] List page updates item status immediately
+- [x] Details page updates status and action button
+- [x] Integration tests for both flows
 
 ## Dependencies
 **Blocking**: Tasks 6.1, 9.1 (List and Details pages), Task 5.4 (DeactivateModal)
