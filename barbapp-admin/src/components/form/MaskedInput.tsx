@@ -10,7 +10,15 @@ interface MaskedInputProps extends Omit<React.InputHTMLAttributes<HTMLInputEleme
 }
 
 export const MaskedInput = forwardRef<HTMLInputElement, MaskedInputProps>(
-  ({ mask, onChange, ...props }, ref) => {
+  ({ mask, onChange, value, ...props }, ref) => {
+    // Apply mask to initial value if provided
+    const maskedValue = value ? (
+      mask === 'phone' ? applyPhoneMask(String(value)) :
+      mask === 'cep' ? applyZipCodeMask(String(value)) :
+      mask === 'document' ? applyDocumentMask(String(value)) :
+      String(value)
+    ) : value;
+
     const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
       let maskedValue = e.target.value;
 
@@ -33,6 +41,7 @@ export const MaskedInput = forwardRef<HTMLInputElement, MaskedInputProps>(
       <Input
         {...props}
         ref={ref}
+        value={maskedValue}
         onChange={handleChange}
       />
     );

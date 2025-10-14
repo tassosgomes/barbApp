@@ -15,8 +15,8 @@ describe('MaskedInput', () => {
   it('should apply phone mask correctly', async () => {
     const user = userEvent.setup();
     let value = '';
-    const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      value = e.target.value;
+    const onChange = (val: string) => {
+      value = val;
     };
 
     render(<MaskedInput mask="phone" data-testid="phone-input" onChange={onChange} />);
@@ -30,8 +30,8 @@ describe('MaskedInput', () => {
   it('should apply CEP mask correctly', async () => {
     const user = userEvent.setup();
     let value = '';
-    const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      value = e.target.value;
+    const onChange = (val: string) => {
+      value = val;
     };
 
     render(<MaskedInput mask="cep" data-testid="cep-input" onChange={onChange} />);
@@ -45,8 +45,8 @@ describe('MaskedInput', () => {
   it('should handle incomplete phone numbers', async () => {
     const user = userEvent.setup();
     let value = '';
-    const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      value = e.target.value;
+    const onChange = (val: string) => {
+      value = val;
     };
 
     render(<MaskedInput mask="phone" data-testid="phone-input" onChange={onChange} />);
@@ -68,8 +68,8 @@ describe('MaskedInput', () => {
   it('should handle incomplete CEP', async () => {
     const user = userEvent.setup();
     let value = '';
-    const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      value = e.target.value;
+    const onChange = (val: string) => {
+      value = val;
     };
 
     render(<MaskedInput mask="cep" data-testid="cep-input" onChange={onChange} />);
@@ -87,8 +87,8 @@ describe('MaskedInput', () => {
   it('should remove non-numeric characters before applying mask', async () => {
     const user = userEvent.setup();
     let value = '';
-    const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      value = e.target.value;
+    const onChange = (val: string) => {
+      value = val;
     };
 
     render(<MaskedInput mask="phone" data-testid="phone-input" onChange={onChange} />);
