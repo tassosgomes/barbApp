@@ -1,5 +1,5 @@
 ---
-status: pending
+status: completed
 parallelizable: true
 blocked_by: ["2.0","3.0"]
 ---
@@ -24,9 +24,9 @@ Garantir que listagens e agenda cumpram SLAs do PRD: <1s lista de barbeiros, <3s
 - Métricas de tempo coletadas nos endpoints críticos
 
 ## Subtarefas
-- [ ] 9.1 Verificar/criar índices e medir ganhos
-- [ ] 9.2 Validar paginação e limites
-- [ ] 9.3 Medir tempos em ambiente dev (amostras) e ajustar queries
+- [x] 9.1 Verificar/criar índices e medir ganhos
+- [x] 9.2 Validar paginação e limites
+- [x] 9.3 Medir tempos em ambiente dev (amostras) e ajustar queries
 
 ## Sequenciamento
 - Bloqueado por: 2.0, 3.0

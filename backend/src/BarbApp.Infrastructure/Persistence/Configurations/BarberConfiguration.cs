@@ -41,6 +41,9 @@ public class BarberConfiguration : IEntityTypeConfiguration<Barber>
         builder.HasIndex(b => b.Phone)
             .HasDatabaseName("ix_barbers_phone");
 
+        builder.HasIndex(b => new { b.BarbeariaId, b.IsActive })
+            .HasDatabaseName("ix_barbers_barbearia_is_active");
+
         // Relationships
         builder.HasOne(b => b.Barbearia)
             .WithMany()
