@@ -20,14 +20,14 @@ const sessionStorageMock = {
   clear: vi.fn(),
 };
 
-global.localStorage = localStorageMock as any;
-global.sessionStorage = sessionStorageMock as any;
+global.localStorage = localStorageMock as unknown as Storage;
+global.sessionStorage = sessionStorageMock as unknown as Storage;
 
 // Mock window.location
-delete (global as any).window.location;
-(global as any).window.location = {
-  href: '',
-};
+Object.defineProperty(window, 'location', {
+  value: { href: '' },
+  writable: true,
+});
 
 // Suppress DataCloneError warnings from Vitest (related to Axios serialization)
 const originalWarn = console.warn;
@@ -36,6 +36,15 @@ console.warn = (...args) => {
     return; // Suppress these specific warnings
   }
   originalWarn.apply(console, args);
+};
+
+// Suppress Radix UI test environment errors
+const originalError = console.error;
+console.error = (...args) => {
+  if (args[0]?.includes?.('hasPointerCapture') || args[0]?.includes?.('scrollIntoView')) {
+    return; // Suppress Radix UI test environment errors
+  }
+  originalError.apply(console, args);
 };
 
 // Establish API mocking before all tests

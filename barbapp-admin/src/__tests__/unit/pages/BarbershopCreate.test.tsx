@@ -26,10 +26,13 @@ vi.mock('@/components/barbershop/BarbershopForm', () => ({
   ),
 }));
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 vi.mock('react-hook-form', () => ({
   useForm: () => ({
     register: vi.fn(),
     handleSubmit: (fn: any) => (e?: any) => {
+      e?.preventDefault?.();
+      e?.preventDefault?.();
       e?.preventDefault?.();
       // Mock valid form data
       const mockData = {

@@ -1,4 +1,6 @@
 import { http, HttpResponse } from 'msw';
+import type { CreateBarbershopRequest, UpdateBarbershopRequest } from '../../types/barbershop';
+import type { LoginRequest } from '../../types/auth';
 
 // Mock data
 const mockBarbershops = [
@@ -106,7 +108,7 @@ export const handlers = [
 
   // POST /api/barbearias - Create barbershop
   http.post('*/api/barbearias', async ({ request }) => {
-    const body = await request.json() as any;
+    const body = await request.json() as CreateBarbershopRequest;
     const newBarbershop = {
       id: Date.now().toString(),
       name: body.name,
@@ -136,7 +138,7 @@ export const handlers = [
   // PUT /api/barbearias/:id - Update barbershop
   http.put('*/api/barbearias/:id', async ({ request, params }) => {
     const { id } = params;
-    const body = await request.json() as any;
+    const body = await request.json() as UpdateBarbershopRequest;
     const index = mockBarbershops.findIndex((b) => b.id === id);
 
     if (index === -1) {
@@ -196,7 +198,7 @@ export const handlers = [
 
   // POST /api/auth/admin-central - Login
   http.post('*/api/auth/admin-central', async ({ request }) => {
-    const body = await request.json() as any;
+    const body = await request.json() as LoginRequest;
 
     // Mock successful login
     if (body?.email && body?.password) {
