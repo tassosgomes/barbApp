@@ -41,7 +41,7 @@ public class AuthenticateBarbeiroUseCase : IAuthenticateBarbeiroUseCase
         var token = _tokenGenerator.GenerateToken(
             userId: barber.Id.ToString(),
             userType: "Barbeiro",
-            email: barber.Telefone, // since no email, use telefone
+            email: barber.Phone, // use Phone instead of Telefone
             barbeariaId: barbearia.Id,
             barbeariaCode: barbearia.Code.Value
         );
