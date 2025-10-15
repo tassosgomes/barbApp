@@ -19,16 +19,16 @@ blocked_by: ["4.0","5.0"]
 Configurar TestContainers e implementar testes de integração para validar a API ponta a ponta, incluindo isolamento multi-tenant e regras de negócio críticas.
 
 ## Requisitos
-- TestContainers com Postgres 16
-- WebApplicationFactory configurado com migrations
-- Cenários: criação, duplicidade de telefone, listagem com filtros, remoção com/sem agendamentos, agenda consolidada, isolamento multi-tenant
+- TestContainers com Postgres 16.
+- WebApplicationFactory configurado com migrations.
+- Cenários: criação, duplicidade de **email**, listagem com filtros, remoção que **cancela agendamentos futuros**, agenda consolidada, isolamento multi-tenant.
 
 ## Subtarefas
-- [ ] 6.1 Configurar TestContainers e factory
-- [ ] 6.2 Testes CRUD de Barbers
-- [ ] 6.3 Teste de isolamento multi-tenant
-- [ ] 6.4 Teste de remoção bloqueada por agendamentos futuros
-- [ ] 6.5 Teste da agenda consolidada
+- [ ] 6.1 Configurar TestContainers e factory.
+- [ ] 6.2 Testes CRUD de Barbers (com auth por email).
+- [ ] 6.3 Teste de isolamento multi-tenant.
+- [ ] 6.4 Teste de remoção que cancela agendamentos futuros.
+- [ ] 6.5 Teste da agenda consolidada.
 
 ## Sequenciamento
 - Bloqueado por: 4.0, 5.0
@@ -36,7 +36,7 @@ Configurar TestContainers e implementar testes de integração para validar a AP
 - Paralelizável: Sim
 
 ## Detalhes de Implementação
-- Reutilizar exemplos da Tech Spec; mascarar telefones nos logs.
+- Reutilizar exemplos da Tech Spec atualizada; mascarar dados sensíveis nos logs.
 
 ## Critérios de Sucesso
-- Todos os testes de integração passam e cobrem cenários chave
+- Todos os testes de integração passam e cobrem os cenários chave atualizados.

@@ -1,5 +1,11 @@
 # Implementação Gestão de Barbeiros (Admin da Barbearia) - Resumo de Tarefas
 
+## Pré-requisito Crítico
+
+**Atenção**: Antes de iniciar este épico, é necessário implementar o fluxo de **Onboarding do Admin da Barbearia**. Isso inclui a criação do usuário `Admin` durante o cadastro de uma nova barbearia e o seu processo de primeiro login, conforme definido nas respostas do PRD.
+
+---
+
 ## Tarefas
 
 - [ ] 1.0 Domain: Entidades, VOs, Exceções e Repositórios (com testes)
