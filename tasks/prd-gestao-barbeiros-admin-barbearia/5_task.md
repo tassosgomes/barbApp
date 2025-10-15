@@ -1,5 +1,5 @@
 ---
-status: pending
+status: completed
 parallelizable: true
 blocked_by: ["3.0"]
 ---
@@ -13,7 +13,7 @@ blocked_by: ["3.0"]
 <unblocks>"6.0","8.0","9.0"</unblocks>
 </task_context>
 
-# Tarefa 5.0: Agenda Consolidada - Integração com Appointments e Polling (30s)
+# Tarefa 5.0: Agenda Consolidada - Integração com Appointments e Polling (30s) ✅ CONCLUÍDA
 
 ## Visão Geral
 Implementar o use case de agenda consolidada, endpoints necessários e mecanismo de atualização via polling no frontend (contratos e diretrizes). Depende do repositório de agendamentos estar disponível.
@@ -26,10 +26,10 @@ Implementar o use case de agenda consolidada, endpoints necessários e mecanismo
 - Testes unitários do use case com mocks de `IAppointmentRepository`
 
 ## Subtarefas
-- [ ] 5.1 Implementar `GetTeamScheduleUseCase`
-- [ ] 5.2 Expor endpoint na API
-- [ ] 5.3 Testes unitários do use case (mock appointments)
-- [ ] 5.4 Instruções de polling para frontend
+- [x] 5.1 Implementar `GetTeamScheduleUseCase`
+- [x] 5.2 Expor endpoint na API
+- [x] 5.3 Testes unitários do use case (mock appointments)
+- [x] 5.4 Instruções de polling para frontend
 
 ## Sequenciamento
 - Bloqueado por: 3.0 (e disponibilidade de IAppointmentRepository do módulo de Agendamentos)
@@ -43,3 +43,7 @@ Implementar o use case de agenda consolidada, endpoints necessários e mecanismo
 ## Critérios de Sucesso
 - Respostas em < 3s para dia atual e equipe típica
 - Testes passam e contrato respeitado
+
+## Status Final
+✅ **CONCLUÍDA** - Tarefa revisada e aprovada em 15/10/2025  
+📄 Relatório de revisão: `5_task_review.md`

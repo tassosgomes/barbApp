@@ -4,5 +4,5 @@ namespace BarbApp.Application.Interfaces.UseCases;
 
 public interface IGetTeamScheduleUseCase
 {
-    Task<TeamScheduleOutput> ExecuteAsync(DateTime date, CancellationToken cancellationToken);
+    Task<TeamScheduleOutput> ExecuteAsync(DateTime date, Guid? barberId, CancellationToken cancellationToken);
 }
