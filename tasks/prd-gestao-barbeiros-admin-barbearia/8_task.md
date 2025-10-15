@@ -21,7 +21,7 @@ Documentar contratos JSON de entrada/saída, disponibilizar exemplos de dados pa
 ## Requisitos
 - Exemplos de request/response para todos os endpoints
 - Mock data JSON para listas e agenda consolidada
-- CORS habilitado para o domínio do frontend
+- CORS habilitado para o domínio do frontend (barberapp.tasso.dev.br)
 
 ## Subtarefas
 - [ ] 8.1 Elaborar contratos e exemplos

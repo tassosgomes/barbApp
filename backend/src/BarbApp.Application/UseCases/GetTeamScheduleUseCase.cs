@@ -5,6 +5,7 @@ using BarbApp.Domain.Exceptions;
 using BarbApp.Domain.Interfaces;
 using BarbApp.Domain.Interfaces.Repositories;
 using Microsoft.Extensions.Logging;
+using System.Diagnostics;
 
 namespace BarbApp.Application.UseCases;
 
@@ -32,6 +33,7 @@ public class GetTeamScheduleUseCase : IGetTeamScheduleUseCase
 
     public async Task<TeamScheduleOutput> ExecuteAsync(DateTime date, Guid? barberId, CancellationToken cancellationToken)
     {
+        var stopwatch = Stopwatch.StartNew();
         _logger.LogInformation("Getting team schedule for date {Date}, barberId: {BarberId}", date, barberId);
 
         var barbeariaId = _tenantContext.BarbeariaId;
@@ -43,7 +45,10 @@ public class GetTeamScheduleUseCase : IGetTeamScheduleUseCase
         var appointments = await GetAppointmentsAsync(barbeariaId.Value, date, barberId, cancellationToken);
         var appointmentOutputs = await MapToAppointmentOutputsAsync(appointments, cancellationToken);
 
-        _logger.LogInformation("Team schedule retrieved for date {Date} with {Count} appointments", date, appointmentOutputs.Count);
+        stopwatch.Stop();
+        BarbAppMetrics.ScheduleRetrievalDuration.WithLabels(barbeariaId.Value.ToString()).Observe(stopwatch.Elapsed.TotalSeconds);
+
+        _logger.LogInformation("Team schedule retrieved for date {Date} with {Count} appointments in {Duration}ms", date, appointmentOutputs.Count, stopwatch.ElapsedMilliseconds);
 
         return new TeamScheduleOutput(appointmentOutputs);
     }

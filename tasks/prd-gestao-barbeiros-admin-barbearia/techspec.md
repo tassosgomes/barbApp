@@ -344,3 +344,106 @@ public class CreateBarberInputValidator : AbstractValidator<CreateBarberInput>
 - **Mitigação**: A operação inteira (cancelar agendamentos + desativar barbeiro) deve ser atômica, envolvida por um `UnitOfWork.Commit()`. Testes de integração são essenciais para validar este cenário.
 
 (Outros riscos permanecem os mesmos)
+
+## Monitoramento e Observabilidade
+
+### Logging Estruturado
+
+**Bibliotecas**: Microsoft.Extensions.Logging + Serilog
+
+**Padrões de Log Implementados:**
+- **Criação de Barbeiro**: `LogInformation("Starting creation of new barber with email {Email} and phone {MaskedPhone}", input.Email, maskedPhone)`
+- **Atualização de Barbeiro**: `LogInformation("Starting update of barber with ID {BarberId} and phone {MaskedPhone}", input.Id, maskedPhone)`
+- **Remoção de Barbeiro**: `LogInformation("Starting removal of barber with ID {BarberId}", barberId)`
+- **Consulta de Agenda**: `LogInformation("Getting team schedule for date {Date}, barberId: {BarberId}", date, barberId)`
+- **Listagem de Barbeiros**: `LogInformation("Listing barbers with filters: isActive={IsActive}, searchName={SearchName}, page={Page}, pageSize={PageSize}", ...)`
+
+**Mascaramento de Dados Sensíveis:**
+- Telefones são mascarados nos logs: `MaskPhone()` converte "11987654321" para "11987****21"
+- Emails não são mascarados (não considerados PII no contexto de barbearias)
+
+### Métricas (Prometheus)
+
+**Métricas Customizadas Implementadas:**
+
+```csharp
+// Counters
+public static readonly Counter BarberCreatedCounter = Metrics
+    .CreateCounter("barbapp_barber_created_total", "Total number of barbers created", new CounterConfiguration
+    {
+        LabelNames = new[] { "barbearia_id" }
+    });
+
+public static readonly Counter BarberRemovedCounter = Metrics
+    .CreateCounter("barbapp_barber_removed_total", "Total number of barbers removed", new CounterConfiguration
+    {
+        LabelNames = new[] { "barbearia_id" }
+    });
+
+// Gauge for active barbers
+public static readonly Gauge ActiveBarbersGauge = Metrics
+    .CreateGauge("barbapp_active_barbers", "Number of active barbers", new GaugeConfiguration
+    {
+        LabelNames = new[] { "barbearia_id" }
+    });
+
+// Histogram for schedule retrieval time
+public static readonly Histogram ScheduleRetrievalDuration = Metrics
+    .CreateHistogram("barbapp_schedule_retrieval_duration_seconds", "Duration of schedule retrieval operations", new HistogramConfiguration
+    {
+        LabelNames = new[] { "barbearia_id" }
+    });
+```
+
+**Pontos de Coleta:**
+- `BarberCreatedCounter.Inc()`: Quando barbeiro é criado com sucesso
+- `ActiveBarbersGauge.Inc()`: Quando barbeiro é criado
+- `BarberRemovedCounter.Inc()`: Quando barbeiro é removido
+- `ActiveBarbersGauge.Dec()`: Quando barbeiro é removido
+- `ActiveBarbersGauge.Set(totalCount)`: Durante listagem de barbeiros ativos
+- `ScheduleRetrievalDuration.Observe(stopwatch.Elapsed.TotalSeconds)`: Após consulta de agenda da equipe
+
+### Dashboards Grafana
+
+**Dashboard: Gestão de Barbeiros por Barbearia**
+- **Gráfico de Linha**: Barbeiros criados/removidos por dia
+- **Gauge**: Número atual de barbeiros ativos
+- **Counter**: Total de operações de gestão (criação + remoção)
+- **Tabela**: Top barbearias por número de barbeiros
+
+**Dashboard: Performance da Agenda**
+- **Histograma**: Tempo de consulta da agenda da equipe (p50, p95, p99)
+- **Counter**: Total de consultas de agenda por barbearia
+- **Gráfico de Área**: Consultas de agenda por hora do dia
+
+**Dashboard: Isolamento Multi-tenant**
+- **Alert**: Detecção de tentativas de acesso cross-tenant (deve ser 0)
+- **Counter**: Operações de gestão por barbearia
+- **Tabela**: Distribuição de barbeiros por barbearia
+
+**Alertas Sugeridos:**
+- 🚨 `barbapp_schedule_retrieval_duration_seconds p95 > 2.0` → Performance degradada na consulta de agenda
+- 🚨 `Tentativa de acesso cross-tenant detectada` → Falha crítica de isolamento
+- 🔶 `barbapp_active_barbers{barbearia_id=""} > 50` → Barbearia com muitos barbeiros (verificar se justificado)
+- ℹ️ `barbapp_barber_created_total increase(1d) > 10` → Dia com muitas criações de barbeiro
+
+### Logs de Auditoria
+
+**Eventos Auditados:**
+- Criação de barbeiro: ID, barbearia, email, timestamp
+- Remoção de barbeiro: ID, barbearia, motivo (se aplicável), agendamentos cancelados
+- Atualização de barbeiro: ID, campos alterados, timestamp
+- Consultas de agenda: barbearia, filtros aplicados, resultado count
+
+**Formato Estruturado:**
+```json
+{
+  "timestamp": "2025-10-15T14:30:00Z",
+  "level": "Information",
+  "message": "Barber created successfully with ID {BarberId} in barbearia {BarbeariaId}",
+  "barberId": "uuid-here",
+  "barbeariaId": "uuid-here",
+  "email": "barbeiro@email.com",
+  "operation": "barber_created"
+}
+```

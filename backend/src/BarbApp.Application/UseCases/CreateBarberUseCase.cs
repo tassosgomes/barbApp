@@ -36,11 +36,13 @@ public class CreateBarberUseCase : ICreateBarberUseCase
 
     public async Task<BarberOutput> ExecuteAsync(CreateBarberInput input, CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Starting creation of new barber with email {Email}", input.Email);
+        var maskedPhone = MaskPhone(input.Phone);
+        _logger.LogInformation("Starting creation of new barber with email {Email} and phone {MaskedPhone}", input.Email, maskedPhone);
 
         var barbeariaId = _tenantContext.BarbeariaId;
         if (barbeariaId == null)
         {
+            _logger.LogError("Failed to create barber: Tenant context not defined");
             throw new BarbApp.Domain.Exceptions.UnauthorizedAccessException("Contexto de barbearia não definido");
         }
 
@@ -67,7 +69,11 @@ public class CreateBarberUseCase : ICreateBarberUseCase
         await _barberRepository.InsertAsync(barber, cancellationToken);
         await _unitOfWork.Commit(cancellationToken);
 
-        _logger.LogInformation("Barber created successfully with ID {BarberId}", barber.Id);
+        // Increment metrics
+        BarbAppMetrics.BarberCreatedCounter.WithLabels(barbeariaId.Value.ToString()).Inc();
+        BarbAppMetrics.ActiveBarbersGauge.WithLabels(barbeariaId.Value.ToString()).Inc();
+
+        _logger.LogInformation("Barber created successfully with ID {BarberId} in barbearia {BarbeariaId}", barber.Id, barbeariaId);
 
         // Load services for output
         var services = new List<BarbershopServiceOutput>();
@@ -88,6 +94,17 @@ public class CreateBarberUseCase : ICreateBarberUseCase
             services,
             barber.IsActive,
             barber.CreatedAt);
+    }
+
+    private static string MaskPhone(string phone)
+    {
+        if (string.IsNullOrWhiteSpace(phone) || phone.Length < 4)
+            return "***";
+
+        // Mask all but last 4 digits
+        var visible = phone.Length >= 4 ? phone[^4..] : phone;
+        var masked = new string('*', phone.Length - visible.Length) + visible;
+        return masked;
     }
 
     private static string FormatPhone(string phone)

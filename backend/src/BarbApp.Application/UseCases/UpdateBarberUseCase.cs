@@ -33,11 +33,13 @@ public class UpdateBarberUseCase : IUpdateBarberUseCase
 
     public async Task<BarberOutput> ExecuteAsync(UpdateBarberInput input, CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Starting update of barber with ID {BarberId}", input.Id);
+        var maskedPhone = MaskPhone(input.Phone);
+        _logger.LogInformation("Starting update of barber with ID {BarberId} and phone {MaskedPhone}", input.Id, maskedPhone);
 
         var barbeariaId = _tenantContext.BarbeariaId;
         if (barbeariaId == null)
         {
+            _logger.LogError("Failed to update barber: Tenant context not defined");
             throw new BarbApp.Domain.Exceptions.UnauthorizedAccessException("Contexto de barbearia não definido");
         }
 
@@ -76,6 +78,17 @@ public class UpdateBarberUseCase : IUpdateBarberUseCase
             services,
             barber.IsActive,
             barber.CreatedAt);
+    }
+
+    private static string MaskPhone(string phone)
+    {
+        if (string.IsNullOrWhiteSpace(phone) || phone.Length < 4)
+            return "***";
+
+        // Mask all but last 4 digits
+        var visible = phone.Length >= 4 ? phone[^4..] : phone;
+        var masked = new string('*', phone.Length - visible.Length) + visible;
+        return masked;
     }
 
     private static string FormatPhone(string phone)
