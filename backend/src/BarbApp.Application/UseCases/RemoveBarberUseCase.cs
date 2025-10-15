@@ -66,6 +66,10 @@ public class RemoveBarberUseCase : IRemoveBarberUseCase
         // Commit all changes atomically
         await _unitOfWork.Commit(cancellationToken);
 
+        // Increment metrics
+        BarbAppMetrics.BarberRemovedCounter.WithLabels(barbeariaId.Value.ToString()).Inc();
+        BarbAppMetrics.ActiveBarbersGauge.WithLabels(barbeariaId.Value.ToString()).Dec();
+
         _logger.LogInformation("Barber {BarberId} removed successfully (deactivated) and {AppointmentCount} future appointments cancelled", barberId, futureAppointments.Count);
     }
 }

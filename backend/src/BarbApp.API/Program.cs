@@ -14,6 +14,7 @@ using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using Prometheus;
 using Serilog;
 using Sentry.AspNetCore;
 
@@ -305,6 +306,10 @@ app.UseCors(app.Environment.IsDevelopment() ? "DevelopmentCors" : "ProductionCor
 // Authentication & Authorization
 app.UseAuthentication();
 app.UseAuthorization();
+
+// Prometheus metrics
+app.UseHttpMetrics();
+app.UseMetricServer();
 
 // Tenant middleware (after authentication)
 app.UseTenantMiddleware();

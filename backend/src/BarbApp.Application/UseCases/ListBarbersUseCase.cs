@@ -63,6 +63,12 @@ public class ListBarbersUseCase : IListBarbersUseCase
             searchName,
             cancellationToken);
 
+        // Update active barbers gauge if listing all active barbers
+        if (isActive == true && string.IsNullOrEmpty(searchName))
+        {
+            BarbAppMetrics.ActiveBarbersGauge.WithLabels(barbeariaId.Value.ToString()).Set(totalCount);
+        }
+
         // Load services for all barbers
         var allServices = await _serviceRepository.ListAsync(barbeariaId.Value, isActive: true, cancellationToken);
         var servicesById = allServices.ToDictionary(s => s.Id);
