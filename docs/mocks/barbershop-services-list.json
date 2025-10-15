@@ -1,0 +1,47 @@
+{
+  "services": [
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440001",
+      "name": "Corte de Cabelo",
+      "description": "Corte masculino completo com lavagem",
+      "durationMinutes": 30,
+      "price": 25.00,
+      "isActive": true
+    },
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440002",
+      "name": "Barba",
+      "description": "Aparação e modelagem da barba",
+      "durationMinutes": 20,
+      "price": 15.00,
+      "isActive": true
+    },
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440004",
+      "name": "Coloração",
+      "description": "Coloração completa do cabelo",
+      "durationMinutes": 60,
+      "price": 80.00,
+      "isActive": true
+    },
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440006",
+      "name": "Sobrancelha",
+      "description": "Design de sobrancelha",
+      "durationMinutes": 15,
+      "price": 10.00,
+      "isActive": true
+    },
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440007",
+      "name": "Corte + Barba",
+      "description": "Pacote completo: corte de cabelo + barba",
+      "durationMinutes": 45,
+      "price": 35.00,
+      "isActive": true
+    }
+  ],
+  "totalCount": 5,
+  "page": 1,
+  "pageSize": 20
+}
