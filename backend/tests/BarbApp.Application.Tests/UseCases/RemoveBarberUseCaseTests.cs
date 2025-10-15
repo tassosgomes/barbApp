@@ -44,7 +44,19 @@ public class RemoveBarberUseCaseTests
         var barbeariaId = Guid.NewGuid();
         var barberId = Guid.NewGuid();
         var barber = Barber.Create(barbeariaId, "João Silva", "joao@test.com", "hash", "11987654321", new List<Guid>());
-        var futureAppointments = new List<Appointment>(); // Will be mocked
+        
+        // Create mock appointments
+        var appointment1 = new Mock<Appointment>();
+        appointment1.Setup(a => a.Id).Returns(Guid.NewGuid());
+        appointment1.Setup(a => a.BarberId).Returns(barberId);
+        appointment1.Setup(a => a.Status).Returns("Confirmed");
+        
+        var appointment2 = new Mock<Appointment>();
+        appointment2.Setup(a => a.Id).Returns(Guid.NewGuid());
+        appointment2.Setup(a => a.BarberId).Returns(barberId);
+        appointment2.Setup(a => a.Status).Returns("Pending");
+        
+        var futureAppointments = new List<Appointment> { appointment1.Object, appointment2.Object };
 
         _tenantContextMock.Setup(x => x.BarbeariaId).Returns(barbeariaId);
         _barberRepositoryMock
@@ -57,8 +69,8 @@ public class RemoveBarberUseCaseTests
         // Act
         await _useCase.ExecuteAsync(barberId, CancellationToken.None);
 
-        // Assert - Since futureAppointments is empty, UpdateStatusAsync should not be called
-        _appointmentRepositoryMock.Verify(x => x.UpdateStatusAsync(It.IsAny<IEnumerable<Appointment>>(), "Cancelled", It.IsAny<CancellationToken>()), Times.Never);
+        // Assert
+        _appointmentRepositoryMock.Verify(x => x.UpdateStatusAsync(futureAppointments, "Cancelled", It.IsAny<CancellationToken>()), Times.Once);
         _barberRepositoryMock.Verify(x => x.UpdateAsync(It.Is<Barber>(b => !b.IsActive), It.IsAny<CancellationToken>()), Times.Once);
         _unitOfWorkMock.Verify(x => x.Commit(It.IsAny<CancellationToken>()), Times.Once);
     }
@@ -87,9 +99,7 @@ public class RemoveBarberUseCaseTests
         _appointmentRepositoryMock.Verify(x => x.UpdateStatusAsync(It.IsAny<IEnumerable<Appointment>>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
         _barberRepositoryMock.Verify(x => x.UpdateAsync(It.Is<Barber>(b => !b.IsActive), It.IsAny<CancellationToken>()), Times.Once);
         _unitOfWorkMock.Verify(x => x.Commit(It.IsAny<CancellationToken>()), Times.Once);
-    }
-
-    [Fact]
+    }    [Fact]
     public async Task ExecuteAsync_BarberNotFound_ShouldThrowException()
     {
         // Arrange

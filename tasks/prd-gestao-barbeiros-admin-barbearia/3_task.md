@@ -1,5 +1,5 @@
 ---
-status: pending
+status: completed
 parallelizable: false
 blocked_by: ["1.0","2.0"]
 ---
@@ -13,7 +13,7 @@ blocked_by: ["1.0","2.0"]
 <unblocks>"4.0","5.0","6.0","8.0"</unblocks>
 </task_context>
 
-# Tarefa 3.0: Application - DTOs, Validators e Use Cases (com testes)
+# Tarefa 3.0: Application - DTOs, Validators e Use Cases (com testes) ✅ CONCLUÍDA
 
 ## Visão Geral
 Implementar DTOs, validações com FluentValidation e use cases: Create/Update/Remove/List/GetById de barbeiros (com auth por email/senha), GetTeamSchedule e gestão de serviços. Cobrir com testes unitários via mocks.
@@ -27,14 +27,14 @@ Implementar DTOs, validações com FluentValidation e use cases: Create/Update/R
 - Testes unitários dos use cases (mocks dos repositórios).
 
 ## Subtarefas
-- [ ] 3.1 Implementar DTOs Inputs/Outputs (com Email/Senha).
-- [ ] 3.2 Implementar Validators (FluentValidation para Email/Senha).
-- [ ] 3.3 Implementar Create/Update use cases.
-- [ ] 3.4 Implementar `RemoveBarberUseCase` (com lógica de cancelamento de agendamentos).
-- [ ] 3.5 Implementar List/GetById com paginação e filtros.
-- [ ] 3.6 Implementar GetTeamSchedule (usar IAppointmentRepository).
-- [ ] 3.7 Implementar use cases de serviços (Create/List/Update/Delete).
-- [ ] 3.8 Testes unitários dos use cases, incluindo o cenário de remoção.
+- [x] 3.1 Implementar DTOs Inputs/Outputs (com Email/Senha). ✅
+- [x] 3.2 Implementar Validators (FluentValidation para Email/Senha). ✅
+- [x] 3.3 Implementar Create/Update use cases. ✅
+- [x] 3.4 Implementar `RemoveBarberUseCase` (com lógica de cancelamento de agendamentos). ✅
+- [x] 3.5 Implementar List/GetById com paginação e filtros. ✅
+- [x] 3.6 Implementar GetTeamSchedule (usar IAppointmentRepository). ✅
+- [x] 3.7 Implementar use cases de serviços (Create/List/Update/Delete). ✅
+- [x] 3.8 Testes unitários dos use cases, incluindo o cenário de remoção. ✅
 
 ## Sequenciamento
 - Bloqueado por: 1.0, 2.0
@@ -48,7 +48,11 @@ Implementar DTOs, validações com FluentValidation e use cases: Create/Update/R
 - Log estruturado nos use cases (Information/Warning/Error).
 
 ## Critérios de Sucesso
-- Testes de application passam cobrindo cenários principais.
+- Testes de application Passam cobrindo cenários principais.
 - Validações rejeitam emails inválidos e duplicados por barbearia.
 - `RemoveBarberUseCase` cancela agendamentos antes de desativar o barbeiro.
 - Use cases retornam DTOs no formato esperado.
+
+## Status Final
+✅ **CONCLUÍDA** - Tarefa revisada e aprovada em 15/10/2025  
+📄 Relatório de revisão: `3_task_review.md`
