@@ -1,6 +1,7 @@
 // BarbApp.Infrastructure/Persistence/Repositories/AppointmentRepository.cs
 using BarbApp.Domain.Entities;
 using BarbApp.Domain.Interfaces.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace BarbApp.Infrastructure.Persistence.Repositories;
 
@@ -17,9 +18,9 @@ public class AppointmentRepository : IAppointmentRepository
         Guid barberId,
         CancellationToken cancellationToken = default)
     {
-        // Since appointments are not yet implemented in the database,
-        // return an empty list for now
-        return new List<Appointment>();
+        return await _context.Appointments
+            .Where(a => a.BarberId == barberId && a.StartTime > DateTime.UtcNow)
+            .ToListAsync(cancellationToken);
     }
 
     public async Task<List<Appointment>> GetAppointmentsByBarbeariaAndDateAsync(
@@ -27,9 +28,14 @@ public class AppointmentRepository : IAppointmentRepository
         DateTime date,
         CancellationToken cancellationToken = default)
     {
-        // Since appointments are not yet implemented in the database,
-        // return an empty list for now
-        return new List<Appointment>();
+        var startOfDay = date.Date;
+        var endOfDay = startOfDay.AddDays(1);
+
+        return await _context.Appointments
+            .Where(a => a.BarbeariaId == barbeariaId &&
+                       a.StartTime >= startOfDay &&
+                       a.StartTime < endOfDay)
+            .ToListAsync(cancellationToken);
     }
 
     public async Task UpdateStatusAsync(
@@ -37,8 +43,12 @@ public class AppointmentRepository : IAppointmentRepository
         string newStatus,
         CancellationToken cancellationToken = default)
     {
-        // Since appointments are not yet implemented in the database,
-        // this is a no-op for now
-        await Task.CompletedTask;
+        foreach (var appointment in appointments)
+        {
+            appointment.UpdateStatus(newStatus);
+            _context.Appointments.Update(appointment);
+        }
+
+        // Don't call SaveChangesAsync here - let UnitOfWork handle it
     }
 }
