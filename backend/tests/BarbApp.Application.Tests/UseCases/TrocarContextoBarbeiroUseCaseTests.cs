@@ -53,7 +53,7 @@ public class TrocarContextoBarbeiroUseCaseTests
 
         var barbeariaCode = UniqueCode.Create("XYZ98765");
         var newBarbearia = CreateTestBarbershop("Nova Barbearia", barbeariaCode);
-        var barber = Barber.Create(input.NovaBarbeariaId, telefone, "João Silva");
+        var barber = Barber.Create(input.NovaBarbeariaId, "João Silva", "joao@test.com", "hashedpassword", telefone);
 
         // Set navigation property for the test
         barber.GetType().GetProperty("Barbearia")?.SetValue(barber, newBarbearia);
@@ -76,7 +76,7 @@ public class TrocarContextoBarbeiroUseCaseTests
             .Setup(x => x.GenerateToken(
                 It.Is<string>(id => id == barber.Id.ToString()),
                 It.Is<string>(type => type == "Barbeiro"),
-                It.Is<string>(email => email == barber.Telefone),
+                It.Is<string>(email => email == barber.Phone),
                 It.Is<Guid?>(barbeariaId => barbeariaId == barber.BarbeariaId),
                 It.Is<string>(barbeariaCode => barbeariaCode == newBarbearia.Code.Value)))
             .Returns(expectedToken);
@@ -98,7 +98,7 @@ public class TrocarContextoBarbeiroUseCaseTests
         _tokenGeneratorMock.Verify(x => x.GenerateToken(
             It.Is<string>(id => id == barber.Id.ToString()),
             It.Is<string>(type => type == "Barbeiro"),
-            It.Is<string>(email => email == barber.Telefone),
+            It.Is<string>(email => email == barber.Phone),
             It.Is<Guid?>(barbeariaId => barbeariaId == barber.BarbeariaId),
             It.Is<string>(barbeariaCode => barbeariaCode == newBarbearia.Code.Value)), Times.Once);
     }

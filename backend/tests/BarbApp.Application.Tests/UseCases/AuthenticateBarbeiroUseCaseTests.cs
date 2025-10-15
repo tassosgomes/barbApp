@@ -49,7 +49,7 @@ public class AuthenticateBarbeiroUseCaseTests
 
         var barbeariaCode = UniqueCode.Create("ABC23456");
         var barbearia = CreateTestBarbershop("Barbearia Teste", barbeariaCode);
-        var barber = Barber.Create(barbearia.Id, "11987654321", "João Silva");
+        var barber = Barber.Create(barbearia.Id, "João Silva", "joao@test.com", "hashedpassword", "11987654321");
 
         _barbershopRepoMock
             .Setup(x => x.GetByCodeAsync(input.Codigo, It.IsAny<CancellationToken>()))
@@ -65,7 +65,7 @@ public class AuthenticateBarbeiroUseCaseTests
             .Setup(x => x.GenerateToken(
                 It.Is<string>(id => id == barber.Id.ToString()),
                 It.Is<string>(type => type == "Barbeiro"),
-                It.Is<string>(email => email == barber.Telefone),
+                It.Is<string>(email => email == barber.Phone),
                 It.Is<Guid?>(barbeariaId => barbeariaId == barbearia.Id),
                 It.Is<string>(barbeariaCode => barbeariaCode == barbearia.Code.Value)))
             .Returns(expectedToken);
@@ -86,7 +86,7 @@ public class AuthenticateBarbeiroUseCaseTests
         _tokenGeneratorMock.Verify(x => x.GenerateToken(
             It.Is<string>(id => id == barber.Id.ToString()),
             It.Is<string>(type => type == "Barbeiro"),
-            It.Is<string>(email => email == barber.Telefone),
+            It.Is<string>(email => email == barber.Phone),
             It.Is<Guid?>(barbeariaId => barbeariaId == barbearia.Id),
             It.Is<string>(barbeariaCode => barbeariaCode == barbearia.Code.Value)), Times.Once);
     }

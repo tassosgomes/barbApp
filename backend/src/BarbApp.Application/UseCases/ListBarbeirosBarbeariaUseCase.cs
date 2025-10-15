@@ -34,7 +34,7 @@ public class ListBarbeirosBarbeariaUseCase : IListBarbeirosBarbeariaUseCase
         {
             Id = b.Id,
             Nome = b.Name,
-            Telefone = b.Telefone,
+            Telefone = b.Phone,
             BarbeariaId = b.BarbeariaId,
             NomeBarbearia = b.Barbearia.Name
         });

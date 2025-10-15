@@ -52,7 +52,7 @@ public class TrocarContextoBarbeiroUseCase : ITrocarContextoBarbeiroUseCase
         var token = _tokenGenerator.GenerateToken(
             userId: barber.Id.ToString(),
             userType: "Barbeiro",
-            email: barber.Telefone,
+            email: barber.Phone,
             barbeariaId: barber.BarbeariaId,
             barbeariaCode: barber.Barbearia.Code.Value
         );

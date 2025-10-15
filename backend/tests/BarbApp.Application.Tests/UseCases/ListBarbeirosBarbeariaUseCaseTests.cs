@@ -45,8 +45,8 @@ public class ListBarbeirosBarbeariaUseCaseTests
             code,
             "admin-user-id"
         );
-        var barber1 = Barber.Create(barbearia.Id, "11987654321", "João Silva");
-        var barber2 = Barber.Create(barbearia.Id, "11987654322", "Maria Santos");
+        var barber1 = Barber.Create(barbearia.Id, "João Silva", "joao@test.com", "hashedpassword1", "11987654321");
+        var barber2 = Barber.Create(barbearia.Id, "Maria Santos", "maria@test.com", "hashedpassword2", "11987654322");
 
         // Set navigation properties for the test
         barber1.GetType().GetProperty("Barbearia")?.SetValue(barber1, barbearia);
@@ -72,13 +72,13 @@ public class ListBarbeirosBarbeariaUseCaseTests
         var resultList = result.ToList();
         resultList[0].Id.Should().Be(barber1.Id);
         resultList[0].Nome.Should().Be(barber1.Name);
-        resultList[0].Telefone.Should().Be(barber1.Telefone);
+        resultList[0].Telefone.Should().Be(barber1.Phone);
         resultList[0].BarbeariaId.Should().Be(barbearia.Id);
         resultList[0].NomeBarbearia.Should().Be(barbearia.Name);
 
         resultList[1].Id.Should().Be(barber2.Id);
         resultList[1].Nome.Should().Be(barber2.Name);
-        resultList[1].Telefone.Should().Be(barber2.Telefone);
+        resultList[1].Telefone.Should().Be(barber2.Phone);
         resultList[1].BarbeariaId.Should().Be(barbearia.Id);
         resultList[1].NomeBarbearia.Should().Be(barbearia.Name);
 
