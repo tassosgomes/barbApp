@@ -1,0 +1,123 @@
+name: BarbApp CI - Main
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: main-ci
+  cancel-in-progress: true
+
+env:
+  CI: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: "1"
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: "1"
+  DOTNET_CLI_HOME: "/tmp/dotnet-cli"
+
+jobs:
+  backend-tests:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: barbapp
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      ConnectionStrings__DefaultConnection: "Host=localhost;Database=barbapp;Username=postgres;Password=postgres"
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+          cache: true
+
+      - name: Restore dependencies
+        run: dotnet restore ./backend/BarbApp.sln
+
+      - name: Build
+        run: dotnet build --configuration Release --no-restore ./backend/BarbApp.sln
+
+      - name: Test
+        run: dotnet test --no-build --logger "trx;LogFileName=test-results.trx" ./backend/BarbApp.sln
+        working-directory: ./backend
+
+      - name: Upload backend test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-test-results
+          path: backend/TestResults/test-results.trx
+          retention-days: 7
+
+      - name: Test summary
+        run: echo "Backend tests completed." >> $GITHUB_STEP_SUMMARY
+
+  admin-tests:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: barbapp
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      ConnectionStrings__DefaultConnection: "Host=localhost;Database=barbapp;Username=postgres;Password=postgres"
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+          cache-dependency-path: 'barbapp-admin/package-lock.json'
+
+      - name: Install dependencies
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
+        run: npm ci
+        working-directory: ./barbapp-admin
+
+      - name: Build
+        run: npm run build
+        working-directory: ./barbapp-admin
+
+      - name: Test
+        env:
+          CI: true
+        run: npm run test -- --runInBand
+        working-directory: ./barbapp-admin
+
+      - name: Upload frontend test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-test-results
+          path: |
+            barbapp-admin/test-results.html
+            barbapp-admin/test-results.json
+          retention-days: 7
+
+      - name: Test summary
+        run: echo "Frontend tests completed." >> $GITHUB_STEP_SUMMARY
