@@ -7,6 +7,19 @@ import type {
   BarbershopFilters,
 } from '@/types';
 
+// Helper function to normalize API response to expected format
+function normalizePaginatedResponse<T>(data: any): PaginatedResponse<T> {
+  return {
+    items: data.items || [],
+    pageNumber: data.pageNumber || data.page || 1,
+    pageSize: data.pageSize || 20,
+    totalPages: data.totalPages || Math.ceil((data.totalCount || 0) / (data.pageSize || 20)),
+    totalCount: data.totalCount || data.items?.length || 0,
+    hasPreviousPage: data.hasPreviousPage !== undefined ? data.hasPreviousPage : (data.page || 1) > 1,
+    hasNextPage: data.hasNextPage !== undefined ? data.hasNextPage : (data.page || 1) < (data.totalPages || Math.ceil((data.totalCount || 0) / (data.pageSize || 20))),
+  };
+}
+
 export const barbershopService = {
   /**
    * List barbershops with pagination and filters
@@ -14,10 +27,10 @@ export const barbershopService = {
    * @returns Paginated list of barbershops
    */
   getAll: async (filters: BarbershopFilters): Promise<PaginatedResponse<Barbershop>> => {
-    const { data } = await api.get<PaginatedResponse<Barbershop>>('/barbearias', {
+    const { data } = await api.get<any>('/barbearias', {
       params: filters,
     });
-    return data;
+    return normalizePaginatedResponse<Barbershop>(data);
   },
 
   /**

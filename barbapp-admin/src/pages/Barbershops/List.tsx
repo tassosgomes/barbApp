@@ -122,12 +122,49 @@ export function BarbershopList() {
     />
   );
   if (!data || data.items.length === 0) return (
-    <EmptyState
-      title="Nenhuma barbearia encontrada"
-      description="Comece cadastrando a primeira barbearia do sistema."
-      actionLabel="+ Nova Barbearia"
-      onAction={handleCreateNew}
-    />
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <h1 className="text-3xl font-bold">Gestão de Barbearias</h1>
+        <Button onClick={handleCreateNew}>
+          + Nova Barbearia
+        </Button>
+      </div>
+
+      {/* Filtros */}
+      <div className="flex gap-4">
+        <Input
+          placeholder="Buscar por nome, email ou cidade..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="max-w-md"
+        />
+        <Select
+          value={statusFilter}
+          onValueChange={setStatusFilter}
+        >
+          <SelectTrigger className="w-48">
+            <SelectValue placeholder="Filtrar por status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todos</SelectItem>
+            <SelectItem value="true">Ativos</SelectItem>
+            <SelectItem value="false">Inativos</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <EmptyState
+        title={searchTerm ? "Nenhuma barbearia encontrada" : "Nenhuma barbearia encontrada"}
+        description={searchTerm ? `Nenhum resultado para "${searchTerm}".` : "Comece cadastrando a primeira barbearia do sistema."}
+        actionLabel={searchTerm ? "Limpar Busca" : "+ Nova Barbearia"}
+        onAction={searchTerm ? () => {
+          setSearchTerm('');
+          setStatusFilter('all');
+          setCurrentPage(1);
+        } : handleCreateNew}
+      />
+    </div>
   );
 
   return (
