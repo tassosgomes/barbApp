@@ -563,4 +563,42 @@ public class BarbersControllerIntegrationTests : IAsyncLifetime
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
+
+    [Fact]
+    public async Task AccessBarbers_FromOtherBarbearia_ShouldReturnEmptyList()
+    {
+        // Arrange - Create barber in test barbearia
+        var barberInput = new CreateBarberInput(
+            "Barbeiro Teste",
+            "barbeiro@teste.com",
+            "Password123!",
+            "(11) 98765-4341",
+            _testServiceIds.Take(1).ToList()
+        );
+
+        var createResponse = await _client.PostAsJsonAsync("/api/barbers", barberInput);
+        createResponse.StatusCode.Should().Be(HttpStatusCode.Created);
+
+        // Create client authenticated for other barbearia
+        var tokenForOtherBarbearia = IntegrationTestWebAppFactory.GenerateTestJwtToken(
+            userId: Guid.NewGuid().ToString(),
+            userType: "AdminBarbearia",
+            email: "admin@otherbarbearia.com",
+            barbeariaId: _otherBarbeariaId
+        );
+
+        var clientForOtherBarbearia = _factory.CreateClient();
+        clientForOtherBarbearia.DefaultRequestHeaders.Authorization =
+            new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", tokenForOtherBarbearia);
+
+        // Act - Try to list barbers from other barbearia
+        var listResponse = await clientForOtherBarbearia.GetAsync("/api/barbers?page=1&pageSize=10");
+
+        // Assert - Should return empty list (global query filter prevents access)
+        listResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var result = await listResponse.Content.ReadFromJsonAsync<PaginatedBarbersOutput>();
+        result.Should().NotBeNull();
+        result!.Barbers.Should().BeEmpty();
+    }
 }
