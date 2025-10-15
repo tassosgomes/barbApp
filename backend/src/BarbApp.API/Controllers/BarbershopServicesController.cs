@@ -81,7 +81,7 @@ public class BarbershopServicesController : ControllerBase
     [ProducesResponseType(typeof(object), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(object), StatusCodes.Status403Forbidden)]
     public async Task<ActionResult<PaginatedBarbershopServicesOutput>> ListServices(
-        [FromQuery] bool? isActive = null,
+        [FromQuery] bool? isActive = true,
         [FromQuery] string? searchName = null,
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 20)
