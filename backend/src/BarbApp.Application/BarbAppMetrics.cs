@@ -30,4 +30,11 @@ public static class BarbAppMetrics
         {
             LabelNames = new[] { "barbearia_id" }
         });
+
+    // Histogram for list barbers time
+    public static readonly Histogram ListBarbersDuration = Metrics
+        .CreateHistogram("barbapp_list_barbers_duration_seconds", "Duration of list barbers operations", new HistogramConfiguration
+        {
+            LabelNames = new[] { "barbearia_id" }
+        });
 }

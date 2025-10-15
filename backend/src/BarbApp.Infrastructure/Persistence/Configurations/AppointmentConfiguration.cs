@@ -42,6 +42,9 @@ public class AppointmentConfiguration : IEntityTypeConfiguration<Appointment>
         builder.HasIndex(a => a.StartTime)
             .HasDatabaseName("ix_appointments_start_time");
 
+        builder.HasIndex(a => new { a.BarberId, a.StartTime })
+            .HasDatabaseName("ix_appointments_barber_start_time");
+
         // Relationships
         builder.HasOne<Barbershop>()
             .WithMany()

@@ -4,6 +4,7 @@ using BarbApp.Domain.Exceptions;
 using BarbApp.Domain.Interfaces;
 using BarbApp.Domain.Interfaces.Repositories;
 using Microsoft.Extensions.Logging;
+using System.Diagnostics;
 
 namespace BarbApp.Application.UseCases;
 
@@ -33,6 +34,7 @@ public class ListBarbersUseCase : IListBarbersUseCase
         int pageSize,
         CancellationToken cancellationToken)
     {
+        var stopwatch = Stopwatch.StartNew();
         _logger.LogInformation("Listing barbers with filters: isActive={IsActive}, searchName={SearchName}, page={Page}, pageSize={PageSize}",
             isActive, searchName, page, pageSize);
 
@@ -44,7 +46,7 @@ public class ListBarbersUseCase : IListBarbersUseCase
 
         // Validate pagination parameters
         if (page < 1) page = 1;
-        if (pageSize < 1 || pageSize > 100) pageSize = 50;
+        if (pageSize < 1 || pageSize > 100) pageSize = 20;
 
         var offset = (page - 1) * pageSize;
 
@@ -90,6 +92,9 @@ public class ListBarbersUseCase : IListBarbersUseCase
                 barber.IsActive,
                 barber.CreatedAt);
         }).ToList();
+
+        stopwatch.Stop();
+        BarbAppMetrics.ListBarbersDuration.WithLabels(barbeariaId.Value.ToString()).Observe(stopwatch.Elapsed.TotalSeconds);
 
         _logger.LogInformation("Listed {Count} barbers out of {TotalCount} total", barberOutputs.Count, totalCount);
 
