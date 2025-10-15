@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect } from 'vitest';
 import { handleApiError } from '@/utils/errorHandler';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 
 describe('handleApiError', () => {
   it('should return user-friendly message for axios error with response', () => {
@@ -12,7 +13,7 @@ describe('handleApiError', () => {
         },
         status: 404,
       },
-    } as any;
+    } as unknown as AxiosError;
 
     const result = handleApiError(axiosError);
     expect(result).toBe('Barbearia não encontrada');
@@ -27,7 +28,7 @@ describe('handleApiError', () => {
         },
         status: 400,
       },
-    } as any;
+    } as unknown as AxiosError;
 
     const result = handleApiError(axiosError);
     expect(result).toBe('Erro de validação');
@@ -40,7 +41,7 @@ describe('handleApiError', () => {
         data: {},
         status: 500,
       },
-    } as any;
+    } as unknown as AxiosError;
 
     const result = handleApiError(axiosError);
     expect(result).toBe('Erro ao processar requisição');
@@ -50,7 +51,7 @@ describe('handleApiError', () => {
     const axiosError = {
       isAxiosError: true,
       request: {},
-    } as any;
+    } as unknown as AxiosError;
 
     const result = handleApiError(axiosError);
     expect(result).toBe('Servidor não respondeu. Verifique sua conexão.');
@@ -87,7 +88,7 @@ describe('handleApiError', () => {
         },
         status: 422,
       },
-    } as any;
+    } as unknown as AxiosError;
 
     const result = handleApiError(axiosError);
     expect(result).toBe('Erro ao processar requisição');
@@ -102,7 +103,7 @@ describe('handleApiError', () => {
         },
         status: 400,
       },
-    } as any;
+    } as unknown as AxiosError;
 
     const result = handleApiError(axiosError);
     // The function returns the array as-is since it doesn't handle arrays specially

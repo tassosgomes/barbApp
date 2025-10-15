@@ -11,6 +11,11 @@ vi.mock('../../../services/api', () => ({
   },
 }));
 
+// Get typed references to the mocked functions
+const mockApiGet = vi.mocked(api.get);
+const mockApiPost = vi.mocked(api.post);
+const mockApiPut = vi.mocked(api.put);
+
 // Mock data
 const mockBarbershops = [
   {
@@ -74,7 +79,7 @@ describe('barbershopService', () => {
         hasNextPage: false,
       };
 
-      (api.get as any).mockResolvedValue({ data: mockResponse });
+      mockApiGet.mockResolvedValue({ data: mockResponse });
 
       const result = await barbershopService.getAll({ pageNumber: 1, pageSize: 20 });
 
@@ -95,7 +100,7 @@ describe('barbershopService', () => {
         hasNextPage: false,
       };
 
-      (api.get as any).mockResolvedValue({ data: mockResponse });
+      mockApiGet.mockResolvedValue({ data: mockResponse });
 
       const result = await barbershopService.getAll({
         pageNumber: 1,
@@ -120,7 +125,7 @@ describe('barbershopService', () => {
         hasNextPage: false,
       };
 
-      (api.get as any).mockResolvedValue({ data: mockResponse });
+      mockApiGet.mockResolvedValue({ data: mockResponse });
 
       const result = await barbershopService.getAll({
         pageNumber: 1,
@@ -145,7 +150,7 @@ describe('barbershopService', () => {
         hasNextPage: false,
       };
 
-      (api.get as any).mockResolvedValue({ data: mockResponse });
+      mockApiGet.mockResolvedValue({ data: mockResponse });
 
       const result = await barbershopService.getAll({ pageNumber: 1, pageSize: 20 });
 
@@ -158,7 +163,7 @@ describe('barbershopService', () => {
 
   describe('getById', () => {
     it('should fetch barbershop by id', async () => {
-      (api.get as any).mockResolvedValue({ data: mockBarbershops[0] });
+      mockApiGet.mockResolvedValue({ data: mockBarbershops[0] });
 
       const result = await barbershopService.getById('1');
 
@@ -168,7 +173,7 @@ describe('barbershopService', () => {
 
     it('should throw error for non-existent barbershop', async () => {
       const error = { response: { status: 404, data: 'Not found' } };
-      (api.get as any).mockRejectedValue(error);
+      mockApiGet.mockRejectedValue(error);
 
       await expect(barbershopService.getById('999')).rejects.toMatchObject({
         response: { status: 404 },
@@ -211,7 +216,7 @@ describe('barbershopService', () => {
         updatedAt: '2024-01-01T00:00:00Z',
       };
 
-      (api.post as any).mockResolvedValue({ data: newBarbershop });
+      mockApiPost.mockResolvedValue({ data: newBarbershop });
 
       const result = await barbershopService.create(request);
 
@@ -252,7 +257,7 @@ describe('barbershopService', () => {
         updatedAt: '2024-01-02T00:00:00Z',
       };
 
-      (api.put as any).mockResolvedValue({ data: updatedBarbershop });
+      mockApiPut.mockResolvedValue({ data: updatedBarbershop });
 
       const result = await barbershopService.update('1', request);
 
@@ -277,7 +282,7 @@ describe('barbershopService', () => {
       };
 
       const error = { response: { status: 404, data: 'Not found' } };
-      (api.put as any).mockRejectedValue(error);
+      mockApiPut.mockRejectedValue(error);
 
       await expect(barbershopService.update('999', request)).rejects.toMatchObject({
         response: { status: 404 },
@@ -287,7 +292,7 @@ describe('barbershopService', () => {
 
   describe('deactivate', () => {
     it('should deactivate barbershop', async () => {
-      (api.put as any).mockResolvedValue({ data: null });
+      mockApiPut.mockResolvedValue({ data: null });
 
       await expect(barbershopService.deactivate('1')).resolves.toBeUndefined();
 
@@ -296,7 +301,7 @@ describe('barbershopService', () => {
 
     it('should throw error when deactivating non-existent barbershop', async () => {
       const error = { response: { status: 404, data: 'Not found' } };
-      (api.put as any).mockRejectedValue(error);
+      mockApiPut.mockRejectedValue(error);
 
       await expect(barbershopService.deactivate('999')).rejects.toMatchObject({
         response: { status: 404 },
@@ -306,7 +311,7 @@ describe('barbershopService', () => {
 
   describe('reactivate', () => {
     it('should reactivate barbershop', async () => {
-      (api.put as any).mockResolvedValue({ data: null });
+      mockApiPut.mockResolvedValue({ data: null });
 
       await expect(barbershopService.reactivate('2')).resolves.toBeUndefined();
 
@@ -315,7 +320,7 @@ describe('barbershopService', () => {
 
     it('should throw error when reactivating non-existent barbershop', async () => {
       const error = { response: { status: 404, data: 'Not found' } };
-      (api.put as any).mockRejectedValue(error);
+      mockApiPut.mockRejectedValue(error);
 
       await expect(barbershopService.reactivate('999')).rejects.toMatchObject({
         response: { status: 404 },
@@ -326,7 +331,7 @@ describe('barbershopService', () => {
   describe('error scenarios', () => {
     it('should handle 404 errors for getById', async () => {
       const error = { response: { status: 404, data: 'Not found' } };
-      (api.get as any).mockRejectedValue(error);
+      mockApiGet.mockRejectedValue(error);
 
       await expect(barbershopService.getById('999')).rejects.toMatchObject({
         response: { status: 404 },
@@ -350,7 +355,7 @@ describe('barbershopService', () => {
       };
 
       const error = { response: { status: 404, data: 'Not found' } };
-      (api.put as any).mockRejectedValue(error);
+      mockApiPut.mockRejectedValue(error);
 
       await expect(barbershopService.update('999', request)).rejects.toMatchObject({
         response: { status: 404 },
@@ -359,7 +364,7 @@ describe('barbershopService', () => {
 
     it('should handle 404 errors for deactivate', async () => {
       const error = { response: { status: 404, data: 'Not found' } };
-      (api.put as any).mockRejectedValue(error);
+      mockApiPut.mockRejectedValue(error);
 
       await expect(barbershopService.deactivate('999')).rejects.toMatchObject({
         response: { status: 404 },
@@ -368,7 +373,7 @@ describe('barbershopService', () => {
 
     it('should handle 404 errors for reactivate', async () => {
       const error = { response: { status: 404, data: 'Not found' } };
-      (api.put as any).mockRejectedValue(error);
+      mockApiPut.mockRejectedValue(error);
 
       await expect(barbershopService.reactivate('999')).rejects.toMatchObject({
         response: { status: 404 },
@@ -377,7 +382,7 @@ describe('barbershopService', () => {
 
     it('should handle network errors', async () => {
       const networkError = new Error('Network Error');
-      (api.get as any).mockRejectedValue(networkError);
+      mockApiGet.mockRejectedValue(networkError);
 
       await expect(barbershopService.getAll({})).rejects.toThrow('Network Error');
     });
@@ -399,7 +404,7 @@ describe('barbershopService', () => {
       };
 
       const error = { response: { status: 500, data: 'Internal Server Error' } };
-      (api.post as any).mockRejectedValue(error);
+      mockApiPost.mockRejectedValue(error);
 
       await expect(barbershopService.create(request)).rejects.toMatchObject({
         response: { status: 500 },

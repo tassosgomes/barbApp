@@ -1,19 +1,19 @@
 # Task 11.4: E2E Tests with Playwright
 
-**Status**: 🔵 Not Started | **Priority**: Alta | **Effort**: 1 day | **Phase**: 11 - Testing
+**Status**: ✅ Completed | **Priority**: Alta | **Effort**: 1 day | **Phase**: 11 - Testing
 
 ## Description
 Write end-to-end tests covering complete user flows using Playwright with real browser automation.
 
 ## Acceptance Criteria
-- [ ] E2E test: Login flow
-- [ ] E2E test: Create barbershop flow
-- [ ] E2E test: Edit barbershop flow
-- [ ] E2E test: Deactivate/reactivate flow
-- [ ] E2E test: Search and filter flow
-- [ ] E2E test: Pagination navigation
-- [ ] E2E test: Error scenarios
-- [ ] All E2E tests pass against local dev server
+- [x] E2E test: Login flow
+- [x] E2E test: Create barbershop flow
+- [x] E2E test: Edit barbershop flow
+- [x] E2E test: Deactivate/reactivate flow
+- [x] E2E test: Search and filter flow
+- [x] E2E test: Pagination navigation
+- [x] E2E test: Error scenarios
+- [x] All E2E tests pass against local dev server
 
 ## Dependencies
 **Blocking**: Task 11.1 (Playwright Config), all CRUD pages
