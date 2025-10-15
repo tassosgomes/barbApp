@@ -14,6 +14,13 @@ public class CustomerRepository : ICustomerRepository
         _context = context;
     }
 
+    public async Task<Customer?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        return await _context.Customers
+            .IgnoreQueryFilters()
+            .FirstOrDefaultAsync(c => c.Id == id, cancellationToken);
+    }
+
     public async Task<Customer?> GetByTelefoneAndBarbeariaIdAsync(string telefone, Guid barbeariaId, CancellationToken cancellationToken = default)
     {
         return await _context.Customers

@@ -22,6 +22,16 @@ public class AppointmentRepository : IAppointmentRepository
         return new List<Appointment>();
     }
 
+    public async Task<List<Appointment>> GetAppointmentsByBarbeariaAndDateAsync(
+        Guid barbeariaId,
+        DateTime date,
+        CancellationToken cancellationToken = default)
+    {
+        // Since appointments are not yet implemented in the database,
+        // return an empty list for now
+        return new List<Appointment>();
+    }
+
     public async Task UpdateStatusAsync(
         IEnumerable<Appointment> appointments,
         string newStatus,

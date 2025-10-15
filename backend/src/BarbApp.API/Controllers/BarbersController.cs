@@ -186,6 +186,7 @@ public class BarbersController : ControllerBase
     /// Obtém agenda consolidada de todos os barbeiros da barbearia
     /// </summary>
     /// <param name="date">Data para filtrar a agenda (formato: YYYY-MM-DD)</param>
+    /// <param name="barberId">ID do barbeiro para filtrar (opcional)</param>
     /// <returns>Agenda da equipe</returns>
     /// <response code="200">Agenda retornada com sucesso</response>
     /// <response code="400">Data inválida</response>
@@ -196,12 +197,12 @@ public class BarbersController : ControllerBase
     [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(object), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(object), StatusCodes.Status403Forbidden)]
-    public async Task<ActionResult<TeamScheduleOutput>> GetTeamSchedule([FromQuery] DateTime? date = null)
+    public async Task<ActionResult<TeamScheduleOutput>> GetTeamSchedule([FromQuery] DateTime? date = null, [FromQuery] Guid? barberId = null)
     {
         var scheduleDate = date ?? DateTime.Today;
-        _logger.LogInformation("Getting team schedule for date: {Date}", scheduleDate);
+        _logger.LogInformation("Getting team schedule for date: {Date}, barberId: {BarberId}", scheduleDate, barberId);
 
-        var result = await _getTeamScheduleUseCase.ExecuteAsync(scheduleDate, HttpContext.RequestAborted);
+        var result = await _getTeamScheduleUseCase.ExecuteAsync(scheduleDate, barberId, HttpContext.RequestAborted);
 
         _logger.LogInformation("Team schedule returned with {AppointmentCount} appointments", result.Appointments.Count);
 
