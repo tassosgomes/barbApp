@@ -100,6 +100,8 @@ builder.Services.AddScoped<IBarberRepository, BarberRepository>();
 builder.Services.AddScoped<IBarbershopRepository, BarbershopRepository>();
 builder.Services.AddScoped<IAddressRepository, AddressRepository>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddScoped<IBarbershopServiceRepository, BarbershopServiceRepository>();
+builder.Services.AddScoped<IAppointmentRepository, AppointmentRepository>();
 
 // Security Services
 builder.Services.AddSingleton<IPasswordHasher, PasswordHasher>();
@@ -128,6 +130,17 @@ builder.Services.AddScoped<IDeactivateBarbershopUseCase, DeactivateBarbershopUse
 builder.Services.AddScoped<IReactivateBarbershopUseCase, ReactivateBarbershopUseCase>();
 builder.Services.AddScoped<IGetBarbershopUseCase, GetBarbershopUseCase>();
 builder.Services.AddScoped<IListBarbershopsUseCase, ListBarbershopsUseCase>();
+builder.Services.AddScoped<ICreateBarberUseCase, CreateBarberUseCase>();
+builder.Services.AddScoped<IUpdateBarberUseCase, UpdateBarberUseCase>();
+builder.Services.AddScoped<IRemoveBarberUseCase, RemoveBarberUseCase>();
+builder.Services.AddScoped<IListBarbersUseCase, ListBarbersUseCase>();
+builder.Services.AddScoped<IGetBarberByIdUseCase, GetBarberByIdUseCase>();
+builder.Services.AddScoped<IGetTeamScheduleUseCase, GetTeamScheduleUseCase>();
+builder.Services.AddScoped<ICreateBarbershopServiceUseCase, CreateBarbershopServiceUseCase>();
+builder.Services.AddScoped<IUpdateBarbershopServiceUseCase, UpdateBarbershopServiceUseCase>();
+builder.Services.AddScoped<IDeleteBarbershopServiceUseCase, DeleteBarbershopServiceUseCase>();
+builder.Services.AddScoped<IListBarbershopServicesUseCase, ListBarbershopServicesUseCase>();
+builder.Services.AddScoped<IGetBarbershopServiceByIdUseCase, GetBarbershopServiceByIdUseCase>();
 
 // ══════════════════════════════════════════════════════════
 // AUTHENTICATION & AUTHORIZATION

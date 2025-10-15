@@ -1,5 +1,5 @@
 ---
-status: pending
+status: completed
 parallelizable: true
 blocked_by: ["3.0"]
 ---
@@ -26,11 +26,11 @@ Implementar controllers REST para gestão de barbeiros e serviços, configurar a
 - Documentação Swagger com exemplos de request/response
 
 ## Subtarefas
-- [ ] 4.1 Implementar BarbersController (CRUD + schedule)
-- [ ] 4.2 Implementar BarbershopServicesController
-- [ ] 4.3 Configurar Authorization e policies
-- [ ] 4.4 Middleware de exception handling
-- [ ] 4.5 Documentar endpoints no Swagger
+- [x] 4.1 Implementar BarbersController (CRUD + schedule)
+- [x] 4.2 Implementar BarbershopServicesController
+- [x] 4.3 Configurar Authorization e policies
+- [x] 4.4 Middleware de exception handling
+- [x] 4.5 Documentar endpoints no Swagger
 
 ## Sequenciamento
 - Bloqueado por: 3.0
@@ -46,3 +46,7 @@ Implementar controllers REST para gestão de barbeiros e serviços, configurar a
 - Swagger apresenta todos os endpoints e exemplos
 - Requisições autenticadas funcionam conforme contratos
 - Códigos HTTP corretos por cenário
+
+## Status Final
+✅ **CONCLUÍDA** - Tarefa revisada e aprovada em 15/10/2025  
+📄 Relatório de revisão: `4_task_review.md`
