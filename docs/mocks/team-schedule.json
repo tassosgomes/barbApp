@@ -1,0 +1,59 @@
+{
+  "appointments": [
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440008",
+      "barberId": "550e8400-e29b-41d4-a716-446655440000",
+      "barberName": "João Silva",
+      "customerId": "550e8400-e29b-41d4-a716-446655440009",
+      "customerName": "Roberto Almeida",
+      "startTime": "2025-10-15T09:00:00Z",
+      "endTime": "2025-10-15T09:30:00Z",
+      "serviceName": "Corte de Cabelo",
+      "status": "Confirmed"
+    },
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440010",
+      "barberId": "550e8400-e29b-41d4-a716-446655440000",
+      "barberName": "João Silva",
+      "customerId": "550e8400-e29b-41d4-a716-446655440011",
+      "customerName": "Fernando Costa",
+      "startTime": "2025-10-15T10:00:00Z",
+      "endTime": "2025-10-15T10:20:00Z",
+      "serviceName": "Barba",
+      "status": "Confirmed"
+    },
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440012",
+      "barberId": "550e8400-e29b-41d4-a716-446655440003",
+      "barberName": "Maria Santos",
+      "customerId": "550e8400-e29b-41d4-a716-446655440013",
+      "customerName": "Ana Paula",
+      "startTime": "2025-10-15T14:00:00Z",
+      "endTime": "2025-10-15T15:00:00Z",
+      "serviceName": "Coloração",
+      "status": "Pending"
+    },
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440014",
+      "barberId": "550e8400-e29b-41d4-a716-446655440000",
+      "barberName": "João Silva",
+      "customerId": "550e8400-e29b-41d4-a716-446655440015",
+      "customerName": "Marcos Vinicius",
+      "startTime": "2025-10-15T15:30:00Z",
+      "endTime": "2025-10-15T16:15:00Z",
+      "serviceName": "Corte + Barba",
+      "status": "Confirmed"
+    },
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440016",
+      "barberId": "550e8400-e29b-41d4-a716-446655440003",
+      "barberName": "Maria Santos",
+      "customerId": "550e8400-e29b-41d4-a716-446655440017",
+      "customerName": "Lucas Mendes",
+      "startTime": "2025-10-15T16:00:00Z",
+      "endTime": "2025-10-15T16:30:00Z",
+      "serviceName": "Corte de Cabelo",
+      "status": "Cancelled"
+    }
+  ]
+}

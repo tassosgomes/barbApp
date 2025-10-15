@@ -1,0 +1,77 @@
+{
+  "barbers": [
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440000",
+      "name": "João Silva",
+      "email": "joao.silva@barbearia.com",
+      "phoneFormatted": "(11) 98765-4321",
+      "services": [
+        {
+          "id": "550e8400-e29b-41d4-a716-446655440001",
+          "name": "Corte de Cabelo",
+          "description": "Corte masculino completo",
+          "durationMinutes": 30,
+          "price": 25.00,
+          "isActive": true
+        },
+        {
+          "id": "550e8400-e29b-41d4-a716-446655440002",
+          "name": "Barba",
+          "description": "Aparação e modelagem da barba",
+          "durationMinutes": 20,
+          "price": 15.00,
+          "isActive": true
+        }
+      ],
+      "isActive": true,
+      "createdAt": "2025-10-01T08:00:00Z"
+    },
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440003",
+      "name": "Maria Santos",
+      "email": "maria.santos@barbearia.com",
+      "phoneFormatted": "(11) 99876-5432",
+      "services": [
+        {
+          "id": "550e8400-e29b-41d4-a716-446655440001",
+          "name": "Corte de Cabelo",
+          "description": "Corte masculino completo",
+          "durationMinutes": 30,
+          "price": 25.00,
+          "isActive": true
+        },
+        {
+          "id": "550e8400-e29b-41d4-a716-446655440004",
+          "name": "Coloração",
+          "description": "Coloração completa do cabelo",
+          "durationMinutes": 60,
+          "price": 80.00,
+          "isActive": true
+        }
+      ],
+      "isActive": true,
+      "createdAt": "2025-09-15T09:30:00Z"
+    },
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440005",
+      "name": "Carlos Oliveira",
+      "email": "carlos.oliveira@barbearia.com",
+      "phoneFormatted": "(11) 98765-1111",
+      "services": [
+        {
+          "id": "550e8400-e29b-41d4-a716-446655440001",
+          "name": "Corte de Cabelo",
+          "description": "Corte masculino completo",
+          "durationMinutes": 30,
+          "price": 25.00,
+          "isActive": true
+        }
+      ],
+      "isActive": false,
+      "createdAt": "2025-08-20T14:15:00Z"
+    }
+  ],
+  "totalCount": 3,
+  "page": 1,
+  "pageSize": 20
+}

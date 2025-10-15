@@ -1,5 +1,5 @@
 ---
-status: pending
+status: completed
 parallelizable: true
 blocked_by: ["4.0","5.0"]
 ---
@@ -24,9 +24,9 @@ Documentar contratos JSON de entrada/saída, disponibilizar exemplos de dados pa
 - CORS habilitado para o domínio do frontend (barberapp.tasso.dev.br)
 
 ## Subtarefas
-- [ ] 8.1 Elaborar contratos e exemplos
-- [ ] 8.2 Criar mocks em arquivos JSON
-- [ ] 8.3 Validar CORS no ambiente de dev
+- [x] 8.1 Elaborar contratos e exemplos
+- [x] 8.2 Criar mocks em arquivos JSON
+- [x] 8.3 Validar CORS no ambiente de dev
 
 ## Sequenciamento
 - Bloqueado por: 4.0, 5.0
