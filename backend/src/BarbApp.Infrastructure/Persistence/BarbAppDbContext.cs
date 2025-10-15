@@ -24,6 +24,7 @@ public class BarbAppDbContext : DbContext
     public DbSet<Barber> Barbers => Set<Barber>();
     public DbSet<BarbershopService> BarbershopServices => Set<BarbershopService>();
     public DbSet<Customer> Customers => Set<Customer>();
+    public DbSet<Appointment> Appointments => Set<Appointment>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -44,5 +45,8 @@ public class BarbAppDbContext : DbContext
 
         modelBuilder.Entity<Customer>().HasQueryFilter(c =>
             _tenantContext.IsAdminCentral || c.BarbeariaId == _tenantContext.BarbeariaId);
+
+        modelBuilder.Entity<Appointment>().HasQueryFilter(a =>
+            _tenantContext.IsAdminCentral || a.BarbeariaId == _tenantContext.BarbeariaId);
     }
 }

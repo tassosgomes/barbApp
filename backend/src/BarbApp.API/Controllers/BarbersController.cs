@@ -84,7 +84,7 @@ public class BarbersController : ControllerBase
     [ProducesResponseType(typeof(object), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(object), StatusCodes.Status403Forbidden)]
     public async Task<ActionResult<PaginatedBarbersOutput>> ListBarbers(
-        [FromQuery] bool? isActive = null,
+        [FromQuery] bool? isActive = true,
         [FromQuery] string? searchName = null,
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 20)
@@ -199,7 +199,7 @@ public class BarbersController : ControllerBase
     [ProducesResponseType(typeof(object), StatusCodes.Status403Forbidden)]
     public async Task<ActionResult<TeamScheduleOutput>> GetTeamSchedule([FromQuery] DateTime? date = null, [FromQuery] Guid? barberId = null)
     {
-        var scheduleDate = date ?? DateTime.Today;
+        var scheduleDate = date ?? DateTime.UtcNow.Date;
         _logger.LogInformation("Getting team schedule for date: {Date}, barberId: {BarberId}", scheduleDate, barberId);
 
         var result = await _getTeamScheduleUseCase.ExecuteAsync(scheduleDate, barberId, HttpContext.RequestAborted);

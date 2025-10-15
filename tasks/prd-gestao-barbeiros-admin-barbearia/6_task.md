@@ -1,5 +1,5 @@
 ---
-status: pending
+status: completed
 parallelizable: true
 blocked_by: ["4.0","5.0"]
 ---
@@ -24,11 +24,11 @@ Configurar TestContainers e implementar testes de integração para validar a AP
 - Cenários: criação, duplicidade de **email**, listagem com filtros, remoção que **cancela agendamentos futuros**, agenda consolidada, isolamento multi-tenant.
 
 ## Subtarefas
-- [ ] 6.1 Configurar TestContainers e factory.
-- [ ] 6.2 Testes CRUD de Barbers (com auth por email).
-- [ ] 6.3 Teste de isolamento multi-tenant.
-- [ ] 6.4 Teste de remoção que cancela agendamentos futuros.
-- [ ] 6.5 Teste da agenda consolidada.
+- [x] 6.1 Configurar TestContainers e factory.
+- [x] 6.2 Testes CRUD de Barbers (com auth por email).
+- [x] 6.3 Teste de isolamento multi-tenant.
+- [x] 6.4 Teste de remoção que cancela agendamentos futuros.
+- [x] 6.5 Teste da agenda consolidada.
 
 ## Sequenciamento
 - Bloqueado por: 4.0, 5.0
@@ -39,4 +39,13 @@ Configurar TestContainers e implementar testes de integração para validar a AP
 - Reutilizar exemplos da Tech Spec atualizada; mascarar dados sensíveis nos logs.
 
 ## Critérios de Sucesso
-- Todos os testes de integração passam e cobrem os cenários chave atualizados.
+- Todos os testes de integração Passam e cobrem os cenários chave atualizados.
+
+---
+
+- [x] 1.0 [Testes de Integração - CRUD, Isolamento Multi-tenant e Agenda] ✅ CONCLUÍDA
+  - [x] 1.1 Implementação completada
+  - [x] 1.2 Definição da tarefa, PRD e tech spec validados
+  - [x] 1.3 Análise de regras e conformidade verificadas
+  - [x] 1.4 Revisão de código completada
+  - [x] 1.5 Pronto para deploy
