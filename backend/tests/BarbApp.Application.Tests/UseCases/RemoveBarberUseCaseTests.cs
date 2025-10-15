@@ -45,18 +45,18 @@ public class RemoveBarberUseCaseTests
         var barberId = Guid.NewGuid();
         var barber = Barber.Create(barbeariaId, "João Silva", "joao@test.com", "hash", "11987654321", new List<Guid>());
         
-        // Create mock appointments
-        var appointment1 = new Mock<Appointment>();
-        appointment1.Setup(a => a.Id).Returns(Guid.NewGuid());
-        appointment1.Setup(a => a.BarberId).Returns(barberId);
-        appointment1.Setup(a => a.Status).Returns("Confirmed");
+        // Create mock appointments using reflection to set private properties
+        var appointment1 = (Appointment)Activator.CreateInstance(typeof(Appointment), true)!;
+        typeof(Appointment).GetProperty("Id")!.SetValue(appointment1, Guid.NewGuid());
+        typeof(Appointment).GetProperty("BarberId")!.SetValue(appointment1, barberId);
+        typeof(Appointment).GetProperty("Status")!.SetValue(appointment1, "Confirmed");
         
-        var appointment2 = new Mock<Appointment>();
-        appointment2.Setup(a => a.Id).Returns(Guid.NewGuid());
-        appointment2.Setup(a => a.BarberId).Returns(barberId);
-        appointment2.Setup(a => a.Status).Returns("Pending");
+        var appointment2 = (Appointment)Activator.CreateInstance(typeof(Appointment), true)!;
+        typeof(Appointment).GetProperty("Id")!.SetValue(appointment2, Guid.NewGuid());
+        typeof(Appointment).GetProperty("BarberId")!.SetValue(appointment2, barberId);
+        typeof(Appointment).GetProperty("Status")!.SetValue(appointment2, "Pending");
         
-        var futureAppointments = new List<Appointment> { appointment1.Object, appointment2.Object };
+        var futureAppointments = new List<Appointment> { appointment1, appointment2 };
 
         _tenantContextMock.Setup(x => x.BarbeariaId).Returns(barbeariaId);
         _barberRepositoryMock
