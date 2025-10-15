@@ -79,7 +79,7 @@ public static class TestHelper
 
         var telefone = $"119{Random.Shared.Next(10000000, 99999999)}";
 
-        var barbeiro = Barber.Create(barbearia.Id, telefone, "Test Barber");
+        var barbeiro = Barber.Create(barbearia.Id, "Test Barber", "testbarber@test.com", "hashedpassword", telefone);
         await context.Barbers.AddAsync(barbeiro);
         await context.SaveChangesAsync();
 

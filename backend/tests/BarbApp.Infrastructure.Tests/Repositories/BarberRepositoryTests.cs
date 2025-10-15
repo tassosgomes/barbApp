@@ -43,7 +43,7 @@ public class BarberRepositoryTests : IDisposable
 
         var barbeariaId = barbearia.Id;
         var telefone = "11999999999";
-        var barber = Barber.Create(barbeariaId, telefone, "João Barber");
+        var barber = Barber.Create(barbeariaId, "João Barber", "joao@test.com", "hashedpassword", telefone);
         await _context.Barbers.AddAsync(barber);
         await _context.SaveChangesAsync();
 
@@ -52,7 +52,7 @@ public class BarberRepositoryTests : IDisposable
 
         // Assert
         result.Should().NotBeNull();
-        result!.Telefone.Should().Be(telefone);
+        result!.Phone.Should().Be(telefone);
         result.BarbeariaId.Should().Be(barbeariaId);
         result.Name.Should().Be("João Barber");
     }
@@ -85,7 +85,7 @@ public class BarberRepositoryTests : IDisposable
         var barbeariaId1 = barbearia1.Id;
         var barbeariaId2 = barbearia2.Id;
         var telefone = "11999999999";
-        var barber = Barber.Create(barbeariaId1, telefone, "João Barber");
+        var barber = Barber.Create(barbeariaId1, "João Barber", "joao@test.com", "hashedpassword", telefone);
         await _context.Barbers.AddAsync(barber);
         await _context.SaveChangesAsync();
 
@@ -111,9 +111,9 @@ public class BarberRepositoryTests : IDisposable
         var barbeariaId2 = barbearia2.Id;
         var barbers = new[]
         {
-            Barber.Create(barbeariaId1, "11999999991", "João"),
-            Barber.Create(barbeariaId1, "11999999992", "Maria"),
-            Barber.Create(barbeariaId2, "11999999993", "Pedro")
+            Barber.Create(barbeariaId1, "João", "joao@test.com", "hashedpassword1", "11999999991"),
+            Barber.Create(barbeariaId1, "Maria", "maria@test.com", "hashedpassword2", "11999999992"),
+            Barber.Create(barbeariaId2, "Pedro", "pedro@test.com", "hashedpassword3", "11999999993")
         };
         await _context.Barbers.AddRangeAsync(barbers);
         await _context.SaveChangesAsync();
@@ -151,14 +151,16 @@ public class BarberRepositoryTests : IDisposable
         await _context.SaveChangesAsync();
 
         var barbeariaId = barbearia.Id;
-        var barber = Barber.Create(barbeariaId, "11999999999", "Novo Barber");
+        var barber = Barber.Create(barbeariaId, "Novo Barber", "novo@test.com", "hashedpassword", "11999999999");
 
         // Act
-        var result = await _repository.AddAsync(barber);
+        await _repository.InsertAsync(barber);
+        await _context.SaveChangesAsync();
 
         // Assert
-        result.Should().Be(barber);
-        _context.Barbers.Should().Contain(barber);
+        var savedBarber = await _context.Barbers.FindAsync(barber.Id);
+        savedBarber.Should().NotBeNull();
+        savedBarber!.Name.Should().Be("Novo Barber");
     }
 
     public void Dispose()
