@@ -1,5 +1,5 @@
 ---
-status: pending
+status: completed
 parallelizable: false
 blocked_by: ["1.0"]
 ---
@@ -26,11 +26,11 @@ Criar o esquema de banco e infraestrutura de persistência: migrations para `bar
 - Scripts/steps para aplicar migrations localmente.
 
 ## Subtarefas
-- [ ] 2.1 Criar migrations de `barbers` (com `email`, `password_hash`) e `barbershop_services`.
-- [ ] 2.2 Implementar `BarberConfiguration` e `BarbershopServiceConfiguration`.
-- [ ] 2.3 Estender `BarbAppDbContext` (DbSets e filtros globais).
-- [ ] 2.4 Implementar repositórios concretos.
-- [ ] 2.5 Validar índices e performance básica (explain/analyze simples).
+- [x] 2.1 Criar migrations de `barbers` (com `email`, `password_hash`) e `barbershop_services`.
+- [x] 2.2 Implementar `BarberConfiguration` e `BarbershopServiceConfiguration`.
+- [x] 2.3 Estender `BarbAppDbContext` (DbSets e filtros globais).
+- [x] 2.4 Implementar repositórios concretos.
+- [x] 2.5 Validar índices e performance básica (explain/analyze simples).
 
 ## Sequenciamento
 - Bloqueado por: 1.0
@@ -46,3 +46,11 @@ Criar o esquema de banco e infraestrutura de persistência: migrations para `bar
 - Migrations aplicam com sucesso e tabelas/índices (incluindo `email`) existem.
 - Repositórios executam CRUD básico sem violar isolamento multi-tenant.
 - Consultas de listagem respeitam paginação e filtros.
+
+## ✅ CONCLUÍDA
+- [x] 2.0 Infra/DB - Migrations, Configurações EF Core, DbContext e Repositórios ✅ CONCLUÍDA
+  - [x] 2.1 Implementação completada
+  - [x] 2.2 Definição da tarefa, PRD e tech spec validados
+  - [x] 2.3 Análise de regras e conformidade verificadas
+  - [x] 2.4 Revisão de código completada
+  - [x] 2.5 Pronto para deploy
