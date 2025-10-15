@@ -15,6 +15,10 @@ export default defineConfig({
     // Suppress console warnings during tests
     silent: true,
     exclude: ['**/node_modules/**', '**/tests/e2e/**'],
+    env: {
+      VITE_API_URL: 'http://localhost:5000/api',
+      VITE_APP_NAME: 'BarbApp Admin',
+    },
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],

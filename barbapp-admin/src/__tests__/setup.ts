@@ -1,26 +1,33 @@
 import '@testing-library/jest-dom/vitest';
-import { cleanup } from '@testing-library/react';
-import { afterEach, vi } from 'vitest';
+import { beforeAll, afterAll, afterEach, vi } from 'vitest';
+import { server } from './mocks/server';
 
-// Set environment variables for tests
-process.env.VITE_API_URL = 'http://localhost:5070/api';
-process.env.VITE_APP_NAME = 'BarbApp Admin';
+// Stub environment variables for tests
+vi.stubEnv('VITE_API_URL', 'http://localhost:3000/api');
+vi.stubEnv('VITE_APP_NAME', 'BarbApp Admin');
 
-// Mock localStorage
+// Mock localStorage and sessionStorage
 const localStorageMock = {
   getItem: vi.fn(),
   setItem: vi.fn(),
   removeItem: vi.fn(),
   clear: vi.fn(),
 };
+const sessionStorageMock = {
+  getItem: vi.fn(),
+  setItem: vi.fn(),
+  removeItem: vi.fn(),
+  clear: vi.fn(),
+};
 
-Object.defineProperty(window, 'localStorage', {
-  value: localStorageMock,
-});
+global.localStorage = localStorageMock as any;
+global.sessionStorage = sessionStorageMock as any;
 
 // Mock window.location
-delete (window as unknown as Record<string, unknown>).location;
-(window as unknown as Record<string, unknown>).location = { href: '' } as Location;
+delete (global as any).window.location;
+(global as any).window.location = {
+  href: '',
+};
 
 // Suppress DataCloneError warnings from Vitest (related to Axios serialization)
 const originalWarn = console.warn;
@@ -31,7 +38,19 @@ console.warn = (...args) => {
   originalWarn.apply(console, args);
 };
 
+// Establish API mocking before all tests
+beforeAll(() => {
+  console.log('Starting MSW server...');
+  server.listen({ onUnhandledRequest: 'error' });
+  console.log('MSW server started');
+});
+
+// Reset any request handlers that we may add during the tests,
+// so they don't affect other tests
 afterEach(() => {
-  cleanup();
+  server.resetHandlers();
   vi.clearAllMocks();
 });
+
+// Clean up after all tests are done
+afterAll(() => server.close());
