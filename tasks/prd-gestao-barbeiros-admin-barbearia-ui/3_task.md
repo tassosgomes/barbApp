@@ -1,5 +1,5 @@
 ---
-status: pending
+status: completed
 parallelizable: true
 blocked_by: ["2.0"]
 ---
@@ -24,9 +24,9 @@ Implementar `src/services/barbers.service.ts` com CRUD, listagem paginada/filtra
 - Uso de `api.ts` (interceptors JWT)
 
 ## Subtarefas
-- [ ] 3.1 Criar arquivo de serviço
-- [ ] 3.2 Implementar normalização de paginação
-- [ ] 3.3 Tratar erros (409/422) para mensagens claras
+- [x] 3.1 Criar arquivo de serviço
+- [x] 3.2 Implementar normalização de paginação
+- [x] 3.3 Tratar erros (409/422) para mensagens claras
 
 ## Sequenciamento
 - Bloqueado por: 2.0

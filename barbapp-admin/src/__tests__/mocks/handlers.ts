@@ -1,6 +1,7 @@
 import { http, HttpResponse } from 'msw';
 import type { CreateBarbershopRequest, UpdateBarbershopRequest } from '../../types/barbershop';
 import type { LoginRequest } from '../../types/auth';
+import type { CreateServiceRequest, UpdateServiceRequest } from '../../types/service';
 
 // Mock data
 const mockBarbershops = [
@@ -45,6 +46,33 @@ const mockBarbershops = [
     isActive: false,
     createdAt: '2024-01-01T00:00:00Z',
     updatedAt: '2024-01-01T00:00:00Z',
+  },
+];
+
+const mockServices = [
+  {
+    id: '1',
+    name: 'Corte de Cabelo',
+    description: 'Corte masculino completo',
+    durationMinutes: 30,
+    price: 25.00,
+    isActive: true,
+  },
+  {
+    id: '2',
+    name: 'Barba',
+    description: 'Aparação e modelagem de barba',
+    durationMinutes: 20,
+    price: 15.00,
+    isActive: true,
+  },
+  {
+    id: '3',
+    name: 'Corte Infantil',
+    description: 'Corte para crianças',
+    durationMinutes: 25,
+    price: 20.00,
+    isActive: false,
   },
 ];
 
@@ -213,5 +241,104 @@ export const handlers = [
     }
 
     return new HttpResponse(null, { status: 401 });
+  }),
+
+  // GET /api/barbershop-services - List services
+  http.get('http://localhost:3000/api/barbershop-services', ({ request }) => {
+    const url = new URL(request.url);
+    const page = parseInt(url.searchParams.get('page') || '1');
+    const pageSize = parseInt(url.searchParams.get('pageSize') || '20');
+    const searchName = url.searchParams.get('searchName');
+    const isActive = url.searchParams.get('isActive');
+
+    let filteredServices = mockServices;
+
+    // Filter by search name
+    if (searchName) {
+      filteredServices = filteredServices.filter(
+        (service) => service.name.toLowerCase().includes(searchName.toLowerCase())
+      );
+    }
+
+    // Filter by active status
+    if (isActive !== null) {
+      filteredServices = filteredServices.filter(
+        (service) => service.isActive === (isActive === 'true')
+      );
+    }
+
+    // Pagination
+    const totalCount = filteredServices.length;
+    const startIndex = (page - 1) * pageSize;
+    const paginatedItems = filteredServices.slice(startIndex, startIndex + pageSize);
+
+    return HttpResponse.json({
+      services: paginatedItems,
+      totalCount,
+      page,
+      pageSize,
+    });
+  }),
+
+  // GET /api/barbershop-services/:id - Get service by ID
+  http.get('http://localhost:3000/api/barbershop-services/:id', ({ params }) => {
+    const { id } = params;
+    const service = mockServices.find((s) => s.id === id);
+
+    if (!service) {
+      return new HttpResponse(null, { status: 404 });
+    }
+
+    return HttpResponse.json(service);
+  }),
+
+  // POST /api/barbershop-services - Create service
+  http.post('http://localhost:3000/api/barbershop-services', async ({ request }) => {
+    const body = await request.json() as CreateServiceRequest;
+    const newService = {
+      id: Date.now().toString(),
+      name: body.name,
+      description: body.description,
+      durationMinutes: body.durationMinutes,
+      price: body.price,
+      isActive: true,
+    };
+
+    mockServices.push(newService);
+    return HttpResponse.json(newService, { status: 201 });
+  }),
+
+  // PUT /api/barbershop-services/:id - Update service
+  http.put('http://localhost:3000/api/barbershop-services/:id', async ({ request, params }) => {
+    const { id } = params;
+    const body = await request.json() as UpdateServiceRequest;
+    const index = mockServices.findIndex((s) => s.id === id);
+
+    if (index === -1) {
+      return new HttpResponse(null, { status: 404 });
+    }
+
+    mockServices[index] = {
+      ...mockServices[index],
+      name: body.name,
+      description: body.description,
+      durationMinutes: body.durationMinutes,
+      price: body.price,
+    };
+
+    return HttpResponse.json(mockServices[index]);
+  }),
+
+  // DELETE /api/barbershop-services/:id - Delete service
+  http.delete('http://localhost:3000/api/barbershop-services/:id', ({ params }) => {
+    const { id } = params;
+    const index = mockServices.findIndex((s) => s.id === id);
+
+    if (index === -1) {
+      return new HttpResponse(null, { status: 404 });
+    }
+
+    mockServices.splice(index, 1);
+    return new HttpResponse(null, { status: 204 });
   }),
 ];
