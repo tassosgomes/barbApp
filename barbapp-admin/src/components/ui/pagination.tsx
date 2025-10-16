@@ -39,7 +39,7 @@ export function Pagination({
           disabled={!hasNextPage}
           onClick={() => onPageChange(currentPage + 1)}
         >
-          Proxima
+          Próxima
           <ChevronRight className="h-4 w-4 ml-1" />
         </Button>
       </div>
