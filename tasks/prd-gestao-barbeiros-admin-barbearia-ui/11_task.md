@@ -40,3 +40,19 @@ Ver “Página: Serviços” e “Contratos de Componentes”.
 
 ## Critérios de Sucesso
 - Fluxo Criar/Editar/Ativar-Inativar funcional e testado
+
+---
+
+## Checklist de Conclusão
+
+- [x] 11.0 [Página — Serviços (lista + formulário + URL state)] ✅ CONCLUÍDA
+  - [x] 11.1 Implementação completada
+  - [x] 11.2 Definição da tarefa, PRD e tech spec validados
+  - [x] 11.3 Análise de regras e conformidade verificadas
+  - [x] 11.4 Revisão de código completada
+  - [x] 11.5 Pronto para deploy
+
+**Data de Conclusão:** 2025-10-16  
+**Commit:** `34a64b5`  
+**Status da Revisão:** ✅ APROVADA COM EXCELÊNCIA  
+**Relatório Completo:** [11_task_review.md](./11_task_review.md)
