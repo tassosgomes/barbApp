@@ -4,6 +4,7 @@ export { useBarberMutations } from './useBarberMutations';
 export { useBarbershops } from './useBarbershops';
 export { useBarbershop } from './useBarbershop';
 export { useDebounce } from './useDebounce';
+export { useSchedule } from './useSchedule';
 export { useServiceMutations } from './useServiceMutations';
 export { useServices } from './useServices';
 export { useToast } from './use-toast';
