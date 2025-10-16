@@ -1,5 +1,5 @@
 ---
-status: pending
+status: completed
 parallelizable: false
 blocked_by: ["1.0","2.0","4.0","7.0","9.0","13.0"]
 ---
@@ -24,11 +24,11 @@ Construir a página de gestão de Serviços: listagem paginada/filtrada, modal/r
 - Estado persistido na URL; reset rápido
 
 ## Subtarefas
-- [ ] 11.1 Listagem com DataTable + filtros + paginação
-- [ ] 11.2 Modal/rota `ServiceForm` (create/update)
-- [ ] 11.3 Ação de ativar/inativar com confirmação
-- [ ] 11.4 Tratamento de erros (409/422) + toasts
-- [ ] 11.5 Testes de integração com MSW
+- [x] 11.1 Listagem com DataTable + filtros + paginação
+- [x] 11.2 Modal/rota `ServiceForm` (create/update)
+- [x] 11.3 Ação de ativar/inativar com confirmação
+- [x] 11.4 Tratamento de erros (409/422) + toasts
+- [x] 11.5 Testes de integração com MSW
 
 ## Sequenciamento
 - Bloqueado por: 1.0, 2.0, 4.0, 7.0, 9.0, 13.0
