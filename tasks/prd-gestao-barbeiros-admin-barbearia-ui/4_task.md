@@ -1,5 +1,5 @@
 ---
-status: pending
+status: completed
 parallelizable: true
 blocked_by: ["2.0"]
 ---
@@ -24,9 +24,9 @@ Implementar `src/services/services.service.ts` com CRUD, listagem paginada/filtr
 - Uso de `api.ts` (interceptors JWT)
 
 ## Subtarefas
-- [ ] 4.1 Criar arquivo de serviço
-- [ ] 4.2 Implementar normalização de paginação
-- [ ] 4.3 Tratar erros (409/422) para mensagens claras
+- [x] 4.1 Criar arquivo de serviço
+- [x] 4.2 Implementar normalização de paginação
+- [x] 4.3 Tratar erros (409/422) para mensagens claras
 
 ## Sequenciamento
 - Bloqueado por: 2.0
@@ -39,3 +39,10 @@ Ver “Endpoints de API” e “Itens de Implementação — Serviços”.
 ## Critérios de Sucesso
 - Lista com filtros funciona contra backend
 - Create/update/toggleActive retornam sucesso e erros tratados
+
+## Status de Conclusão ✅ CONCLUÍDA
+- [x] 4.1 Implementação completada
+- [x] 4.2 Definição da tarefa, PRD e tech spec validados
+- [x] 4.3 Análise de regras e conformidade verificadas
+- [x] 4.4 Revisão de código completada
+- [x] 4.5 Pronto para deploy
