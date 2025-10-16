@@ -1,5 +1,4 @@
----
-status: pending
+status: completed
 parallelizable: false
 blocked_by: []
 ---
@@ -24,10 +23,10 @@ Adicionar TanStack React Query ao projeto, configurar o QueryClientProvider no `
 - Devtools ativo apenas em DEV
 
 ## Subtarefas
-- [ ] 1.1 Instalar `@tanstack/react-query` e `@tanstack/react-query-devtools`
-- [ ] 1.2 Criar `src/lib/queryClient.ts` com configuração padrão
-- [ ] 1.3 Envolver `App` com `QueryClientProvider` em `main.tsx`
-- [ ] 1.4 Habilitar Devtools em ambiente de desenvolvimento
+- [x] 1.1 Instalar `@tanstack/react-query` e `@tanstack/react-query-devtools`
+- [x] 1.2 Criar `src/lib/queryClient.ts` com configuração padrão
+- [x] 1.3 Envolver `App` com `QueryClientProvider` em `main.tsx`
+- [x] 1.4 Habilitar Devtools em ambiente de desenvolvimento
 
 ## Sequenciamento
 - Bloqueado por: —
@@ -41,3 +40,10 @@ Ver seção “Sequenciamento de Desenvolvimento” da Tech Spec e “React Quer
 - Build roda sem erros
 - Queries podem ser usadas nas páginas
 - Devtools aparecem em DEV
+
+- [x] 1.0 Bootstrap React Query e dependências ✅ CONCLUÍDA
+	- [x] 1.1 Implementação completada
+	- [x] 1.2 Definição da tarefa, PRD e tech spec validados
+	- [x] 1.3 Análise de regras e conformidade verificadas
+	- [x] 1.4 Revisão de código completada
+	- [x] 1.5 Pronto para deploy
