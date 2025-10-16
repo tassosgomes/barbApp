@@ -8,7 +8,16 @@ import type {
 } from '@/types';
 
 // Helper function to normalize API response to expected format
-function normalizePaginatedResponse<T>(data: any): PaginatedResponse<T> {
+function normalizePaginatedResponse<T>(data: {
+  items?: T[];
+  pageNumber?: number;
+  page?: number;
+  pageSize?: number;
+  totalPages?: number;
+  totalCount?: number;
+  hasPreviousPage?: boolean;
+  hasNextPage?: boolean;
+}): PaginatedResponse<T> {
   return {
     items: data.items || [],
     pageNumber: data.pageNumber || data.page || 1,
@@ -27,7 +36,16 @@ export const barbershopService = {
    * @returns Paginated list of barbershops
    */
   getAll: async (filters: BarbershopFilters): Promise<PaginatedResponse<Barbershop>> => {
-    const { data } = await api.get<any>('/barbearias', {
+    const { data } = await api.get<{
+      items?: Barbershop[];
+      pageNumber?: number;
+      page?: number;
+      pageSize?: number;
+      totalPages?: number;
+      totalCount?: number;
+      hasPreviousPage?: boolean;
+      hasNextPage?: boolean;
+    }>('/barbearias', {
       params: filters,
     });
     return normalizePaginatedResponse<Barbershop>(data);

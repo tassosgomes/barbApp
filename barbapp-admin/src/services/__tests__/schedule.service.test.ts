@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { scheduleService } from '../schedule.service';
 import api from '../api';
+import { AppointmentStatus } from '@/types/schedule';
 
 // Mock the API module
 vi.mock('../api', () => ({
@@ -44,7 +45,7 @@ describe('Schedule Service', () => {
       const filters = {
         date: '2025-10-15',
         barberId: '550e8400-e29b-41d4-a716-446655440000',
-        status: 'Confirmed' as any,
+        status: AppointmentStatus.Confirmed,
       };
 
       const result = await scheduleService.list(filters);

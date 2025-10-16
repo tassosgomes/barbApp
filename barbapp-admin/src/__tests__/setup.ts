@@ -29,6 +29,23 @@ Object.defineProperty(window, 'location', {
   writable: true,
 });
 
+// Polyfill for Radix UI components that require pointer capture and scroll into view
+if (typeof Element.prototype.hasPointerCapture === 'undefined') {
+  Element.prototype.hasPointerCapture = vi.fn(() => false);
+}
+
+if (typeof Element.prototype.scrollIntoView === 'undefined') {
+  Element.prototype.scrollIntoView = vi.fn();
+}
+
+if (typeof Element.prototype.releasePointerCapture === 'undefined') {
+  Element.prototype.releasePointerCapture = vi.fn();
+}
+
+if (typeof Element.prototype.setPointerCapture === 'undefined') {
+  Element.prototype.setPointerCapture = vi.fn();
+}
+
 // Suppress DataCloneError warnings from Vitest (related to Axios serialization)
 const originalWarn = console.warn;
 console.warn = (...args) => {

@@ -1,6 +1,9 @@
 export { StatusBadge } from "./status-badge";
 export { LoadingSpinner } from "./loading-spinner";
 export { Pagination } from "./pagination";
+export { DataTable } from "./data-table";
+export { FiltersBar } from "./filters-bar";
+export { DatePicker } from "./date-picker";
 export { Badge } from "./badge";
 export { Button } from "./button";
 export { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "./dialog";

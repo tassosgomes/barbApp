@@ -1,5 +1,5 @@
 ---
-status: pending
+status: completed
 parallelizable: true
 blocked_by: ["1.0","2.0","3.0"]
 ---
@@ -24,9 +24,9 @@ Criar `useBarbers` (lista com filtros/paginação) e `useBarberMutations` (creat
 - Invalidação de cache após mutações
 
 ## Subtarefas
-- [ ] 6.1 Implementar `useBarbers`
-- [ ] 6.2 Implementar `useBarberMutations`
-- [ ] 6.3 Testes unitários dos hooks com MSW
+- [x] 6.1 Implementar `useBarbers`
+- [x] 6.2 Implementar `useBarberMutations`
+- [x] 6.3 Testes unitários dos hooks com MSW
 
 ## Sequenciamento
 - Bloqueado por: 1.0, 2.0, 3.0
@@ -39,3 +39,10 @@ Ver “Hooks (novos)” na Tech Spec.
 ## Critérios de Sucesso
 - Hooks retornam dados, estados de loading/erro e refetch
 - Mutações invalidam listas corretamente
+
+- [x] 6.0 [Hooks — Barbeiros (queries/mutações)] ✅ CONCLUÍDA
+  - [x] 6.1 Implementação completada
+  - [x] 6.2 Definição da tarefa, PRD e tech spec validados
+  - [x] 6.3 Análise de regras e conformidade verificadas
+  - [x] 6.4 Revisão de código completada
+  - [x] 6.5 Pronto para deploy

@@ -1,6 +1,7 @@
 import { http, HttpResponse } from 'msw';
 import type { CreateBarbershopRequest, UpdateBarbershopRequest } from '../../types/barbershop';
 import type { LoginRequest } from '../../types/auth';
+import type { CreateBarberRequest, UpdateBarberRequest } from '../../types/barber';
 
 // Mock data
 const mockBarbershops = [
@@ -45,6 +46,41 @@ const mockBarbershops = [
     isActive: false,
     createdAt: '2024-01-01T00:00:00Z',
     updatedAt: '2024-01-01T00:00:00Z',
+  },
+];
+
+const mockBarbers = [
+  {
+    id: '1',
+    name: 'João Silva',
+    email: 'joao@test.com',
+    phoneFormatted: '(11) 99999-9999',
+    services: [
+      {
+        id: '1',
+        name: 'Corte de Cabelo',
+      },
+    ],
+    isActive: true,
+    createdAt: '2024-01-01T00:00:00Z',
+  },
+  {
+    id: '2',
+    name: 'Maria Santos',
+    email: 'maria@test.com',
+    phoneFormatted: '(11) 88888-8888',
+    services: [
+      {
+        id: '1',
+        name: 'Corte de Cabelo',
+      },
+      {
+        id: '2',
+        name: 'Barba',
+      },
+    ],
+    isActive: false,
+    createdAt: '2024-01-02T00:00:00Z',
   },
 ];
 
@@ -194,6 +230,111 @@ export const handlers = [
     barbershop.updatedAt = new Date().toISOString();
 
     return HttpResponse.json(null);
+  }),
+
+  // GET /api/barbers - List barbers
+  http.get('*/api/barbers', ({ request }) => {
+    const url = new URL(request.url);
+    const page = parseInt(url.searchParams.get('page') || '1');
+    const pageSize = parseInt(url.searchParams.get('pageSize') || '20');
+    const searchName = url.searchParams.get('searchName');
+    const isActive = url.searchParams.get('isActive');
+
+    let filteredBarbers = mockBarbers;
+
+    // Filter by search name
+    if (searchName) {
+      filteredBarbers = filteredBarbers.filter(
+        (barber) =>
+          barber.name.toLowerCase().includes(searchName.toLowerCase()) ||
+          barber.email.toLowerCase().includes(searchName.toLowerCase())
+      );
+    }
+
+    // Filter by active status
+    if (isActive !== null) {
+      filteredBarbers = filteredBarbers.filter(
+        (barber) => barber.isActive === (isActive === 'true')
+      );
+    }
+
+    // Pagination
+    const totalCount = filteredBarbers.length;
+    const totalPages = Math.ceil(totalCount / pageSize);
+    const startIndex = (page - 1) * pageSize;
+    const paginatedItems = filteredBarbers.slice(startIndex, startIndex + pageSize);
+
+    return HttpResponse.json({
+      items: paginatedItems,
+      pageNumber: page,
+      pageSize,
+      totalPages,
+      totalCount,
+      hasPreviousPage: page > 1,
+      hasNextPage: page < totalPages,
+    });
+  }),
+
+  // GET /api/barbers/:id - Get barber by ID
+  http.get('*/api/barbers/:id', ({ params }) => {
+    const { id } = params;
+    const barber = mockBarbers.find((b) => b.id === id);
+
+    if (!barber) {
+      return new HttpResponse(null, { status: 404 });
+    }
+
+    return HttpResponse.json(barber);
+  }),
+
+  // POST /api/barbers - Create barber
+  http.post('*/api/barbers', async ({ request }) => {
+    const body = await request.json() as CreateBarberRequest;
+    const newBarber = {
+      id: Date.now().toString(),
+      name: body.name,
+      email: body.email,
+      phoneFormatted: body.phone,
+      services: [], // Would need to resolve service IDs to service summaries
+      isActive: true,
+      createdAt: new Date().toISOString(),
+    };
+
+    mockBarbers.push(newBarber);
+    return HttpResponse.json(newBarber, { status: 201 });
+  }),
+
+  // PUT /api/barbers/:id - Update barber
+  http.put('*/api/barbers/:id', async ({ request, params }) => {
+    const { id } = params;
+    const body = await request.json() as UpdateBarberRequest;
+    const index = mockBarbers.findIndex((b) => b.id === id);
+
+    if (index === -1) {
+      return new HttpResponse(null, { status: 404 });
+    }
+
+    mockBarbers[index] = {
+      ...mockBarbers[index],
+      name: body.name,
+      phoneFormatted: body.phone,
+      services: [], // Would need to resolve service IDs
+    };
+
+    return HttpResponse.json(mockBarbers[index]);
+  }),
+
+  // DELETE /api/barbers/:id - Delete barber (deactivate)
+  http.delete('*/api/barbers/:id', ({ params }) => {
+    const { id } = params;
+    const barber = mockBarbers.find((b) => b.id === id);
+
+    if (!barber) {
+      return new HttpResponse(null, { status: 404 });
+    }
+
+    barber.isActive = false;
+    return new HttpResponse(null, { status: 204 });
   }),
 
   // POST /api/auth/admin-central - Login
