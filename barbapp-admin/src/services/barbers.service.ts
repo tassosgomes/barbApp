@@ -83,7 +83,7 @@ export const barbersService = {
       await api.delete(`/barbers/${id}`);
     } else {
       // Activation not implemented yet
-      throw new Error('Activation endpoint not implemented yet');
+      return Promise.reject(new Error('Activation endpoint not implemented yet'));
     }
   },
 };
