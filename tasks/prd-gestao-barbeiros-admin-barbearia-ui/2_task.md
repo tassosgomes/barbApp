@@ -1,5 +1,5 @@
 ---
-status: pending
+status: completed
 parallelizable: true
 blocked_by: []
 ---
@@ -23,9 +23,9 @@ Definir tipos de domínio (Barber, BarbershopService, Appointment) e filtros, al
 - `src/schemas/{barber.ts, service.ts}` com validações
 
 ## Subtarefas
-- [ ] 2.1 Criar tipos TS conforme Tech Spec
-- [ ] 2.2 Implementar schemas Zod (create/update)
-- [ ] 2.3 Exportar via `src/types/index.ts`
+- [x] 2.1 Criar tipos TS conforme Tech Spec
+- [x] 2.2 Implementar schemas Zod (create/update)
+- [x] 2.3 Exportar via `src/types/index.ts`
 
 ## Sequenciamento
 - Bloqueado por: —
