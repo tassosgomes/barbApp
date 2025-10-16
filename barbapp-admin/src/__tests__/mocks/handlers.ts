@@ -112,6 +112,42 @@ const mockServices = [
   },
 ];
 
+const mockAppointments = [
+  {
+    id: '1',
+    barberId: '1',
+    barberName: 'João Silva',
+    customerId: '1',
+    customerName: 'Cliente 1',
+    startTime: '2024-10-16T09:00:00Z',
+    endTime: '2024-10-16T09:30:00Z',
+    serviceName: 'Corte de Cabelo',
+    status: 'Confirmed',
+  },
+  {
+    id: '2',
+    barberId: '1',
+    barberName: 'João Silva',
+    customerId: '2',
+    customerName: 'Cliente 2',
+    startTime: '2024-10-16T10:00:00Z',
+    endTime: '2024-10-16T10:20:00Z',
+    serviceName: 'Barba',
+    status: 'Pending',
+  },
+  {
+    id: '3',
+    barberId: '2',
+    barberName: 'Maria Santos',
+    customerId: '3',
+    customerName: 'Cliente 3',
+    startTime: '2024-10-16T14:00:00Z',
+    endTime: '2024-10-16T14:30:00Z',
+    serviceName: 'Corte de Cabelo',
+    status: 'Cancelled',
+  },
+];
+
 // Mock handlers
 export const handlers = [
   // GET /api/barbearias - List barbershops
@@ -481,5 +517,40 @@ export const handlers = [
 
     service.isActive = false;
     return new HttpResponse(null, { status: 204 });
+  }),
+
+  // GET /api/barbers/schedule - List schedule appointments
+  http.get('*/api/barbers/schedule', ({ request }) => {
+    const url = new URL(request.url);
+    const date = url.searchParams.get('date');
+    const barberId = url.searchParams.get('barberId');
+    const status = url.searchParams.get('status');
+
+    let filteredAppointments = mockAppointments;
+
+    // Filter by date (YYYY-MM-DD)
+    if (date) {
+      filteredAppointments = filteredAppointments.filter(
+        (appointment) => appointment.startTime.startsWith(date)
+      );
+    }
+
+    // Filter by barber
+    if (barberId) {
+      filteredAppointments = filteredAppointments.filter(
+        (appointment) => appointment.barberId === barberId
+      );
+    }
+
+    // Filter by status
+    if (status) {
+      filteredAppointments = filteredAppointments.filter(
+        (appointment) => appointment.status === status
+      );
+    }
+
+    return HttpResponse.json({
+      appointments: filteredAppointments,
+    });
   }),
 ];

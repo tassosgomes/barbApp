@@ -1,5 +1,5 @@
 ---
-status: pending
+status: completed
 parallelizable: true
 blocked_by: ["1.0","2.0","5.0"]
 ---
@@ -24,8 +24,8 @@ Criar `useSchedule` para recuperar a agenda com `refetchInterval: 30_000` e filt
 - Tratamento de erros e estado de loading
 
 ## Subtarefas
-- [ ] 8.1 Implementar `useSchedule`
-- [ ] 8.2 Testes unitários com MSW
+- [x] 8.1 Implementar `useSchedule`
+- [x] 8.2 Testes unitários com MSW
 
 ## Sequenciamento
 - Bloqueado por: 1.0, 2.0, 5.0
@@ -37,3 +37,10 @@ Ver “Polling Agenda” e “Endpoints de API — Agenda”.
 
 ## Critérios de Sucesso
 - Hook realiza polling e atualiza dados com estabilidade
+
+## Status de Conclusão ✅ CONCLUÍDA
+- [x] 8.1 Implementação completada
+- [x] 8.2 Definição da tarefa, PRD e tech spec validados
+- [x] 8.3 Análise de regras e conformidade verificadas
+- [x] 8.4 Revisão de código completada
+- [x] 8.5 Pronto para deploy
