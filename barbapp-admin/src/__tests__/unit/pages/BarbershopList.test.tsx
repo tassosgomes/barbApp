@@ -144,7 +144,9 @@ describe('BarbershopList', () => {
 
     expect(screen.getByText('Nenhuma barbearia encontrada')).toBeInTheDocument();
     expect(screen.getByText('Comece cadastrando a primeira barbearia do sistema.')).toBeInTheDocument();
-    expect(screen.getByText('+ Nova Barbearia')).toBeInTheDocument();
+    // Should have two buttons with the same text (header + empty state)
+    const createButtons = screen.getAllByText('+ Nova Barbearia');
+    expect(createButtons).toHaveLength(2);
   });
 
   it('renders barbershop list with data', () => {
@@ -178,8 +180,9 @@ describe('BarbershopList', () => {
     const user = userEvent.setup();
     render(<BarbershopList />);
 
-    const createButton = screen.getByText('+ Nova Barbearia');
-    await user.click(createButton);
+    // Get all buttons with the text and click the one in the empty state (second one)
+    const createButtons = screen.getAllByText('+ Nova Barbearia');
+    await user.click(createButtons[1]); // Empty state button
 
     expect(navigateMock).toHaveBeenCalledWith('/barbearias/nova');
   });
