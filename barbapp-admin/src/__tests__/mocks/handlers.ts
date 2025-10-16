@@ -298,6 +298,7 @@ export const handlers = [
 
   // GET /api/barbers - List barbers
   http.get('*/api/barbers', ({ request }) => {
+    console.log('MSW: Handling GET /api/barbers request:', request.url);
     const url = new URL(request.url);
     const page = parseInt(url.searchParams.get('page') || '1');
     const pageSize = parseInt(url.searchParams.get('pageSize') || '20');
@@ -328,6 +329,7 @@ export const handlers = [
     const startIndex = (page - 1) * pageSize;
     const paginatedItems = filteredBarbers.slice(startIndex, startIndex + pageSize);
 
+    console.log('MSW: Returning barbers data:', { items: paginatedItems.length, totalCount });
     return HttpResponse.json({
       items: paginatedItems,
       pageNumber: page,

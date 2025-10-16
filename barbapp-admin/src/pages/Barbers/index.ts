@@ -1,0 +1,1 @@
+export { BarbersListPage } from './List';

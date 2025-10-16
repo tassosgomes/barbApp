@@ -1,6 +1,7 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { Login } from '@/pages/Login/Login';
 import { BarbershopList, BarbershopCreate, BarbershopEdit, BarbershopDetails } from '@/pages/Barbershops';
+import { BarbersListPage } from '@/pages/Barbers';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 
 export const router = createBrowserRouter([
@@ -24,6 +25,10 @@ export const router = createBrowserRouter([
           { path: ':id', element: <BarbershopDetails /> },
           { path: ':id/editar', element: <BarbershopEdit /> },
         ],
+      },
+      {
+        path: 'barbeiros',
+        element: <BarbersListPage />,
       },
     ],
   },
