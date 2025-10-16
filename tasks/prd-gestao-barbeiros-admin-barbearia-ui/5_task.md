@@ -1,5 +1,5 @@
 ---
-status: pending
+status: completed
 parallelizable: true
 blocked_by: ["2.0"]
 ---
@@ -24,9 +24,9 @@ Implementar `src/services/schedule.service.ts` para obter a agenda consolidada c
 - Datas ISO, exibição local será feita na UI
 
 ## Subtarefas
-- [ ] 5.1 Criar arquivo de serviço
-- [ ] 5.2 Implementar função `list`
-- [ ] 5.3 Tratar erros de rede e tempo limite
+- [x] 5.1 Criar arquivo de serviço
+- [x] 5.2 Implementar função `list`
+- [x] 5.3 Tratar erros de rede e tempo limite
 
 ## Sequenciamento
 - Bloqueado por: 2.0
@@ -39,3 +39,10 @@ Ver “Endpoints de API — Agenda” e “Polling Agenda” na Tech Spec.
 ## Critérios de Sucesso
 - Recupera agenda com filtros
 - Resiste a falhas transitórias (retry)
+
+## Status de Conclusão ✅ CONCLUÍDA
+- [x] 5.1 Implementação completada
+- [x] 5.2 Definição da tarefa, PRD e tech spec validados
+- [x] 5.3 Análise de regras e conformidade verificadas
+- [x] 5.4 Revisão de código completada
+- [x] 5.5 Pronto para deploy
