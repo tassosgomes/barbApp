@@ -1,5 +1,5 @@
 ---
-status: pending
+status: completed
 parallelizable: true
 blocked_by: ["1.0","2.0","4.0"]
 ---
@@ -24,9 +24,9 @@ Criar `useServices` (lista com filtros/paginação) e `useServiceMutations` (cre
 - Invalidação de cache após mutações
 
 ## Subtarefas
-- [ ] 7.1 Implementar `useServices`
-- [ ] 7.2 Implementar `useServiceMutations`
-- [ ] 7.3 Testes unitários dos hooks com MSW
+- [x] 7.1 Implementar `useServices`
+- [x] 7.2 Implementar `useServiceMutations`
+- [x] 7.3 Testes unitários dos hooks com MSW
 
 ## Sequenciamento
 - Bloqueado por: 1.0, 2.0, 4.0
@@ -39,3 +39,10 @@ Ver “Hooks (novos)” na Tech Spec.
 ## Critérios de Sucesso
 - Hooks retornam dados, estados de loading/erro e refetch
 - Mutações invalidam listas corretamente
+
+## Status de Conclusão ✅ CONCLUÍDA
+- [x] 7.1 Implementação completada
+- [x] 7.2 Definição da tarefa, PRD e tech spec validados
+- [x] 7.3 Análise de regras e conformidade verificadas
+- [x] 7.4 Revisão de código completada
+- [x] 7.5 Pronto para deploy
