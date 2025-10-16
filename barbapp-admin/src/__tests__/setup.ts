@@ -3,7 +3,7 @@ import { beforeAll, afterAll, afterEach, vi } from 'vitest';
 import { server } from './mocks/server';
 
 // Stub environment variables for tests
-vi.stubEnv('VITE_API_URL', 'http://localhost:3000/api');
+vi.stubEnv('VITE_API_URL', 'http://localhost:5000/api');
 vi.stubEnv('VITE_APP_NAME', 'BarbApp Admin');
 
 // Mock localStorage and sessionStorage
@@ -79,4 +79,8 @@ afterEach(() => {
 });
 
 // Clean up after all tests are done
-afterAll(() => server.close());
+afterAll(() => {
+  console.log('Closing MSW server...');
+  server.close();
+  console.log('MSW server closed');
+});

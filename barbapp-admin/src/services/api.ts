@@ -24,6 +24,7 @@ api.interceptors.request.use(
 
     // Log request
     console.log(`API Request: ${config.method?.toUpperCase()} ${config.url}`);
+    console.log(`Full URL: ${config.baseURL}${config.url}`);
 
     return config;
   },

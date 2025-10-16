@@ -1,5 +1,5 @@
 ---
-status: pending
+status: completed
 parallelizable: false
 blocked_by: ["1.0","2.0","3.0","6.0","9.0","13.0"]
 ---
@@ -24,11 +24,11 @@ Construir a página de gestão de Barbeiros: listagem paginada/filtrada, modal/r
 - Estado persistido na URL; reset rápido
 
 ## Subtarefas
-- [ ] 10.1 Listagem com DataTable + filtros + paginação
-- [ ] 10.2 Modal/rota `BarberForm` (create/update)
-- [ ] 10.3 Ação de ativar/inativar com confirmação
-- [ ] 10.4 Tratamento de erros (409/422) + toasts
-- [ ] 10.5 Testes de integração com MSW
+- [x] 10.1 Listagem com DataTable + filtros + paginação
+- [x] 10.2 Modal/rota `BarberForm` (create/update)
+- [x] 10.3 Ação de ativar/inativar com confirmação
+- [x] 10.4 Tratamento de erros (409/422) + toasts
+- [x] 10.5 Testes de integração com MSW
 
 ## Sequenciamento
 - Bloqueado por: 1.0, 2.0, 3.0, 6.0, 9.0, 13.0
@@ -40,3 +40,10 @@ Ver “Página: Barbeiros” e “Contratos de Componentes”.
 
 ## Critérios de Sucesso
 - Fluxo Criar/Editar/Ativar-Inativar funcional e testado
+
+- [x] 10.0 [Página — Barbeiros (lista + formulário + URL state)] ✅ CONCLUÍDA
+  - [x] 10.1 Implementação completada
+  - [x] 10.2 Definição da tarefa, PRD e tech spec validados
+  - [x] 10.3 Análise de regras e conformidade verificadas
+  - [x] 10.4 Revisão de código completada
+  - [x] 10.5 Pronto para deploy
