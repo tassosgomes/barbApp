@@ -43,7 +43,7 @@ export function BarbershopCreate() {
       setCreatedBarbershop(result);
       toast({
         title: 'Barbearia cadastrada com sucesso!',
-        description: `Código gerado: ${result.code || 'N/A'}`,
+        description: `Código gerado: ${result.code || 'N/A'}. As credenciais de acesso foram enviadas para o e-mail cadastrado.`,
       });
     } catch (error) {
       toast({
@@ -65,6 +65,11 @@ export function BarbershopCreate() {
           <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
             <p className="text-2xl font-mono font-bold text-green-800">
               {createdBarbershop.code || 'Código não disponível'}
+            </p>
+          </div>
+          <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <p className="text-sm text-blue-800">
+              ℹ️ As credenciais de acesso foram enviadas para o e-mail <strong>{createdBarbershop.email}</strong>
             </p>
           </div>
           <div className="mt-6 flex gap-4 justify-center">

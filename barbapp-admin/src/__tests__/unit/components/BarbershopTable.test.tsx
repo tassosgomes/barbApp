@@ -35,6 +35,7 @@ describe("BarbershopTable", () => {
     onDeactivate: vi.fn(),
     onReactivate: vi.fn(),
     onCopyCode: vi.fn(),
+    onResendCredentials: vi.fn(),
   };
 
   it("should render barbershop data correctly", () => {
@@ -102,5 +103,15 @@ describe("BarbershopTable", () => {
 
     await user.click(screen.getByText("ABC123XY"));
     expect(onCopyCode).toHaveBeenCalledWith("ABC123XY");
+  });
+
+  it("should call onResendCredentials when resend credentials button is clicked", async () => {
+    const user = userEvent.setup();
+    const onResendCredentials = vi.fn();
+
+    render(<BarbershopTable {...defaultProps} onResendCredentials={onResendCredentials} />);
+
+    await user.click(screen.getByRole("button", { name: /reenviar credenciais/i }));
+    expect(onResendCredentials).toHaveBeenCalledWith("1");
   });
 });

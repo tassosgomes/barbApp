@@ -5,6 +5,7 @@ import { BarbershopTable } from '@/components/barbershop/BarbershopTable';
 import { BarbershopTableSkeleton } from '@/components/barbershop/BarbershopTableSkeleton';
 import { EmptyState } from '@/components/barbershop/EmptyState';
 import { DeactivateModal } from '@/components/barbershop/DeactivateModal';
+import { ResendCredentialsModal } from '@/components/barbershop/ResendCredentialsModal';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -36,7 +37,7 @@ export function BarbershopList() {
   // Buscar dados
   const { data, loading, error, refetch } = useBarbershops(filters);
 
-  // Modal de confirmação
+  // Modal de confirmação de desativação
   const [deactivateModalOpen, setDeactivateModalOpen] = useState(false);
   const [selectedBarbershop, setSelectedBarbershop] = useState<{
     id: string;
@@ -44,6 +45,15 @@ export function BarbershopList() {
     code: string;
   } | null>(null);
   const [isDeactivating, setIsDeactivating] = useState(false);
+
+  // Modal de reenvio de credenciais
+  const [resendCredentialsModalOpen, setResendCredentialsModalOpen] = useState(false);
+  const [selectedBarbershopForResend, setSelectedBarbershopForResend] = useState<{
+    id: string;
+    name: string;
+    email: string;
+  } | null>(null);
+  const [isResending, setIsResending] = useState(false);
 
   const handleDeactivate = (id: string) => {
     const barbershop = data?.items.find(b => b.id === id);
@@ -106,6 +116,40 @@ export function BarbershopList() {
       title: 'Código copiado!',
       description: `O código ${code} foi copiado para a área de transferência.`,
     });
+  };
+
+  const handleResendCredentials = (id: string) => {
+    const barbershop = data?.items.find(b => b.id === id);
+    if (barbershop) {
+      setSelectedBarbershopForResend({
+        id: barbershop.id,
+        name: barbershop.name,
+        email: barbershop.email,
+      });
+      setResendCredentialsModalOpen(true);
+    }
+  };
+
+  const confirmResendCredentials = async () => {
+    if (!selectedBarbershopForResend) return;
+
+    setIsResending(true);
+    try {
+      await barbershopService.resendCredentials(selectedBarbershopForResend.id);
+      toast({
+        title: 'Credenciais reenviadas com sucesso!',
+        description: `As credenciais foram enviadas para ${selectedBarbershopForResend.email}.`,
+      });
+      setResendCredentialsModalOpen(false);
+    } catch {
+      toast({
+        title: 'Erro ao reenviar credenciais',
+        description: 'Tente novamente mais tarde.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsResending(false);
+    }
   };
 
   const handleCreateNew = () => {
@@ -208,6 +252,7 @@ export function BarbershopList() {
         onDeactivate={handleDeactivate}
         onReactivate={handleReactivate}
         onCopyCode={handleCopyCode}
+        onResendCredentials={handleResendCredentials}
       />
 
       {/* Paginação */}
@@ -219,7 +264,7 @@ export function BarbershopList() {
         hasNextPage={data.hasNextPage}
       />
 
-      {/* Modal de Confirmação */}
+      {/* Modal de Confirmação de Desativação */}
       <DeactivateModal
         open={deactivateModalOpen}
         onClose={() => setDeactivateModalOpen(false)}
@@ -227,6 +272,16 @@ export function BarbershopList() {
         barbershopName={selectedBarbershop?.name}
         barbershopCode={selectedBarbershop?.code}
         isLoading={isDeactivating}
+      />
+
+      {/* Modal de Reenvio de Credenciais */}
+      <ResendCredentialsModal
+        open={resendCredentialsModalOpen}
+        onClose={() => setResendCredentialsModalOpen(false)}
+        onConfirm={confirmResendCredentials}
+        barbershopName={selectedBarbershopForResend?.name}
+        barbershopEmail={selectedBarbershopForResend?.email}
+        isLoading={isResending}
       />
     </div>
   );

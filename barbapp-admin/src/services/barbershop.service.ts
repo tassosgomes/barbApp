@@ -97,4 +97,12 @@ export const barbershopService = {
   reactivate: async (id: string): Promise<void> => {
     await api.put(`/barbearias/${id}/reativar`);
   },
+
+  /**
+   * Resend credentials email to barbershop admin
+   * @param id - Barbershop unique identifier
+   */
+  resendCredentials: async (id: string): Promise<void> => {
+    await api.post(`/barbearias/${id}/reenviar-credenciais`);
+  },
 };

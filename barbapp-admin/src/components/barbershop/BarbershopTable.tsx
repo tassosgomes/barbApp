@@ -17,6 +17,7 @@ interface BarbershopTableProps {
   onDeactivate: (id: string) => void;
   onReactivate: (id: string) => void;
   onCopyCode: (code: string) => void;
+  onResendCredentials: (id: string) => void;
 }
 
 export function BarbershopTable({
@@ -26,6 +27,7 @@ export function BarbershopTable({
   onDeactivate,
   onReactivate,
   onCopyCode,
+  onResendCredentials,
 }: BarbershopTableProps) {
   return (
     <div className="rounded-lg border">
@@ -78,6 +80,14 @@ export function BarbershopTable({
                     onClick={() => onEdit(barbershop.id)}
                   >
                     Editar
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => onResendCredentials(barbershop.id)}
+                    className="text-blue-600 hover:text-blue-800"
+                  >
+                    Reenviar Credenciais
                   </Button>
                   {barbershop.isActive ? (
                     <Button
