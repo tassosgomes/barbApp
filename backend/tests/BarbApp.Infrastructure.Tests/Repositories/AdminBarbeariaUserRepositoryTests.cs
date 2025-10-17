@@ -120,6 +120,7 @@ public class AdminBarbeariaUserRepositoryTests : IDisposable
 
         // Act
         var result = await _repository.AddAsync(user);
+        await _context.SaveChangesAsync(); // Unit of Work responsibility
 
         // Assert
         result.Should().Be(user);

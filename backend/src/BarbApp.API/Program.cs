@@ -315,9 +315,6 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-// HTTPS redirection
-app.UseHttpsRedirection();
-
 // CORS
 app.UseCors(app.Environment.IsDevelopment() ? "DevelopmentCors" : "ProductionCors");
 
