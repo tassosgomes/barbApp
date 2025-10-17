@@ -552,7 +552,7 @@ public class BarbershopsControllerIntegrationTests
         createdBarbershop.Should().NotBeNull();
 
         // Act
-        var response = await _client.PostAsync($"/api/barbearias/{createdBarbershop!.Id}/resend-credentials", null);
+        var response = await _client.PostAsync($"/api/barbearias/{createdBarbershop!.Id}/reenviar-credenciais", null);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -568,7 +568,7 @@ public class BarbershopsControllerIntegrationTests
         var nonExistentId = Guid.NewGuid();
 
         // Act
-        var response = await _client.PostAsync($"/api/barbearias/{nonExistentId}/resend-credentials", null);
+        var response = await _client.PostAsync($"/api/barbearias/{nonExistentId}/reenviar-credenciais", null);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
@@ -582,7 +582,7 @@ public class BarbershopsControllerIntegrationTests
         var barbershopId = Guid.NewGuid();
 
         // Act
-        var response = await unauthClient.PostAsync($"/api/barbearias/{barbershopId}/resend-credentials", null);
+        var response = await unauthClient.PostAsync($"/api/barbearias/{barbershopId}/reenviar-credenciais", null);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
@@ -605,7 +605,7 @@ public class BarbershopsControllerIntegrationTests
         var barbershopId = Guid.NewGuid();
 
         // Act
-        var response = await adminBarbeariaClient.PostAsync($"/api/barbearias/{barbershopId}/resend-credentials", null);
+        var response = await adminBarbeariaClient.PostAsync($"/api/barbearias/{barbershopId}/reenviar-credenciais", null);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
