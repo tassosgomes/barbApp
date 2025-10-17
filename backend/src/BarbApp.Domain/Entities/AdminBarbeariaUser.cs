@@ -52,4 +52,13 @@ public class AdminBarbeariaUser
     {
         return PasswordHash == passwordHash;
     }
+
+    public void UpdatePassword(string newPasswordHash)
+    {
+        if (string.IsNullOrWhiteSpace(newPasswordHash))
+            throw new ArgumentException("Password hash is required");
+
+        PasswordHash = newPasswordHash;
+        UpdatedAt = DateTime.UtcNow;
+    }
 }

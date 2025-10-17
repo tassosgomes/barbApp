@@ -140,6 +140,7 @@ builder.Services.AddScoped<IDeactivateBarbershopUseCase, DeactivateBarbershopUse
 builder.Services.AddScoped<IReactivateBarbershopUseCase, ReactivateBarbershopUseCase>();
 builder.Services.AddScoped<IGetBarbershopUseCase, GetBarbershopUseCase>();
 builder.Services.AddScoped<IListBarbershopsUseCase, ListBarbershopsUseCase>();
+builder.Services.AddScoped<IResendCredentialsUseCase, ResendCredentialsUseCase>();
 builder.Services.AddScoped<ICreateBarberUseCase, CreateBarberUseCase>();
 builder.Services.AddScoped<IUpdateBarberUseCase, UpdateBarberUseCase>();
 builder.Services.AddScoped<IRemoveBarberUseCase, RemoveBarberUseCase>();

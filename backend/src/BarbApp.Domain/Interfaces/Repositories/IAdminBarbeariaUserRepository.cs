@@ -7,5 +7,7 @@ public interface IAdminBarbeariaUserRepository
 {
     Task<AdminBarbeariaUser?> GetByEmailAndBarbeariaIdAsync(string email, Guid barbeariaId, CancellationToken cancellationToken = default);
     Task<AdminBarbeariaUser?> GetByEmailAsync(string email, CancellationToken cancellationToken = default);
+    Task<AdminBarbeariaUser?> GetByBarbershopIdAsync(Guid barbershopId, CancellationToken cancellationToken = default);
     Task<AdminBarbeariaUser> AddAsync(AdminBarbeariaUser user, CancellationToken cancellationToken = default);
+    Task UpdateAsync(AdminBarbeariaUser user, CancellationToken cancellationToken = default);
 }
