@@ -256,7 +256,7 @@ public class BarbershopsController : ControllerBase
     /// <response code="403">Usuário não tem permissão para reenviar credenciais</response>
     /// <response code="404">Barbearia não encontrada</response>
     /// <response code="500">Falha ao enviar e-mail</response>
-    [HttpPost("{id:guid}/resend-credentials")]
+    [HttpPost("{id:guid}/reenviar-credenciais")]
     [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(object), StatusCodes.Status401Unauthorized)]
