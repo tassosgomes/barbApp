@@ -24,6 +24,13 @@ public class AdminBarbeariaUserRepository : IAdminBarbeariaUserRepository
                 u.BarbeariaId == barbeariaId, cancellationToken);
     }
 
+    public async Task<AdminBarbeariaUser?> GetByEmailAsync(string email, CancellationToken cancellationToken = default)
+    {
+        return await _context.AdminBarbeariaUsers
+            .IgnoreQueryFilters()
+            .FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower(), cancellationToken);
+    }
+
     public async Task<AdminBarbeariaUser> AddAsync(AdminBarbeariaUser user, CancellationToken cancellationToken = default)
     {
         await _context.AdminBarbeariaUsers.AddAsync(user, cancellationToken);
