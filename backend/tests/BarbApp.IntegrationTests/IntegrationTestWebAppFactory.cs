@@ -47,11 +47,19 @@ public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>
                 ["JwtSettings:Secret"] = "test-secret-key-at-least-32-characters-long-for-jwt",
                 ["JwtSettings:Issuer"] = "BarbApp-Test",
                 ["JwtSettings:Audience"] = "BarbApp-Test-Users",
-                ["JwtSettings:ExpirationMinutes"] = "60"
+                ["JwtSettings:ExpirationMinutes"] = "60",
+                // SMTP settings (not used but required by SmtpEmailService if it gets instantiated)
+                ["SmtpSettings:Host"] = "localhost",
+                ["SmtpSettings:Port"] = "587",
+                ["SmtpSettings:EnableSsl"] = "true",
+                ["SmtpSettings:Username"] = "test",
+                ["SmtpSettings:Password"] = "test",
+                ["SmtpSettings:FromEmail"] = "test@test.com",
+                ["SmtpSettings:FromName"] = "Test"
             }!);
         });
 
-        builder.ConfigureServices(services =>
+        builder.ConfigureTestServices(services =>
         {
             // Remove existing DbContext registration
             var dbContextDescriptor = services.SingleOrDefault(
@@ -74,6 +82,15 @@ public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>
             {
                 options.UseNpgsql(_dbContainer.GetConnectionString());
             });
+
+            // Remove ALL IEmailService registrations and replace with no-op implementation for testing
+            var emailServiceDescriptors = services.Where(
+                d => d.ServiceType == typeof(BarbApp.Application.Interfaces.IEmailService)).ToList();
+            foreach (var descriptor in emailServiceDescriptors)
+            {
+                services.Remove(descriptor);
+            }
+            services.AddScoped<BarbApp.Application.Interfaces.IEmailService, NoOpEmailService>();
         });
 
         builder.UseEnvironment("Testing");

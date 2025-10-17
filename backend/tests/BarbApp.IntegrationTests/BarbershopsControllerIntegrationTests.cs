@@ -61,6 +61,9 @@ public class BarbershopsControllerIntegrationTests
                     // Add test DbContext
                     services.AddDbContext<BarbAppDbContext>(options =>
                         options.UseNpgsql(_dbFixture.ConnectionString));
+
+                    // Register NoOpEmailService for testing (needed for Task 15.3)
+                    services.AddScoped<BarbApp.Application.Interfaces.IEmailService, NoOpEmailService>();
                 });
 
                 builder.UseEnvironment("Testing");
