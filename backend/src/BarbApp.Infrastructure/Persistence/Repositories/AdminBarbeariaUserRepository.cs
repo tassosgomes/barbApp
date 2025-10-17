@@ -42,13 +42,18 @@ public class AdminBarbeariaUserRepository : IAdminBarbeariaUserRepository
     public async Task<AdminBarbeariaUser> AddAsync(AdminBarbeariaUser user, CancellationToken cancellationToken = default)
     {
         await _context.AdminBarbeariaUsers.AddAsync(user, cancellationToken);
-        await _context.SaveChangesAsync(cancellationToken);
+        // Note: SaveChangesAsync is intentionally NOT called here.
+        // The caller (e.g., CreateBarbershopUseCase) is responsible for committing via IUnitOfWork.
+        // This allows for transactional integrity when multiple operations are involved.
         return user;
     }
 
     public async Task UpdateAsync(AdminBarbeariaUser user, CancellationToken cancellationToken = default)
     {
         _context.AdminBarbeariaUsers.Update(user);
-        await _context.SaveChangesAsync(cancellationToken);
+        // Note: SaveChangesAsync is intentionally NOT called here.
+        // The caller (e.g., ResendCredentialsUseCase) is responsible for committing via IUnitOfWork.
+        // This allows for transactional integrity when multiple operations are involved.
+        await Task.CompletedTask;
     }
 }
