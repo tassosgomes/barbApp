@@ -6,6 +6,7 @@ using BarbApp.Application.Interfaces;
 using BarbApp.Application.Interfaces.UseCases;
 using BarbApp.Domain.Interfaces;
 using BarbApp.Domain.Interfaces.Repositories;
+using BarbApp.Application.Configuration;
 using BarbApp.Infrastructure.Configuration;
 using BarbApp.Infrastructure.Middlewares;
 using BarbApp.Infrastructure.Services;
@@ -123,6 +124,10 @@ builder.Services.Configure<JwtSettings>(
 // SMTP Settings
 builder.Services.Configure<SmtpSettings>(
     builder.Configuration.GetSection("SmtpSettings"));
+
+// App Settings
+builder.Services.Configure<AppSettings>(
+    builder.Configuration.GetSection("AppSettings"));
 
 // ══════════════════════════════════════════════════════════
 // DEPENDENCY INJECTION - Use Cases

@@ -194,6 +194,151 @@ Acesse a documentação interativa em: http://localhost:5000/swagger
 
 ---
 
+## 📧 Template de Email de Boas-Vindas
+
+Quando uma nova barbearia é cadastrada, um email de boas-vindas é enviado automaticamente para o administrador da barbearia contendo:
+
+- Credenciais de acesso (email e senha temporária)
+- Link personalizado para acesso ao painel administrativo
+- Instruções de primeiros passos
+
+### Formato do Link de Acesso
+
+O link segue o padrão: `{FRONTEND_URL}/{CODIGO}/login`
+
+**Exemplo:**
+```
+http://app.barbapp.com/ABC12345/login
+```
+
+Onde:
+- `FRONTEND_URL`: URL base do frontend (configurado em `appsettings.json`)
+- `CODIGO`: Código único de 8 caracteres alfanuméricos da barbearia
+
+### Template HTML (Exemplo)
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bem-vindo ao BarbApp</title>
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+    <div style="background-color: #f8f9fa; border-radius: 10px; padding: 30px; margin-bottom: 20px;">
+        <h1 style="color: #2c3e50; margin-bottom: 10px;">Bem-vindo ao BarbApp! 💈</h1>
+        <p style="font-size: 16px; margin-bottom: 20px;">
+            Olá! Sua barbearia <strong>Barbearia do Tasso Zé</strong> foi cadastrada com sucesso.
+        </p>
+    </div>
+
+    <div style="background-color: #fff; border: 1px solid #dee2e6; border-radius: 10px; padding: 30px; margin-bottom: 20px;">
+        <h2 style="color: #2c3e50; margin-bottom: 15px;">Suas Credenciais de Acesso</h2>
+        <p style="margin-bottom: 15px;">Use as credenciais abaixo para acessar o painel administrativo:</p>
+        
+        <div style="background-color: #f8f9fa; border-left: 4px solid #007bff; padding: 15px; margin: 20px 0; border-radius: 5px;">
+            <p style="margin: 5px 0;"><strong>E-mail:</strong> tasso.gomes@outlook.com</p>
+            <p style="margin: 5px 0;"><strong>Senha:</strong> <code style="background-color: #e9ecef; padding: 5px 10px; border-radius: 3px; font-size: 14px; font-family: 'Courier New', monospace;">96z7ZBK#DXNn</code></p>
+        </div>
+
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="http://app.barbapp.com/6SJJRFPD/login" 
+               style="background-color: #007bff; 
+                      color: white; 
+                      padding: 12px 30px; 
+                      text-decoration: none; 
+                      border-radius: 5px;
+                      display: inline-block;
+                      font-weight: bold;">
+                Acessar Painel Administrativo
+            </a>
+        </div>
+
+        <p style="text-align: center; color: #6c757d; font-size: 14px;">
+            Ou copie e cole este link no seu navegador:<br>
+            <span style="background-color: #e9ecef; padding: 5px 10px; border-radius: 3px; word-break: break-all; font-family: 'Courier New', monospace; font-size: 12px;">http://app.barbapp.com/6SJJRFPD/login</span>
+        </p>
+
+        <div style="background-color: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0; border-radius: 5px;">
+            <p style="margin: 0; color: #856404;">
+                <strong>⚠️ Importante:</strong> Guarde sua senha em local seguro. Recomendamos alterá-la após o primeiro acesso.
+            </p>
+        </div>
+    </div>
+
+    <div style="background-color: #fff; border: 1px solid #dee2e6; border-radius: 10px; padding: 30px; margin-bottom: 20px;">
+        <h2 style="color: #2c3e50; margin-bottom: 15px;">Próximos Passos</h2>
+        <ol style="margin: 0; padding-left: 20px;">
+            <li style="margin-bottom: 10px;">Clique no link acima ou copie e cole no seu navegador</li>
+            <li style="margin-bottom: 10px;">Faça login com seu e-mail e senha</li>
+            <li style="margin-bottom: 10px;">Cadastre seus barbeiros</li>
+            <li style="margin-bottom: 10px;">Configure seus serviços e horários</li>
+            <li>Comece a receber agendamentos!</li>
+        </ol>
+    </div>
+
+    <div style="text-align: center; color: #6c757d; font-size: 14px; padding-top: 20px; border-top: 1px solid #dee2e6;">
+        <p>Caso tenha alguma dúvida, entre em contato com nosso suporte.</p>
+        <p style="margin: 5px 0;">BarbApp - Gestão de Barbearias</p>
+    </div>
+</body>
+</html>
+```
+
+### Template Texto Plano (Fallback)
+
+```
+Bem-vindo ao BarbApp! 
+
+Sua barbearia "Barbearia do Tasso Zé" foi cadastrada com sucesso.
+
+=== CREDENCIAIS DE ACESSO ===
+
+E-mail: tasso.gomes@outlook.com
+Senha: 96z7ZBK#DXNn
+
+=== ACESSO AO SISTEMA ===
+
+Acesse o painel administrativo em:
+http://app.barbapp.com/6SJJRFPD/login
+
+⚠️ IMPORTANTE: Guarde sua senha em local seguro. Recomendamos alterá-la após o primeiro acesso.
+
+=== PRÓXIMOS PASSOS ===
+
+1. Clique no link acima ou copie e cole no seu navegador
+2. Faça login com seu e-mail e senha
+3. Cadastre seus barbeiros
+4. Configure seus serviços e horários
+5. Comece a receber agendamentos!
+
+Caso tenha alguma dúvida, entre em contato com nosso suporte.
+
+BarbApp - Gestão de Barbearias
+```
+
+### Configuração
+
+O URL base do frontend é configurado em `appsettings.json`:
+
+```json
+{
+  "AppSettings": {
+    "FrontendUrl": "http://app.barbapp.com"
+  }
+}
+```
+
+Para desenvolvimento local, use:
+```json
+{
+  "AppSettings": {
+    "FrontendUrl": "http://localhost:3000"
+  }
+}
+```
+
 ## 🏗️ Arquitetura Técnica
 
 API REST em .NET 8 seguindo Clean Architecture para sistema multi-tenant de gestão de barbearias.

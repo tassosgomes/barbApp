@@ -6,6 +6,8 @@ using BarbApp.Domain.Exceptions;
 using BarbApp.Domain.Interfaces.Repositories;
 using BarbApp.Domain.ValueObjects;
 using Microsoft.Extensions.Logging;
+using BarbApp.Application.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace BarbApp.Application.UseCases;
 
@@ -19,6 +21,7 @@ public class CreateBarbershopUseCase : ICreateBarbershopUseCase
     private readonly IEmailService _emailService;
     private readonly IUniqueCodeGenerator _codeGenerator;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IOptions<AppSettings> _appSettings;
     private readonly ILogger<CreateBarbershopUseCase> _logger;
 
     public CreateBarbershopUseCase(
@@ -30,6 +33,7 @@ public class CreateBarbershopUseCase : ICreateBarbershopUseCase
         IEmailService emailService,
         IUniqueCodeGenerator codeGenerator,
         IUnitOfWork unitOfWork,
+        IOptions<AppSettings> appSettings,
         ILogger<CreateBarbershopUseCase> logger)
     {
         _barbershopRepository = barbershopRepository;
@@ -40,6 +44,7 @@ public class CreateBarbershopUseCase : ICreateBarbershopUseCase
         _emailService = emailService;
         _codeGenerator = codeGenerator;
         _unitOfWork = unitOfWork;
+        _appSettings = appSettings;
         _logger = logger;
     }
 
@@ -117,12 +122,13 @@ public class CreateBarbershopUseCase : ICreateBarbershopUseCase
         try
         {
             // Send welcome email with credentials
+            var loginUrl = $"{_appSettings.Value.FrontendUrl}/{barbershop.Code.Value}/login";
             var emailMessage = new EmailMessage
             {
                 To = input.Email,
                 Subject = "Bem-vindo ao BarbApp - Suas credenciais de acesso",
-                HtmlBody = BuildWelcomeEmailHtml(barbershop.Name, input.Email, password),
-                TextBody = BuildWelcomeEmailText(barbershop.Name, input.Email, password)
+                HtmlBody = BuildWelcomeEmailHtml(barbershop.Name, input.Email, password, loginUrl),
+                TextBody = BuildWelcomeEmailText(barbershop.Name, input.Email, password, loginUrl)
             };
 
             await _emailService.SendAsync(emailMessage, cancellationToken);
@@ -159,7 +165,7 @@ public class CreateBarbershopUseCase : ICreateBarbershopUseCase
             barbershop.UpdatedAt);
     }
 
-    private static string BuildWelcomeEmailHtml(string barbershopName, string email, string password)
+    private static string BuildWelcomeEmailHtml(string barbershopName, string email, string password, string loginUrl)
     {
         return $@"
 <!DOCTYPE html>
@@ -177,23 +183,39 @@ public class CreateBarbershopUseCase : ICreateBarbershopUseCase
         </p>
     </div>
 
-    <div style=""background-color: #fff; border: 1px solid #dee2e6; border-radius: 10px; padding: 30px; margin-bottom: 20px;"">
-        <h2 style=""color: #2c3e50; margin-bottom: 15px;"">Suas Credenciais de Acesso</h2>
-        <p style=""margin-bottom: 15px;"">Use as credenciais abaixo para acessar o painel administrativo:</p>
-        
-        <div style=""background-color: #f8f9fa; border-left: 4px solid #007bff; padding: 15px; margin: 20px 0; border-radius: 5px;"">
-            <p style=""margin: 5px 0;""><strong>E-mail:</strong> {email}</p>
-            <p style=""margin: 5px 0;""><strong>Senha:</strong> <code style=""background-color: #e9ecef; padding: 5px 10px; border-radius: 3px; font-size: 14px; font-family: 'Courier New', monospace;"">{password}</code></p>
-        </div>
+        <div style=""background-color: #fff; border: 1px solid #dee2e6; border-radius: 10px; padding: 30px; margin-bottom: 20px;"">
+            <h2 style=""color: #2c3e50; margin-bottom: 15px;"">Suas Credenciais de Acesso</h2>
+            <p style=""margin-bottom: 15px;"">Use as credenciais abaixo para acessar o painel administrativo:</p>
+            
+            <div style=""background-color: #f8f9fa; border-left: 4px solid #007bff; padding: 15px; margin: 20px 0; border-radius: 5px;"">
+                <p style=""margin: 5px 0;""><strong>E-mail:</strong> {email}</p>
+                <p style=""margin: 5px 0;""><strong>Senha:</strong> <code style=""background-color: #e9ecef; padding: 5px 10px; border-radius: 3px; font-size: 14px; font-family: 'Courier New', monospace;"">{password}</code></p>
+            </div>
 
-        <div style=""background-color: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0; border-radius: 5px;"">
-            <p style=""margin: 0; color: #856404;"">
-                <strong>⚠️ Importante:</strong> Guarde sua senha em local seguro. Recomendamos alterá-la após o primeiro acesso.
+            <div style=""text-align: center; margin: 30px 0;"">
+                <a href=""{loginUrl}"" 
+                   style=""background-color: #007bff; 
+                          color: white; 
+                          padding: 12px 30px; 
+                          text-decoration: none; 
+                          border-radius: 5px;
+                          display: inline-block;
+                          font-weight: bold;"">
+                    Acessar Painel Administrativo
+                </a>
+            </div>
+
+            <p style=""text-align: center; color: #6c757d; font-size: 14px;"">
+                Ou copie e cole este link no seu navegador:<br>
+                <span style=""background-color: #e9ecef; padding: 5px 10px; border-radius: 3px; word-break: break-all; font-family: 'Courier New', monospace; font-size: 12px;"">{loginUrl}</span>
             </p>
-        </div>
-    </div>
 
-    <div style=""background-color: #fff; border: 1px solid #dee2e6; border-radius: 10px; padding: 30px; margin-bottom: 20px;"">
+            <div style=""background-color: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0; border-radius: 5px;"">
+                <p style=""margin: 0; color: #856404;"">
+                    <strong>⚠️ Importante:</strong> Guarde sua senha em local seguro. Recomendamos alterá-la após o primeiro acesso.
+                </p>
+            </div>
+        </div>    <div style=""background-color: #fff; border: 1px solid #dee2e6; border-radius: 10px; padding: 30px; margin-bottom: 20px;"">
         <h2 style=""color: #2c3e50; margin-bottom: 15px;"">Próximos Passos</h2>
         <ol style=""margin: 0; padding-left: 20px;"">
             <li style=""margin-bottom: 10px;"">Acesse o painel administrativo do BarbApp</li>
@@ -211,7 +233,7 @@ public class CreateBarbershopUseCase : ICreateBarbershopUseCase
 </html>";
     }
 
-    private static string BuildWelcomeEmailText(string barbershopName, string email, string password)
+    private static string BuildWelcomeEmailText(string barbershopName, string email, string password, string loginUrl)
     {
         return $@"Bem-vindo ao BarbApp! 
 
@@ -222,14 +244,20 @@ Sua barbearia ""{barbershopName}"" foi cadastrada com sucesso.
 E-mail: {email}
 Senha: {password}
 
+=== ACESSO AO SISTEMA ===
+
+Acesse o painel administrativo em:
+{loginUrl}
+
 ⚠️ IMPORTANTE: Guarde sua senha em local seguro. Recomendamos alterá-la após o primeiro acesso.
 
 === PRÓXIMOS PASSOS ===
 
-1. Acesse o painel administrativo do BarbApp
-2. Cadastre seus barbeiros
-3. Configure seus serviços e horários
-4. Comece a receber agendamentos!
+1. Clique no link acima ou copie e cole no seu navegador
+2. Faça login com seu e-mail e senha
+3. Cadastre seus barbeiros
+4. Configure seus serviços e horários
+5. Comece a receber agendamentos!
 
 Caso tenha alguma dúvida, entre em contato com nosso suporte.
 

@@ -1,3 +1,4 @@
+using BarbApp.Application.Configuration;
 using BarbApp.Application.DTOs;
 using BarbApp.Application.Interfaces;
 using BarbApp.Application.Interfaces.UseCases;
@@ -8,6 +9,7 @@ using BarbApp.Domain.Interfaces.Repositories;
 using BarbApp.Domain.ValueObjects;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
 
@@ -24,6 +26,7 @@ public class CreateBarbershopUseCaseTests
     private readonly Mock<IUniqueCodeGenerator> _codeGeneratorMock;
     private readonly Mock<IUnitOfWork> _unitOfWorkMock;
     private readonly Mock<ILogger<CreateBarbershopUseCase>> _loggerMock;
+    private readonly Mock<IOptions<AppSettings>> _appSettingsMock;
     private readonly CreateBarbershopUseCase _useCase;
 
     public CreateBarbershopUseCaseTests()
@@ -37,6 +40,9 @@ public class CreateBarbershopUseCaseTests
         _codeGeneratorMock = new Mock<IUniqueCodeGenerator>();
         _unitOfWorkMock = new Mock<IUnitOfWork>();
         _loggerMock = new Mock<ILogger<CreateBarbershopUseCase>>();
+        _appSettingsMock = new Mock<IOptions<AppSettings>>();
+
+        _appSettingsMock.Setup(x => x.Value).Returns(new AppSettings { FrontendUrl = "http://app.barbapp.com" });
 
         _useCase = new CreateBarbershopUseCase(
             _barbershopRepositoryMock.Object,
@@ -47,6 +53,7 @@ public class CreateBarbershopUseCaseTests
             _emailServiceMock.Object,
             _codeGeneratorMock.Object,
             _unitOfWorkMock.Object,
+            _appSettingsMock.Object,
             _loggerMock.Object);
     }
 
@@ -107,6 +114,61 @@ public class CreateBarbershopUseCaseTests
         _adminBarbeariaUserRepositoryMock.Verify(x => x.AddAsync(It.IsAny<AdminBarbeariaUser>(), It.IsAny<CancellationToken>()), Times.Once);
         _emailServiceMock.Verify(x => x.SendAsync(It.IsAny<EmailMessage>(), It.IsAny<CancellationToken>()), Times.Once);
         _unitOfWorkMock.Verify(x => x.Commit(It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_ValidInput_ShouldSendEmailWithLoginUrl()
+    {
+        // Arrange
+        var input = new CreateBarbershopInput(
+            "Barbearia Teste",
+            "12345678000190",
+            "11987654321",
+            "João Silva",
+            "joao@test.com",
+            "01310100",
+            "Av. Paulista",
+            "1000",
+            "Sala 15",
+            "Bela Vista",
+            "São Paulo",
+            "SP");
+
+        _barbershopRepositoryMock
+            .Setup(x => x.GetByDocumentAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Barbershop?)null);
+
+        _adminBarbeariaUserRepositoryMock
+            .Setup(x => x.GetByEmailAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((AdminBarbeariaUser?)null);
+
+        _codeGeneratorMock
+            .Setup(x => x.GenerateAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync("ABC23456");
+
+        _passwordGeneratorMock
+            .Setup(x => x.Generate(It.IsAny<int>()))
+            .Returns("SecurePass123!");
+
+        _passwordHasherMock
+            .Setup(x => x.Hash(It.IsAny<string>()))
+            .Returns("$2a$12$hashedpassword");
+
+        EmailMessage? capturedEmail = null;
+        _emailServiceMock
+            .Setup(x => x.SendAsync(It.Is<EmailMessage>(email => true), It.IsAny<CancellationToken>()))
+            .Callback<EmailMessage, CancellationToken>((email, _) => capturedEmail = email)
+            .Returns(Task.CompletedTask);
+
+        // Act
+        await _useCase.ExecuteAsync(input, CancellationToken.None);
+
+        // Assert
+        capturedEmail.Should().NotBeNull();
+        capturedEmail!.To.Should().Be("joao@test.com");
+        capturedEmail.Subject.Should().Be("Bem-vindo ao BarbApp - Suas credenciais de acesso");
+        capturedEmail.HtmlBody.Should().Contain("http://app.barbapp.com/ABC23456/login");
+        capturedEmail.TextBody.Should().Contain("http://app.barbapp.com/ABC23456/login");
     }
 
     [Fact]

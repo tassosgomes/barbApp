@@ -1,4 +1,4 @@
-namespace BarbApp.Infrastructure.Configuration;
+namespace BarbApp.Application.Configuration;
 
 /// <summary>
 /// Configurações gerais da aplicação.
