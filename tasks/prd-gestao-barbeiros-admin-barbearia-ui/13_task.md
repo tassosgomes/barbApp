@@ -1,5 +1,5 @@
 ---
-status: pending
+status: completed
 parallelizable: true
 blocked_by: ["1.0"]
 ---
@@ -23,9 +23,9 @@ Configurar rotas para Barbeiros, Serviços e Agenda, protegendo-as via `useAuth`
 - Reading de session flag `session_expired` e feedback ao usuário (opcional)
 
 ## Subtarefas
-- [ ] 13.1 Definir rotas no `routes/`
-- [ ] 13.2 Implementar `PrivateRoute`/guard com `useAuth`
-- [ ] 13.3 Redirecionamentos e mensagens de sessão expirada
+- [x] 13.1 Definir rotas no `routes/`
+- [x] 13.2 Implementar `PrivateRoute`/guard com `useAuth`
+- [x] 13.3 Redirecionamentos e mensagens de sessão expirada
 
 ## Sequenciamento
 - Bloqueado por: 1.0
@@ -37,3 +37,12 @@ Ver interceptors em `api.ts` e hook `useAuth` existente.
 
 ## Critérios de Sucesso
 - Rotas protegidas e navegação estável
+
+## Status de Conclusão ✅ CONCLUÍDA
+- [x] 13.1 Rotas definidas
+  - [x] Rota `/barbeiros` já existia (tarefa anterior)
+  - [x] Rota `/servicos` já existia (tarefa anterior)
+  - [x] Rota `/agenda` adicionada (durante Task 12.0)
+- [x] 13.2 Proteção de rotas via ProtectedRoute já implementada
+- [x] 13.3 Interceptors de autenticação já funcionando
+- [x] 13.4 Pronto para uso
