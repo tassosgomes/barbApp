@@ -3,6 +3,7 @@ import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 
 interface DatePickerProps {
+  id?: string;
   value?: string;
   onChange?: (value: string) => void;
   placeholder?: string;
@@ -11,9 +12,10 @@ interface DatePickerProps {
 }
 
 export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
-  ({ value, onChange, placeholder = 'Selecione uma data', className, disabled, ...props }, ref) => {
+  ({ id, value, onChange, placeholder = 'Selecione uma data', className, disabled, ...props }, ref) => {
     return (
       <Input
+        id={id}
         ref={ref}
         type="date"
         value={value || ''}

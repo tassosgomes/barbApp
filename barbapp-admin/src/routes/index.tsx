@@ -3,6 +3,7 @@ import { Login } from '@/pages/Login/Login';
 import { BarbershopList, BarbershopCreate, BarbershopEdit, BarbershopDetails } from '@/pages/Barbershops';
 import { BarbersListPage } from '@/pages/Barbers';
 import { ServicesListPage } from '@/pages/Services';
+import { SchedulePage } from '@/pages/Schedule';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 
 export const router = createBrowserRouter([
@@ -34,6 +35,10 @@ export const router = createBrowserRouter([
       {
         path: 'servicos',
         element: <ServicesListPage />,
+      },
+      {
+        path: 'agenda',
+        element: <SchedulePage />,
       },
     ],
   },
