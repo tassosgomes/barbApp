@@ -610,4 +610,182 @@ public class BarbershopsControllerIntegrationTests
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
+
+    #region GetByCode Tests (Public Endpoint)
+
+    [Fact]
+    public async Task GetByCode_ValidCode_ShouldReturn200WithBasicData()
+    {
+        // Arrange - Create a barbershop first
+        var createInput = new
+        {
+            name = "Barbearia para Validação de Código",
+            document = "55667788000199",
+            phone = "(11) 98765-9999",
+            ownerName = "Tasso Gomes",
+            email = "tasso.validacao@teste.com",
+            zipCode = "01310-100",
+            street = "Av. Paulista",
+            number = "9999",
+            complement = (string?)null,
+            neighborhood = "Bela Vista",
+            city = "São Paulo",
+            state = "SP"
+        };
+
+        var createResponse = await _client.PostAsJsonAsync("/api/barbearias", createInput);
+        createResponse.EnsureSuccessStatusCode();
+        var created = await createResponse.Content.ReadFromJsonAsync<BarbershopOutput>();
+        var codigo = created!.Code;
+
+        // Create unauthenticated client (endpoint is public)
+        var publicClient = _factory.CreateClient();
+
+        // Act
+        var response = await publicClient.GetAsync($"/api/barbearias/codigo/{codigo}");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var result = await response.Content.ReadFromJsonAsync<ValidateBarbeariaCodeResponse>();
+        result.Should().NotBeNull();
+        result!.Id.Should().Be(created.Id);
+        result.Nome.Should().Be("Barbearia para Validação de Código");
+        result.Codigo.Should().Be(codigo);
+        result.IsActive.Should().BeTrue();
+
+        // Verify no sensitive data is exposed
+        var jsonResponse = await response.Content.ReadAsStringAsync();
+        jsonResponse.Should().NotContain("document");
+        jsonResponse.Should().NotContain("phone");
+        jsonResponse.Should().NotContain("email");
+        jsonResponse.Should().NotContain("address");
+        jsonResponse.Should().NotContain("ownerName");
+    }
+
+    [Fact]
+    public async Task GetByCode_InvalidCode_ShouldReturn404()
+    {
+        // Arrange
+        var invalidCode = "INVALID1"; // Código que não existe
+
+        // Create unauthenticated client (endpoint is public)
+        var publicClient = _factory.CreateClient();
+
+        // Act
+        var response = await publicClient.GetAsync($"/api/barbearias/codigo/{invalidCode}");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+
+    [Fact]
+    public async Task GetByCode_InvalidFormat_ShouldReturn400()
+    {
+        // Arrange
+        var invalidFormat = "ABC"; // Menos de 8 caracteres
+
+        // Create unauthenticated client (endpoint is public)
+        var publicClient = _factory.CreateClient();
+
+        // Act
+        var response = await publicClient.GetAsync($"/api/barbearias/codigo/{invalidFormat}");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+    }
+
+    [Fact]
+    public async Task GetByCode_InactiveBarbershop_ShouldReturn403()
+    {
+        // Arrange - Create a barbershop and deactivate it
+        var createInput = new
+        {
+            name = "Barbearia Inativa",
+            document = "99887766000155",
+            phone = "(11) 98765-8888",
+            ownerName = "Pedro Silva",
+            email = "pedro.inativa@teste.com",
+            zipCode = "01310-100",
+            street = "Av. Paulista",
+            number = "8888",
+            complement = (string?)null,
+            neighborhood = "Bela Vista",
+            city = "São Paulo",
+            state = "SP"
+        };
+
+        var createResponse = await _client.PostAsJsonAsync("/api/barbearias", createInput);
+        createResponse.EnsureSuccessStatusCode();
+        var created = await createResponse.Content.ReadFromJsonAsync<BarbershopOutput>();
+        var codigo = created!.Code;
+
+        // Deactivate the barbershop
+        var deactivateResponse = await _client.PutAsync($"/api/barbearias/{created.Id}/desativar", null);
+        deactivateResponse.EnsureSuccessStatusCode();
+
+        // Create unauthenticated client (endpoint is public)
+        var publicClient = _factory.CreateClient();
+
+        // Act
+        var response = await publicClient.GetAsync($"/api/barbearias/codigo/{codigo}");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+    }
+
+    [Fact]
+    public async Task GetByCode_NoAuthRequired_ShouldAllowAnonymousAccess()
+    {
+        // Arrange - Create a barbershop first
+        var createInput = new
+        {
+            name = "Barbearia Pública",
+            document = "44556677000188",
+            phone = "(11) 98765-7777",
+            ownerName = "Ana Silva",
+            email = "ana.publica@teste.com",
+            zipCode = "01310-100",
+            street = "Av. Paulista",
+            number = "7777",
+            complement = (string?)null,
+            neighborhood = "Bela Vista",
+            city = "São Paulo",
+            state = "SP"
+        };
+
+        var createResponse = await _client.PostAsJsonAsync("/api/barbearias", createInput);
+        createResponse.EnsureSuccessStatusCode();
+        var created = await createResponse.Content.ReadFromJsonAsync<BarbershopOutput>();
+        var codigo = created!.Code;
+
+        // Create completely fresh client with no authentication
+        var anonymousClient = new HttpClient
+        {
+            BaseAddress = new Uri("http://localhost")
+        };
+        var factory = new WebApplicationFactory<Program>()
+            .WithWebHostBuilder(builder =>
+            {
+                builder.ConfigureAppConfiguration((context, config) =>
+                {
+                    config.AddInMemoryCollection(new Dictionary<string, string?>
+                    {
+                        ["ConnectionStrings:DefaultConnection"] = _dbFixture.ConnectionString
+                    });
+                });
+
+                builder.UseEnvironment("Testing");
+            });
+
+        anonymousClient = factory.CreateClient();
+
+        // Act
+        var response = await anonymousClient.GetAsync($"/api/barbearias/codigo/{codigo}");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+    }
+
+    #endregion
 }
