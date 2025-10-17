@@ -31,10 +31,24 @@ public class AdminBarbeariaUserRepository : IAdminBarbeariaUserRepository
             .FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower(), cancellationToken);
     }
 
+    public async Task<AdminBarbeariaUser?> GetByBarbershopIdAsync(Guid barbershopId, CancellationToken cancellationToken = default)
+    {
+        return await _context.AdminBarbeariaUsers
+            .IgnoreQueryFilters()
+            .Include(u => u.Barbearia)
+            .FirstOrDefaultAsync(u => u.BarbeariaId == barbershopId, cancellationToken);
+    }
+
     public async Task<AdminBarbeariaUser> AddAsync(AdminBarbeariaUser user, CancellationToken cancellationToken = default)
     {
         await _context.AdminBarbeariaUsers.AddAsync(user, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
         return user;
+    }
+
+    public async Task UpdateAsync(AdminBarbeariaUser user, CancellationToken cancellationToken = default)
+    {
+        _context.AdminBarbeariaUsers.Update(user);
+        await _context.SaveChangesAsync(cancellationToken);
     }
 }

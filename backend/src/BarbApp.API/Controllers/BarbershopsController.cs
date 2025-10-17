@@ -1,4 +1,5 @@
 using BarbApp.Application.DTOs;
+using BarbApp.Application.Interfaces;
 using BarbApp.Application.Interfaces.UseCases;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,6 +19,7 @@ public class BarbershopsController : ControllerBase
     private readonly IReactivateBarbershopUseCase _reactivateBarbershopUseCase;
     private readonly IGetBarbershopUseCase _getBarbershopUseCase;
     private readonly IListBarbershopsUseCase _listBarbershopsUseCase;
+    private readonly IResendCredentialsUseCase _resendCredentialsUseCase;
     private readonly ILogger<BarbershopsController> _logger;
 
     public BarbershopsController(
@@ -28,6 +30,7 @@ public class BarbershopsController : ControllerBase
         IReactivateBarbershopUseCase reactivateBarbershopUseCase,
         IGetBarbershopUseCase getBarbershopUseCase,
         IListBarbershopsUseCase listBarbershopsUseCase,
+        IResendCredentialsUseCase resendCredentialsUseCase,
         ILogger<BarbershopsController> logger)
     {
         _createBarbershopUseCase = createBarbershopUseCase;
@@ -37,6 +40,7 @@ public class BarbershopsController : ControllerBase
         _reactivateBarbershopUseCase = reactivateBarbershopUseCase;
         _getBarbershopUseCase = getBarbershopUseCase;
         _listBarbershopsUseCase = listBarbershopsUseCase;
+        _resendCredentialsUseCase = resendCredentialsUseCase;
         _logger = logger;
     }
 
@@ -239,5 +243,34 @@ public class BarbershopsController : ControllerBase
         _logger.LogInformation("Barbershop reactivated successfully with ID: {Id}", id);
 
         return NoContent();
+    }
+
+    /// <summary>
+    /// Reenvia as credenciais de acesso do Admin Barbearia
+    /// </summary>
+    /// <param name="id">ID da barbearia</param>
+    /// <returns>Mensagem de sucesso</returns>
+    /// <response code="200">Credenciais reenviadas com sucesso</response>
+    /// <response code="400">Administrador da barbearia não encontrado</response>
+    /// <response code="401">Usuário não autenticado</response>
+    /// <response code="403">Usuário não tem permissão para reenviar credenciais</response>
+    /// <response code="404">Barbearia não encontrada</response>
+    /// <response code="500">Falha ao enviar e-mail</response>
+    [HttpPost("{id:guid}/resend-credentials")]
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> ResendCredentials(Guid id)
+    {
+        _logger.LogInformation("Resending credentials for barbershop with ID: {Id}", id);
+
+        await _resendCredentialsUseCase.ExecuteAsync(id, HttpContext.RequestAborted);
+
+        _logger.LogInformation("Credentials resent successfully for barbershop with ID: {Id}", id);
+
+        return Ok(new { message = "Credenciais reenviadas com sucesso. O administrador receberá um e-mail com a nova senha." });
     }
 }

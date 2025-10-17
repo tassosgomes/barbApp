@@ -6,6 +6,7 @@ using BarbApp.Application.Interfaces;
 using BarbApp.Application.Interfaces.UseCases;
 using BarbApp.Domain.Interfaces;
 using BarbApp.Domain.Interfaces.Repositories;
+using BarbApp.Infrastructure.Configuration;
 using BarbApp.Infrastructure.Middlewares;
 using BarbApp.Infrastructure.Services;
 using BarbApp.Infrastructure.Persistence;
@@ -106,14 +107,22 @@ builder.Services.AddScoped<IAppointmentRepository, AppointmentRepository>();
 
 // Security Services
 builder.Services.AddSingleton<IPasswordHasher, PasswordHasher>();
+builder.Services.AddSingleton<IPasswordGenerator, SecurePasswordGenerator>();
 builder.Services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
 builder.Services.AddScoped<ITenantContext, TenantContext>();
 builder.Services.AddScoped<IUniqueCodeGenerator, UniqueCodeGenerator>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
+// Email Service
+builder.Services.AddScoped<IEmailService, SmtpEmailService>();
+
 // JWT Settings
 builder.Services.Configure<JwtSettings>(
     builder.Configuration.GetSection("JwtSettings"));
+
+// SMTP Settings
+builder.Services.Configure<SmtpSettings>(
+    builder.Configuration.GetSection("SmtpSettings"));
 
 // ══════════════════════════════════════════════════════════
 // DEPENDENCY INJECTION - Use Cases
@@ -131,6 +140,7 @@ builder.Services.AddScoped<IDeactivateBarbershopUseCase, DeactivateBarbershopUse
 builder.Services.AddScoped<IReactivateBarbershopUseCase, ReactivateBarbershopUseCase>();
 builder.Services.AddScoped<IGetBarbershopUseCase, GetBarbershopUseCase>();
 builder.Services.AddScoped<IListBarbershopsUseCase, ListBarbershopsUseCase>();
+builder.Services.AddScoped<IResendCredentialsUseCase, ResendCredentialsUseCase>();
 builder.Services.AddScoped<ICreateBarberUseCase, CreateBarberUseCase>();
 builder.Services.AddScoped<IUpdateBarberUseCase, UpdateBarberUseCase>();
 builder.Services.AddScoped<IRemoveBarberUseCase, RemoveBarberUseCase>();
