@@ -169,6 +169,26 @@ public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
+    /// <summary>
+    /// Configures a WebApplicationFactory to use NoOpEmailService for testing.
+    /// Use this helper to configure any WebApplicationFactory<Program> instance.
+    /// </summary>
+    public static void ConfigureNoOpEmailService(IServiceCollection services)
+    {
+        // Remove all existing IEmailService registrations
+        var emailServiceDescriptors = services
+            .Where(d => d.ServiceType == typeof(BarbApp.Application.Interfaces.IEmailService))
+            .ToList();
+        
+        foreach (var descriptor in emailServiceDescriptors)
+        {
+            services.Remove(descriptor);
+        }
+        
+        // Add NoOpEmailService
+        services.AddScoped<BarbApp.Application.Interfaces.IEmailService, NoOpEmailService>();
+    }
+
     protected override void Dispose(bool disposing)
     {
         if (disposing && _containerStarted)

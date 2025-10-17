@@ -12,11 +12,11 @@ using Xunit;
 
 namespace BarbApp.IntegrationTests.Middlewares;
 
-public class MiddlewareIntegrationTests : IClassFixture<WebApplicationFactory<Program>>
+public class MiddlewareIntegrationTests : IClassFixture<IntegrationTestWebAppFactory>
 {
-    private readonly WebApplicationFactory<Program> _factory;
+    private readonly IntegrationTestWebAppFactory _factory;
 
-    public MiddlewareIntegrationTests(WebApplicationFactory<Program> factory)
+    public MiddlewareIntegrationTests(IntegrationTestWebAppFactory factory)
     {
         _factory = factory;
     }

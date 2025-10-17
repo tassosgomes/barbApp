@@ -40,6 +40,7 @@ public class AuthControllerIntegrationTests : IClassFixture<WebApplicationFactor
         {
             builder.ConfigureServices(services =>
             {
+                IntegrationTestWebAppFactory.ConfigureNoOpEmailService(services);
                 services.AddSingleton(mockUseCase.Object);
             });
         }).CreateClient();
@@ -76,6 +77,7 @@ public class AuthControllerIntegrationTests : IClassFixture<WebApplicationFactor
         {
             builder.ConfigureServices(services =>
             {
+                IntegrationTestWebAppFactory.ConfigureNoOpEmailService(services);
                 services.AddSingleton(mockUseCase.Object);
             });
         }).CreateClient();
@@ -113,6 +115,7 @@ public class AuthControllerIntegrationTests : IClassFixture<WebApplicationFactor
         {
             builder.ConfigureServices(services =>
             {
+                IntegrationTestWebAppFactory.ConfigureNoOpEmailService(services);
                 services.AddSingleton(mockUseCase.Object);
             });
         }).CreateClient();
@@ -149,6 +152,7 @@ public class AuthControllerIntegrationTests : IClassFixture<WebApplicationFactor
         {
             builder.ConfigureServices(services =>
             {
+                IntegrationTestWebAppFactory.ConfigureNoOpEmailService(services);
                 services.AddSingleton(mockUseCase.Object);
             });
         }).CreateClient();
@@ -183,6 +187,7 @@ public class AuthControllerIntegrationTests : IClassFixture<WebApplicationFactor
         {
             builder.ConfigureServices(services =>
             {
+                IntegrationTestWebAppFactory.ConfigureNoOpEmailService(services);
                 services.AddAuthentication(options =>
                 {
                     options.DefaultAuthenticateScheme = "Test";
@@ -219,6 +224,7 @@ public class AuthControllerIntegrationTests : IClassFixture<WebApplicationFactor
         {
             builder.ConfigureServices(services =>
             {
+                IntegrationTestWebAppFactory.ConfigureNoOpEmailService(services);
                 services.AddAuthentication(options =>
                 {
                     options.DefaultAuthenticateScheme = "Test";

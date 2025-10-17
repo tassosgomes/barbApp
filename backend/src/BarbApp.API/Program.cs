@@ -114,8 +114,7 @@ builder.Services.AddScoped<IUniqueCodeGenerator, UniqueCodeGenerator>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 // Email Service
-// TODO (Task 15.6): Register IEmailService properly in DI
-// builder.Services.AddScoped<IEmailService, SmtpEmailService>();
+builder.Services.AddScoped<IEmailService, SmtpEmailService>();
 
 // JWT Settings
 builder.Services.Configure<JwtSettings>(
