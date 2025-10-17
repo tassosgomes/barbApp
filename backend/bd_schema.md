@@ -1,0 +1,201 @@
+# BarbApp Database Schema
+
+This document outlines the database schema for the BarbApp application, generated from the PostgreSQL database.
+
+## Table of Contents
+- [Tables](#tables)
+  - [`__EFMigrationsHistory`](#__efmigrationshistory)
+  - [`addresses`](#addresses)
+  - [`admin_barbearia_users`](#admin_barbearia_users)
+  - [`admin_central_users`](#admin_central_users)
+  - [`appointments`](#appointments)
+  - [`barbers`](#barbers)
+  - [`barbershop_services`](#barbershop_services)
+  - [`barbershops`](#barbershops)
+  - [`customers`](#customers)
+- [Relationships](#relationships)
+- [Indexes](#indexes)
+
+## Tables
+
+### `__EFMigrationsHistory`
+This table is used by Entity Framework Core to track database migrations.
+
+| Column         | Type                  | Constraints |
+|----------------|-----------------------|-------------|
+| `MigrationId`  | `character varying(150)` | **NOT NULL, PRIMARY KEY** |
+| `ProductVersion`| `character varying(32)` | **NOT NULL** |
+
+### `addresses`
+Stores address information.
+
+| Column         | Type                       | Constraints |
+|----------------|----------------------------|-------------|
+| `address_id`   | `uuid`                     | **NOT NULL, PRIMARY KEY** |
+| `zip_code`     | `character varying(10)`    | **NOT NULL** |
+| `street`       | `character varying(255)`   | **NOT NULL** |
+| `number`       | `character varying(20)`    | **NOT NULL** |
+| `complement`   | `character varying(255)`   |             |
+| `neighborhood` | `character varying(255)`   | **NOT NULL** |
+| `city`         | `character varying(255)`   | **NOT NULL** |
+| `state`        | `character varying(2)`     | **NOT NULL** |
+| `created_at`   | `timestamp with time zone` | **NOT NULL** |
+| `updated_at`   | `timestamp with time zone` | **NOT NULL** |
+
+### `admin_barbearia_users`
+Stores administrator users for a specific barbershop.
+
+| Column                    | Type                       | Constraints |
+|---------------------------|----------------------------|-------------|
+| `admin_barbearia_user_id` | `uuid`                     | **NOT NULL, PRIMARY KEY** |
+| `barbearia_id`            | `uuid`                     | **NOT NULL** |
+| `email`                   | `character varying(255)`   | **NOT NULL** |
+| `password_hash`           | `text`                     | **NOT NULL** |
+| `name`                    | `character varying(255)`   | **NOT NULL** |
+| `is_active`               | `boolean`                  | **NOT NULL** |
+| `created_at`              | `timestamp with time zone` | **NOT NULL** |
+| `updated_at`              | `timestamp with time zone` | **NOT NULL** |
+
+### `admin_central_users`
+Stores central administrator users of the system.
+
+| Column                  | Type                       | Constraints |
+|-------------------------|----------------------------|-------------|
+| `admin_central_user_id` | `uuid`                     | **NOT NULL, PRIMARY KEY** |
+| `email`                 | `character varying(255)`   | **NOT NULL** |
+| `password_hash`         | `character varying(255)`   | **NOT NULL** |
+| `name`                  | `character varying(255)`   | **NOT NULL** |
+| `is_active`             | `boolean`                  | **NOT NULL** |
+| `created_at`            | `timestamp with time zone` | **NOT NULL** |
+| `updated_at`            | `timestamp with time zone` | **NOT NULL** |
+
+### `appointments`
+Stores appointment information.
+
+| Column         | Type                       | Constraints |
+|----------------|----------------------------|-------------|
+| `appointment_id`| `uuid`                    | **NOT NULL, PRIMARY KEY** |
+| `barbearia_id` | `uuid`                     | **NOT NULL** |
+| `barber_id`    | `uuid`                     | **NOT NULL** |
+| `customer_id`  | `uuid`                     | **NOT NULL** |
+| `service_id`   | `uuid`                     | **NOT NULL** |
+| `start_time`   | `timestamp with time zone` | **NOT NULL** |
+| `end_time`     | `timestamp with time zone` | **NOT NULL** |
+| `service_name` | `character varying(100)`   | **NOT NULL** |
+| `status`       | `character varying(20)`    | **NOT NULL** |
+
+### `barbers`
+Stores barber information.
+
+| Column         | Type                       | Constraints |
+|----------------|----------------------------|-------------|
+| `barber_id`    | `uuid`                     | **NOT NULL, PRIMARY KEY** |
+| `barbearia_id` | `uuid`                     | **NOT NULL** |
+| `phone`        | `character varying(11)`    | **NOT NULL** |
+| `name`         | `character varying(100)`   | **NOT NULL** |
+| `is_active`    | `boolean`                  | **NOT NULL** |
+| `created_at`   | `timestamp with time zone` | **NOT NULL** |
+| `updated_at`   | `timestamp with time zone` | **NOT NULL** |
+| `email`        | `character varying(255)`   | **NOT NULL**, DEFAULT `''` |
+| `password_hash`| `text`                     | **NOT NULL**, DEFAULT `''` |
+| `service_ids`  | `uuid[]`                   | **NOT NULL** |
+
+### `barbershop_services`
+Stores the services offered by a barbershop.
+
+| Column           | Type                       | Constraints |
+|------------------|----------------------------|-------------|
+| `service_id`     | `uuid`                     | **NOT NULL, PRIMARY KEY** |
+| `barbearia_id`   | `uuid`                     | **NOT NULL** |
+| `name`           | `character varying(100)`   | **NOT NULL** |
+| `description`    | `character varying(500)`   |             |
+| `duration_minutes`| `integer`                 | **NOT NULL** |
+| `price`          | `numeric(10,2)`            | **NOT NULL** |
+| `is_active`      | `boolean`                  | **NOT NULL** |
+| `created_at`     | `timestamp with time zone` | **NOT NULL** |
+| `updated_at`     | `timestamp with time zone` | **NOT NULL** |
+
+### `barbershops`
+Stores barbershop information.
+
+| Column         | Type                       | Constraints |
+|----------------|----------------------------|-------------|
+| `barbershop_id`| `uuid`                     | **NOT NULL, PRIMARY KEY** |
+| `code`         | `character varying(8)`     | **NOT NULL** |
+| `name`         | `character varying(255)`   | **NOT NULL** |
+| `is_active`    | `boolean`                  | **NOT NULL** |
+| `created_at`   | `timestamp with time zone` | **NOT NULL** |
+| `updated_at`   | `timestamp with time zone` | **NOT NULL** |
+| `address_id`   | `uuid`                     | **NOT NULL**, DEFAULT `0000...` |
+| `created_by`   | `character varying(255)`   | **NOT NULL**, DEFAULT `''` |
+| `document`     | `character varying(14)`    | **NOT NULL**, DEFAULT `''` |
+| `document_type`| `integer`                  | **NOT NULL**, DEFAULT `0` |
+| `email`        | `character varying(255)`   | **NOT NULL**, DEFAULT `''` |
+| `owner_name`   | `character varying(255)`   | **NOT NULL**, DEFAULT `''` |
+| `phone`        | `character varying(15)`    | **NOT NULL**, DEFAULT `''` |
+| `updated_by`   | `character varying(255)`   | **NOT NULL**, DEFAULT `''` |
+
+### `customers`
+Stores customer information.
+
+| Column         | Type                       | Constraints |
+|----------------|----------------------------|-------------|
+| `customer_id`  | `uuid`                     | **NOT NULL, PRIMARY KEY** |
+| `barbearia_id` | `uuid`                     | **NOT NULL** |
+| `telefone`     | `character varying(11)`    | **NOT NULL** |
+| `name`         | `character varying(255)`   | **NOT NULL** |
+| `is_active`    | `boolean`                  | **NOT NULL** |
+| `created_at`   | `timestamp with time zone` | **NOT NULL** |
+| `updated_at`   | `timestamp with time zone` | **NOT NULL** |
+
+---
+
+## Relationships
+
+This section describes the foreign key relationships between the tables.
+
+| From Table                | Foreign Key    | To Table          | Primary Key     |
+|---------------------------|----------------|-------------------|-----------------|
+| `admin_barbearia_users`   | `barbearia_id` | `barbershops`     | `barbershop_id` |
+| `appointments`            | `barber_id`    | `barbers`         | `barber_id`     |
+| `appointments`            | `barbearia_id` | `barbershops`     | `barbershop_id` |
+| `appointments`            | `customer_id`  | `customers`       | `customer_id`   |
+| `barbers`                 | `barbearia_id` | `barbershops`     | `barbershop_id` |
+| `barbershop_services`     | `barbearia_id` | `barbershops`     | `barbershop_id` |
+| `barbershops`             | `address_id`   | `addresses`       | `address_id`    |
+| `customers`               | `barbearia_id` | `barbershops`     | `barbershop_id` |
+
+---
+
+## Indexes
+
+This section lists the indexes created to optimize query performance.
+
+| Table                   | Index Name                                | Type    | Columns                     |
+|-------------------------|-------------------------------------------|---------|-----------------------------|
+| `admin_central_users`   | `idx_admin_central_users_email`           | UNIQUE  | `email`                     |
+| `admin_barbearia_users` | `ix_admin_barbearia_users_barbearia_id`   | BTREE   | `barbearia_id`              |
+| `admin_barbearia_users` | `ix_admin_barbearia_users_email`          | BTREE   | `email`                     |
+| `admin_barbearia_users` | `ix_admin_barbearia_users_email_barbearia_id` | UNIQUE  | `email`, `barbearia_id`     |
+| `appointments`          | `ix_appointments_barbearia_id`            | BTREE   | `barbearia_id`              |
+| `appointments`          | `ix_appointments_barbearia_start_time`    | BTREE   | `barbearia_id`, `start_time`|
+| `appointments`          | `ix_appointments_barber_id`               | BTREE   | `barber_id`                 |
+| `appointments`          | `ix_appointments_barber_start_time`       | BTREE   | `barber_id`, `start_time`   |
+| `appointments`          | `ix_appointments_customer_id`             | BTREE   | `customer_id`               |
+| `appointments`          | `ix_appointments_start_time`              | BTREE   | `start_time`                |
+| `barbers`               | `ix_barbers_barbearia_id`                 | BTREE   | `barbearia_id`              |
+| `barbers`               | `ix_barbers_barbearia_is_active`          | BTREE   | `barbearia_id`, `is_active` |
+| `barbers`               | `ix_barbers_email`                        | BTREE   | `email`                     |
+| `barbers`               | `ix_barbers_phone`                        | BTREE   | `phone`                     |
+| `barbers`               | `uq_barbers_barbearia_email`              | UNIQUE  | `barbearia_id`, `email`     |
+| `barbershops`           | `IX_barbershops_address_id`               | BTREE   | `address_id`                |
+| `barbershops`           | `IX_barbershops_document`                 | UNIQUE  | `document`                  |
+| `barbershops`           | `idx_barbershops_code`                    | UNIQUE  | `code`                      |
+| `barbershops`           | `idx_barbershops_is_active`               | BTREE   | `is_active`                 |
+| `barbershops`           | `idx_barbershops_name`                    | BTREE   | `name`                      |
+| `barbershop_services`   | `ix_barbershop_services_barbearia_id`     | BTREE   | `barbearia_id`              |
+| `barbershop_services`   | `ix_barbershop_services_barbearia_name`   | BTREE   | `barbearia_id`, `name`      |
+| `barbershop_services`   | `ix_barbershop_services_is_active`        | BTREE   | `is_active`                 |
+| `customers`             | `ix_customers_barbearia_id`               | BTREE   | `barbearia_id`              |
+| `customers`             | `ix_customers_telefone`                   | BTREE   | `telefone`                  |
+| `customers`             | `ix_customers_telefone_barbearia_id`      | UNIQUE  | `telefone`, `barbearia_id`  |
