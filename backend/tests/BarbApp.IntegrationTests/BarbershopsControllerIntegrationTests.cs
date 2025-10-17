@@ -525,4 +525,89 @@ public class BarbershopsControllerIntegrationTests
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
+
+    [Fact]
+    public async Task ResendCredentials_ValidBarbershop_ShouldReturn200AndResendEmail()
+    {
+        // Arrange - Create barbershop first
+        var createInput = new
+        {
+            name = "Barbearia Reenvio Teste",
+            document = "11223344000156",
+            phone = "(11) 98765-4322",
+            ownerName = "Maria Santos",
+            email = "maria@reenvio.com",
+            zipCode = "01310-100",
+            street = "Av. Paulista",
+            number = "2000",
+            complement = (string?)null,
+            neighborhood = "Bela Vista",
+            city = "São Paulo",
+            state = "SP"
+        };
+
+        var createResponse = await _client.PostAsJsonAsync("/api/barbearias", createInput);
+        createResponse.StatusCode.Should().Be(HttpStatusCode.Created);
+        var createdBarbershop = await createResponse.Content.ReadFromJsonAsync<BarbershopOutput>();
+        createdBarbershop.Should().NotBeNull();
+
+        // Act
+        var response = await _client.PostAsync($"/api/barbearias/{createdBarbershop!.Id}/resend-credentials", null);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var content = await response.Content.ReadAsStringAsync();
+        content.Should().Contain("Credenciais reenviadas com sucesso");
+    }
+
+    [Fact]
+    public async Task ResendCredentials_NonExistentBarbershop_ShouldReturn404()
+    {
+        // Arrange
+        var nonExistentId = Guid.NewGuid();
+
+        // Act
+        var response = await _client.PostAsync($"/api/barbearias/{nonExistentId}/resend-credentials", null);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+
+    [Fact]
+    public async Task ResendCredentials_WithoutAuth_ShouldReturn401()
+    {
+        // Arrange
+        var unauthClient = _factory.CreateClient();
+        var barbershopId = Guid.NewGuid();
+
+        // Act
+        var response = await unauthClient.PostAsync($"/api/barbearias/{barbershopId}/resend-credentials", null);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+    }
+
+    [Fact]
+    public async Task ResendCredentials_WithNonAdminCentralRole_ShouldReturn403()
+    {
+        // Arrange - Create client with AdminBarbearia token (not AdminCentral)
+        var adminBarbeariaClient = _factory.CreateClient();
+        var token = IntegrationTestWebAppFactory.GenerateTestJwtToken(
+            userId: Guid.NewGuid().ToString(),
+            userType: "AdminBarbearia",
+            email: "adminbarb@test.com",
+            barbeariaId: Guid.NewGuid()
+        );
+        adminBarbeariaClient.DefaultRequestHeaders.Authorization =
+            new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+        var barbershopId = Guid.NewGuid();
+
+        // Act
+        var response = await adminBarbeariaClient.PostAsync($"/api/barbearias/{barbershopId}/resend-credentials", null);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+    }
 }
