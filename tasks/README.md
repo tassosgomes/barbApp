@@ -95,6 +95,37 @@ Este diretório contém os Product Requirement Documents (PRDs) para a Fase 1 (M
 
 ---
 
+### 15. [Onboarding Automático do Admin da Barbearia](./prd-onboarding-admin-barbearia/prd.md) 🆕
+**Responsável**: Admin Central  
+**Objetivo**: Automatizar criação de credenciais de acesso do Admin Barbearia no cadastro
+
+**Funcionalidades Principais**:
+- Criação automática de usuário Admin Barbearia ao cadastrar barbearia
+- Geração de senha aleatória segura (12 caracteres)
+- Envio de e-mail com credenciais de acesso
+- Reenvio de credenciais pelo Admin Central (nova senha gerada)
+- URLs parametrizadas (dev/prod)
+- Suporte SMTP com e sem autenticação
+
+**Stack Técnica**:
+- Backend: MailKit + BCrypt + RandomNumberGenerator
+- Frontend: Modal de confirmação + Toasts
+- Dev: smtp4dev (Docker)
+- Prod: SMTP configurável
+
+**Estimativa**: ~23 pontos (3-4 dias)
+
+**Documentos**:
+- 📋 [README](./prd-onboarding-admin-barbearia/README.md) - Visão geral e navegação
+- 📝 [PRD](./prd-onboarding-admin-barbearia/prd.md) - Requisitos de produto
+- 🔧 [Tech Spec](./prd-onboarding-admin-barbearia/techspec.md) - Especificação técnica
+- ✅ [Tasks](./prd-onboarding-admin-barbearia/tasks.md) - Breakdown de implementação
+- ⚙️ [Config Guide](./prd-onboarding-admin-barbearia/CONFIG.md) - Setup e configuração
+
+**Dependências**: PRD 1 (Gestão de Barbearias)
+
+---
+
 ## Ordem de Implementação Sugerida
 
 1. **PRD 5 - Sistema Multi-tenant** (base arquitetural)
