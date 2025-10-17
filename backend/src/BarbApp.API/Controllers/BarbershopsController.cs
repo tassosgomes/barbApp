@@ -1,6 +1,7 @@
 using BarbApp.Application.DTOs;
 using BarbApp.Application.Interfaces;
 using BarbApp.Application.Interfaces.UseCases;
+using BarbApp.Application.UseCases;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -42,6 +43,35 @@ public class BarbershopsController : ControllerBase
         _listBarbershopsUseCase = listBarbershopsUseCase;
         _resendCredentialsUseCase = resendCredentialsUseCase;
         _logger = logger;
+    }
+
+    /// <summary>
+    /// Valida o código de uma barbearia (endpoint público para tela de login)
+    /// </summary>
+    /// <param name="codigo">Código da barbearia (8 caracteres alfanuméricos)</param>
+    /// <param name="useCase">Use case injetado via DI</param>
+    /// <returns>Informações básicas da barbearia</returns>
+    /// <response code="200">Código válido - retorna dados básicos da barbearia</response>
+    /// <response code="400">Código com formato inválido</response>
+    /// <response code="403">Barbearia inativa</response>
+    /// <response code="404">Código não encontrado</response>
+    [HttpGet("codigo/{codigo}")]
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(ValidateBarbeariaCodeResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<ValidateBarbeariaCodeResponse>> GetByCode(
+        [FromRoute] string codigo,
+        [FromServices] ValidateBarbeariaCodeUseCase useCase)
+    {
+        _logger.LogInformation("Validating barbershop code: {Code}", codigo);
+
+        var result = await useCase.ExecuteAsync(codigo, HttpContext.RequestAborted);
+
+        _logger.LogInformation("Code validated successfully for barbershop: {Name} (ID: {Id})", result.Nome, result.Id);
+
+        return Ok(result);
     }
 
     /// <summary>

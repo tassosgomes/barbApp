@@ -57,6 +57,7 @@ public class GlobalExceptionHandlerMiddleware
             DuplicateBarberException => (HttpStatusCode.Conflict, exception.Message),
             InvalidDocumentException => (HttpStatusCode.BadRequest, exception.Message),
             BarbeariaInactiveException => (HttpStatusCode.UnprocessableEntity, exception.Message),
+            Domain.Exceptions.ValidationException => (HttpStatusCode.BadRequest, exception.Message),
             FluentValidation.ValidationException => (HttpStatusCode.BadRequest, exception.Message),
             _ => (HttpStatusCode.InternalServerError, "An error occurred processing your request")
         };
