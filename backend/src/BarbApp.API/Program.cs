@@ -141,6 +141,7 @@ builder.Services.AddScoped<IReactivateBarbershopUseCase, ReactivateBarbershopUse
 builder.Services.AddScoped<IGetBarbershopUseCase, GetBarbershopUseCase>();
 builder.Services.AddScoped<IListBarbershopsUseCase, ListBarbershopsUseCase>();
 builder.Services.AddScoped<IResendCredentialsUseCase, ResendCredentialsUseCase>();
+builder.Services.AddScoped<IGetMyBarbershopUseCase, GetMyBarbershopUseCase>();
 builder.Services.AddScoped<ValidateBarbeariaCodeUseCase>();
 builder.Services.AddScoped<ICreateBarberUseCase, CreateBarberUseCase>();
 builder.Services.AddScoped<IUpdateBarberUseCase, UpdateBarberUseCase>();

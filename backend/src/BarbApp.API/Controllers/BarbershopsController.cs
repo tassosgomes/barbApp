@@ -9,7 +9,7 @@ namespace BarbApp.API.Controllers;
 
 [ApiController]
 [Route("api/barbearias")]
-[Authorize(Roles = "AdminCentral")]
+[Authorize]
 [Produces("application/json")]
 public class BarbershopsController : ControllerBase
 {
@@ -21,6 +21,7 @@ public class BarbershopsController : ControllerBase
     private readonly IGetBarbershopUseCase _getBarbershopUseCase;
     private readonly IListBarbershopsUseCase _listBarbershopsUseCase;
     private readonly IResendCredentialsUseCase _resendCredentialsUseCase;
+    private readonly IGetMyBarbershopUseCase _getMyBarbershopUseCase;
     private readonly ILogger<BarbershopsController> _logger;
 
     public BarbershopsController(
@@ -32,6 +33,7 @@ public class BarbershopsController : ControllerBase
         IGetBarbershopUseCase getBarbershopUseCase,
         IListBarbershopsUseCase listBarbershopsUseCase,
         IResendCredentialsUseCase resendCredentialsUseCase,
+        IGetMyBarbershopUseCase getMyBarbershopUseCase,
         ILogger<BarbershopsController> logger)
     {
         _createBarbershopUseCase = createBarbershopUseCase;
@@ -42,6 +44,7 @@ public class BarbershopsController : ControllerBase
         _getBarbershopUseCase = getBarbershopUseCase;
         _listBarbershopsUseCase = listBarbershopsUseCase;
         _resendCredentialsUseCase = resendCredentialsUseCase;
+        _getMyBarbershopUseCase = getMyBarbershopUseCase;
         _logger = logger;
     }
 
@@ -75,6 +78,31 @@ public class BarbershopsController : ControllerBase
     }
 
     /// <summary>
+    /// Obtém os dados completos da barbearia do usuário autenticado (Admin Barbearia)
+    /// </summary>
+    /// <returns>Dados completos da barbearia</returns>
+    /// <response code="200">Dados da barbearia retornados com sucesso</response>
+    /// <response code="401">Token inválido ou expirado</response>
+    /// <response code="403">Usuário não é Admin Barbearia ou não tem barbearia associada</response>
+    /// <response code="404">Barbearia não encontrada</response>
+    [HttpGet("me")]
+    [Authorize(Roles = "AdminBarbearia")]
+    [ProducesResponseType(typeof(BarbershopOutput), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<BarbershopOutput>> GetMyBarbershop()
+    {
+        _logger.LogInformation("Getting my barbershop data");
+
+        var result = await _getMyBarbershopUseCase.ExecuteAsync(HttpContext.RequestAborted);
+
+        _logger.LogInformation("My barbershop data retrieved successfully for barbershop: {Name} (ID: {Id})", result.Name, result.Id);
+
+        return Ok(result);
+    }
+
+    /// <summary>
     /// Cria uma nova barbearia no sistema
     /// </summary>
     /// <param name="input">Dados da barbearia a ser criada</param>
@@ -85,6 +113,7 @@ public class BarbershopsController : ControllerBase
     /// <response code="403">Usuário não tem permissão para criar barbearias</response>
     /// <response code="422">Documento já cadastrado ou outros erros de negócio</response>
     [HttpPost]
+    [Authorize(Roles = "AdminCentral")]
     [ProducesResponseType(typeof(BarbershopOutput), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(object), StatusCodes.Status401Unauthorized)]
@@ -113,6 +142,7 @@ public class BarbershopsController : ControllerBase
     /// <response code="403">Usuário não tem permissão para atualizar barbearias</response>
     /// <response code="404">Barbearia não encontrada</response>
     [HttpPut("{id:guid}")]
+    [Authorize(Roles = "AdminCentral")]
     [ProducesResponseType(typeof(BarbershopOutput), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(object), StatusCodes.Status401Unauthorized)]
@@ -144,6 +174,7 @@ public class BarbershopsController : ControllerBase
     /// <response code="403">Usuário não tem permissão para visualizar barbearias</response>
     /// <response code="404">Barbearia não encontrada</response>
     [HttpGet("{id:guid}")]
+    [Authorize(Roles = "AdminCentral")]
     [ProducesResponseType(typeof(BarbershopOutput), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(object), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(object), StatusCodes.Status403Forbidden)]
@@ -170,6 +201,7 @@ public class BarbershopsController : ControllerBase
     /// <response code="401">Usuário não autenticado</response>
     /// <response code="403">Usuário não tem permissão para listar barbearias</response>
     [HttpGet]
+    [Authorize(Roles = "AdminCentral")]
     [ProducesResponseType(typeof(PaginatedBarbershopsOutput), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(object), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(object), StatusCodes.Status403Forbidden)]
@@ -210,6 +242,7 @@ public class BarbershopsController : ControllerBase
     /// <response code="403">Usuário não tem permissão para excluir barbearias</response>
     /// <response code="404">Barbearia não encontrada</response>
     [HttpDelete("{id:guid}")]
+    [Authorize(Roles = "AdminCentral")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(object), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(object), StatusCodes.Status403Forbidden)]
@@ -235,6 +268,7 @@ public class BarbershopsController : ControllerBase
     /// <response code="403">Usuário não tem permissão para desativar barbearias</response>
     /// <response code="404">Barbearia não encontrada</response>
     [HttpPut("{id:guid}/desativar")]
+    [Authorize(Roles = "AdminCentral")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(object), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(object), StatusCodes.Status403Forbidden)]
@@ -260,6 +294,7 @@ public class BarbershopsController : ControllerBase
     /// <response code="403">Usuário não tem permissão para reativar barbearias</response>
     /// <response code="404">Barbearia não encontrada</response>
     [HttpPut("{id:guid}/reativar")]
+    [Authorize(Roles = "AdminCentral")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(object), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(object), StatusCodes.Status403Forbidden)]
@@ -287,6 +322,7 @@ public class BarbershopsController : ControllerBase
     /// <response code="404">Barbearia não encontrada</response>
     /// <response code="500">Falha ao enviar e-mail</response>
     [HttpPost("{id:guid}/reenviar-credenciais")]
+    [Authorize(Roles = "AdminCentral")]
     [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(object), StatusCodes.Status401Unauthorized)]

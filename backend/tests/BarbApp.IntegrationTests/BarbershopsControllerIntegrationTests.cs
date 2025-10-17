@@ -787,5 +787,77 @@ public class BarbershopsControllerIntegrationTests
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
+    [Fact]
+    public async Task GetMyBarbershop_AsAdminBarbearia_ShouldReturn200WithBarbershopData()
+    {
+        // Arrange - Create a barbershop first
+        var createInput = new
+        {
+            name = "Barbearia Minha",
+            document = "11223344000177",
+            phone = "(11) 98765-9999",
+            ownerName = "Carlos Silva",
+            email = "carlos.minha@teste.com",
+            zipCode = "01310-100",
+            street = "Av. Paulista",
+            number = "9999",
+            complement = (string?)null,
+            neighborhood = "Bela Vista",
+            city = "São Paulo",
+            state = "SP"
+        };
+
+        var createResponse = await _client.PostAsJsonAsync("/api/barbearias", createInput);
+        createResponse.EnsureSuccessStatusCode();
+        var createdBarbershop = await createResponse.Content.ReadFromJsonAsync<BarbershopOutput>();
+
+        // Create a client with AdminBarbearia token
+        var adminBarbeariaClient = _factory.CreateClient();
+        var adminBarbeariaToken = IntegrationTestWebAppFactory.GenerateTestJwtToken(
+            userId: Guid.NewGuid().ToString(),
+            userType: "AdminBarbearia",
+            email: "admin.barbearia@test.com",
+            barbeariaId: createdBarbershop!.Id
+        );
+        adminBarbeariaClient.DefaultRequestHeaders.Authorization =
+            new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", adminBarbeariaToken);
+
+        // Act
+        var response = await adminBarbeariaClient.GetAsync("/api/barbearias/me");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var result = await response.Content.ReadFromJsonAsync<BarbershopOutput>();
+        result.Should().NotBeNull();
+        result!.Id.Should().Be(createdBarbershop.Id);
+        result.Name.Should().Be("Barbearia Minha");
+        result.Code.Should().Be(createdBarbershop.Code);
+    }
+
+    [Fact]
+    public async Task GetMyBarbershop_AsAdminCentral_ShouldReturn403()
+    {
+        // Arrange - Use the existing AdminCentral client (no barbeariaId in token)
+
+        // Act
+        var response = await _client.GetAsync("/api/barbearias/me");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+    }
+
+    [Fact]
+    public async Task GetMyBarbershop_Unauthenticated_ShouldReturn401()
+    {
+        // Arrange - Create unauthenticated client
+        var unauthenticatedClient = _factory.CreateClient();
+
+        // Act
+        var response = await unauthenticatedClient.GetAsync("/api/barbearias/me");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+    }
+
     #endregion
 }
