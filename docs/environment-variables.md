@@ -40,6 +40,16 @@ Este documento descreve todas as variáveis de ambiente necessárias para execut
 - **Valor Padrão**: `24`
 - **Exemplo**: `24`
 
+## Configuração da Aplicação
+
+### AppSettings:FrontendUrl
+- **Tipo**: String (URL)
+- **Obrigatório**: Sim
+- **Descrição**: URL base do frontend para construção de links em e-mails de boas-vindas
+- **Formato**: `https://seudominio.com` ou `http://localhost:3000` (desenvolvimento)
+- **Exemplo Produção**: `https://barbapp.com`
+- **Exemplo Desenvolvimento**: `http://localhost:3000`
+
 ## Configuração de Banco de Dados
 
 ### ConnectionStrings:DefaultConnection
@@ -63,6 +73,9 @@ Arquivo de configuração base commitado no repositório. **NÃO** deve conter v
     "Audience": "barbapp-api",
     "ExpirationHours": 24
   },
+  "AppSettings": {
+    "FrontendUrl": ""
+  },
   "ConnectionStrings": {
     "DefaultConnection": "Host=localhost;Database=barbapp;Username=postgres;Password=postgres"
   }
@@ -79,6 +92,9 @@ Arquivo de configuração para ambiente de desenvolvimento. **NÃO** deve ser co
     "Issuer": "barbapp",
     "Audience": "barbapp-api",
     "ExpirationHours": 24
+  },
+  "AppSettings": {
+    "FrontendUrl": "http://localhost:3000"
   },
   "ConnectionStrings": {
     "DefaultConnection": "Host=localhost;Database=barbapp;Username=postgres;Password=postgres"
@@ -97,6 +113,9 @@ Arquivo de configuração para ambiente de produção. **NÃO** deve ser commita
     "Audience": "barbapp-api",
     "ExpirationHours": 24
   },
+  "AppSettings": {
+    "FrontendUrl": "{{USE_ENVIRONMENT_VARIABLE_OR_SECRET_MANAGER}}"
+  },
   "ConnectionStrings": {
     "DefaultConnection": "{{USE_ENVIRONMENT_VARIABLE_OR_SECRET_MANAGER}}"
   }
@@ -114,6 +133,7 @@ ENV JWT__SECRETKEY="sua-secret-key-aqui"
 ENV JWT__ISSUER="barbapp"
 ENV JWT__AUDIENCE="barbapp-api"
 ENV JWT__EXPIRATIONHOURS="24"
+ENV APPSETTINGS__FRONTENDURL="https://barbapp.com"
 ENV CONNECTIONSTRINGS__DEFAULTCONNECTION="Host=postgres;Database=barbapp_prod;Username=barbapp_user;Password=secure_password"
 ```
 
@@ -124,12 +144,14 @@ Configurar Application Settings:
 - `Jwt:Issuer` = `barbapp`
 - `Jwt:Audience` = `barbapp-api`
 - `Jwt:ExpirationHours` = `24`
+- `AppSettings:FrontendUrl` = `https://barbapp.com`
 - `ConnectionStrings:DefaultConnection` = `Host=...`
 
 ## Checklist de Segurança
 
 - [ ] `Jwt:SecretKey` tem no mínimo 32 caracteres
 - [ ] `Jwt:SecretKey` é diferente entre ambientes (dev, staging, prod)
+- [ ] `AppSettings:FrontendUrl` é uma URL válida e segura (HTTPS em produção)
 - [ ] `appsettings.Development.json` está no .gitignore
 - [ ] `appsettings.Production.json` está no .gitignore
 - [ ] Senhas de banco de dados são fortes e únicas por ambiente
@@ -149,6 +171,10 @@ Configurar Application Settings:
 ### Erro: "The Connection String property has not been initialized"
 - **Causa**: Connection string não está configurada
 - **Solução**: Adicionar a connection string no arquivo de configuração apropriado
+
+### Erro: "FrontendUrl is not configured" ou links de email quebrados
+- **Causa**: `AppSettings:FrontendUrl` não está configurado
+- **Solução**: Adicionar a URL base do frontend no `appsettings.json` ou variável de ambiente `APPSETTINGS__FRONTENDURL`
 
 ## Referências
 
