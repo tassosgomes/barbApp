@@ -40,9 +40,9 @@ A implementação segue uma abordagem sequencial com oportunidades de paraleliza
 
 ### Fase 1: Infraestrutura Backend (Sprint 1 - Semana 1)
 
-- [ ] 1.0 Implementar endpoint de validação de código da barbearia
+- [x] 1.0 Implementar endpoint de validação de código da barbearia
 - [ ] 2.0 Implementar endpoint de dados completos da barbearia
-- [ ] 3.0 Atualizar template de email de boas-vindas
+- [x] 3.0 Atualizar template de email de boas-vindas
 
 ### Fase 2: Autenticação Frontend (Sprint 2 - Semana 2)
 
