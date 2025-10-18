@@ -1,0 +1,1 @@
+export { ServicosPage } from './ServicosPage';
