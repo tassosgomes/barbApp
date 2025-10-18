@@ -47,3 +47,11 @@ export type {
 	ServiceFilters,
 	ScheduleFilters,
 } from './filters';
+
+// Admin Barbearia types
+export type {
+	BarbeariaInfo,
+	UseBarbeariaCodeReturn,
+	AdminBarbeariaAuth,
+	AdminBarbeariaSession,
+} from './adminBarbearia';

@@ -1,4 +1,5 @@
 export { useAuth } from './useAuth';
+export { useBarbeariaCode } from './useBarbeariaCode';
 export { useBarbers } from './useBarbers';
 export { useBarberMutations } from './useBarberMutations';
 export { useBarbershops } from './useBarbershops';

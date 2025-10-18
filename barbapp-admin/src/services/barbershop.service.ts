@@ -6,6 +6,7 @@ import type {
   PaginatedResponse,
   BarbershopFilters,
 } from '@/types';
+import type { BarbeariaInfo } from '@/types/adminBarbearia';
 
 // Helper function to normalize API response to expected format
 function normalizePaginatedResponse<T>(data: {
@@ -104,5 +105,16 @@ export const barbershopService = {
    */
   resendCredentials: async (id: string): Promise<void> => {
     await api.post(`/barbearias/${id}/reenviar-credenciais`);
+  },
+
+  /**
+   * Validate barbershop code and return basic info
+   * Used for Admin Barbearia login validation
+   * @param codigo - Barbershop code (8 uppercase alphanumeric characters)
+   * @returns Basic barbershop information
+   */
+  validateCode: async (codigo: string): Promise<BarbeariaInfo> => {
+    const { data } = await api.get<BarbeariaInfo>(`/barbearias/codigo/${codigo}`);
+    return data;
   },
 };
