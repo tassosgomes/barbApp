@@ -36,7 +36,7 @@ export const adminBarbeariaAuthService = {
    */
   login: async (request: LoginAdminBarbeariaRequest): Promise<LoginAdminBarbeariaResponse> => {
     const response = await api.post<LoginAdminBarbeariaResponse>(
-      '/api/auth/admin-barbearia/login',
+      '/auth/admin-barbearia/login',
       request
     );
 

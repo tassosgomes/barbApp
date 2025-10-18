@@ -6,13 +6,16 @@ import '@/index.css';
 import { Toaster } from '@/components/ui/toaster';
 import App from '@/App';
 import { queryClient } from '@/lib/queryClient';
+import { BarbeariaProvider } from '@/contexts/BarbeariaContext';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      <App />
-      <Toaster />
-      {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />}
+      <BarbeariaProvider>
+        <App />
+        <Toaster />
+        {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />}
+      </BarbeariaProvider>
     </QueryClientProvider>
   </StrictMode>,
 );
