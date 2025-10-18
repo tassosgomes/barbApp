@@ -176,8 +176,111 @@ Configurar Application Settings:
 - **Causa**: `AppSettings:FrontendUrl` não está configurado
 - **Solução**: Adicionar a URL base do frontend no `appsettings.json` ou variável de ambiente `APPSETTINGS__FRONTENDURL`
 
+## Variáveis de Ambiente - Frontend (barbapp-admin)
+
+O frontend utiliza Vite como build tool, que expõe variáveis de ambiente com o prefixo `VITE_`.
+
+### VITE_API_URL
+- **Tipo**: String (URL)
+- **Obrigatório**: Sim
+- **Descrição**: URL base da API backend para requisições HTTP
+- **Formato**: `http://localhost:5000/api` (desenvolvimento) ou `https://api.barbapp.com` (produção)
+- **Exemplo Desenvolvimento**: `http://localhost:5000/api`
+- **Exemplo Produção**: `https://api.barbapp.com`
+
+### VITE_APP_NAME
+- **Tipo**: String
+- **Obrigatório**: Não
+- **Descrição**: Nome da aplicação exibido na interface
+- **Valor Padrão**: `BarbApp Admin`
+- **Exemplo**: `BarbApp Admin`
+
+### Arquivo .env (Frontend)
+
+Crie um arquivo `.env.local` na raiz do projeto `barbapp-admin`:
+
+```env
+# API Configuration
+VITE_API_URL=http://localhost:5000/api
+
+# App Configuration
+VITE_APP_NAME=BarbApp Admin
+```
+
+### Configuração por Ambiente
+
+**.env.development** (commitado)
+```env
+VITE_API_URL=http://localhost:5000/api
+VITE_APP_NAME=BarbApp Admin [DEV]
+```
+
+**.env.production** (não commitado)
+```env
+VITE_API_URL=https://api.barbapp.com
+VITE_APP_NAME=BarbApp Admin
+```
+
+**.env.local** (não commitado, sobrescreve outros arquivos)
+```env
+# Usado para desenvolvimento local, sobrescreve .env.development
+VITE_API_URL=http://localhost:5000/api
+```
+
+### Multi-Tenancy e Roteamento
+
+O frontend do Admin Barbearia utiliza roteamento baseado em tenant (código da barbearia):
+
+**Estrutura de URLs:**
+```
+Admin Central:
+  http://localhost:3001/admin-central/login
+  http://localhost:3001/admin-central/barbearias
+
+Admin Barbearia (Multi-tenant):
+  http://localhost:3001/{codigo-barbearia}/login
+  http://localhost:3001/{codigo-barbearia}/dashboard
+  http://localhost:3001/{codigo-barbearia}/barbeiros
+  http://localhost:3001/{codigo-barbearia}/servicos
+  http://localhost:3001/{codigo-barbearia}/agenda
+```
+
+**Exemplo de Tenants:**
+```
+http://localhost:3001/ABC123/login
+http://localhost:3001/BARBER2024/dashboard
+http://localhost:3001/TEST1234/agenda
+```
+
+O código da barbearia é extraído da URL e usado para:
+1. Validar existência e status da barbearia (API: `GET /barbershops/{code}/info`)
+2. Identificar o tenant nas requisições subsequentes
+3. Isolar dados entre barbearias diferentes
+
+### Variáveis Internas do Frontend
+
+Além das variáveis de ambiente, o frontend gerencia:
+
+**LocalStorage:**
+- `adminCentral_token`: Token JWT do Admin Central
+- `adminBarbearia_token`: Token JWT do Admin Barbearia
+- `adminBarbearia_barbeariaId`: ID da barbearia autenticada
+- `adminBarbearia_codigo`: Código da barbearia
+
+**TenantContext:**
+O React Context gerencia informações do tenant atual:
+```typescript
+interface TenantContextType {
+  codigo: string;
+  barbeariaId: string;
+  barbeariaNome: string;
+  isLoading: boolean;
+}
+```
+
 ## Referências
 
 - [ASP.NET Core Configuration](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/configuration/)
 - [JWT Best Practices](https://tools.ietf.org/html/rfc8725)
 - [Secret Storage in Production](https://learn.microsoft.com/en-us/aspnet/core/security/app-secrets)
+- [Vite Environment Variables](https://vitejs.dev/guide/env-and-mode.html)
