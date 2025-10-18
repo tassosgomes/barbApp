@@ -5,8 +5,11 @@ import { BarbersListPage } from '@/pages/Barbers';
 import { ServicesListPage } from '@/pages/Services';
 import { SchedulePage } from '@/pages/Schedule';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
+import { adminBarbeariaRoutes } from './adminBarbearia.routes';
 
 export const router = createBrowserRouter([
+  // Admin Barbearia routes (must come first to match /:codigo patterns)
+  ...adminBarbeariaRoutes,
   {
     path: '/login',
     element: <Login />,

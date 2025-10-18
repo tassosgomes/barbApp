@@ -1,0 +1,1 @@
+export { LoginAdminBarbearia } from './LoginAdminBarbearia';
