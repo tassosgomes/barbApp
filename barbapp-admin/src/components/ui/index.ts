@@ -17,3 +17,5 @@ export { Toast, ToastAction, ToastDescription, ToastProvider, ToastTitle, ToastV
 export { Toaster } from "./toaster";
 export { ConfirmDialog } from "./confirm-dialog";
 export { ErrorBoundary } from "./error-boundary";
+export { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "./card";
+export { Alert, AlertDescription, AlertTitle } from "./alert";
