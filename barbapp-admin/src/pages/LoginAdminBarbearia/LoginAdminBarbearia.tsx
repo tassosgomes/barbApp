@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
 import { useBarbeariaCode } from '@/hooks/useBarbeariaCode';
 import { useBarbearia } from '@/contexts/BarbeariaContext';
 import { adminBarbeariaAuthService } from '@/services/adminBarbeariaAuth.service';
@@ -54,7 +55,7 @@ export function LoginAdminBarbearia() {
       // Redirect to dashboard
       navigate(`/${codigo}/dashboard`);
     },
-    onError: (error: any) => {
+    onError: (error: AxiosError) => {
       if (error.response?.status === 401) {
         toast({
           title: 'Credenciais inválidas',

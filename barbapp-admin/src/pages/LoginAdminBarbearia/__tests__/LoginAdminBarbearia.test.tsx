@@ -1,6 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
 import { LoginAdminBarbearia } from '../LoginAdminBarbearia';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 
@@ -237,8 +238,10 @@ describe('LoginAdminBarbearia', () => {
       isValidating: false,
     });
 
-    const error = new Error('Unauthorized') as any;
-    error.response = { status: 401 };
+    const error = {
+      response: { status: 401 },
+      message: 'Unauthorized',
+    } as AxiosError;
     mockAdminBarbeariaAuthService.login.mockRejectedValue(error);
 
     render(<LoginAdminBarbearia />, { wrapper });
