@@ -4,7 +4,7 @@ import { ProtectedBarbeariaRoute } from '@/components/ProtectedBarbeariaRoute';
 import { AdminBarbeariaLayout } from '@/layouts/AdminBarbeariaLayout';
 import { Dashboard } from '@/pages/Dashboard';
 import { BarbeirosListPage, BarbeiroFormPage } from '@/pages/Barbeiros';
-import { ServicosPage } from '@/pages/Servicos';
+import { ServicosListPage, ServicoFormPage } from '@/pages/Servicos';
 import { AgendaPage } from '@/pages/Agenda';
 
 /**
@@ -53,7 +53,15 @@ export const adminBarbeariaRoutes: RouteObject[] = [
       },
       {
         path: 'servicos',
-        element: <ServicosPage />,
+        element: <ServicosListPage />,
+      },
+      {
+        path: 'servicos/novo',
+        element: <ServicoFormPage />,
+      },
+      {
+        path: 'servicos/:id',
+        element: <ServicoFormPage />,
       },
       {
         path: 'agenda',

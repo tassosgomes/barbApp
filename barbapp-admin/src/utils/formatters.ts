@@ -115,3 +115,48 @@ export function formatDate(isoDate: string): string {
     minute: '2-digit',
   });
 }
+
+/**
+ * Formatar valor monetário em Real Brasileiro (R$)
+ * 
+ * @param value - Valor numérico a ser formatado
+ * @returns String formatada como moeda brasileira
+ * 
+ * @example
+ * formatCurrency(35) // "R$ 35,00"
+ * formatCurrency(50.5) // "R$ 50,50"
+ * formatCurrency(1234.56) // "R$ 1.234,56"
+ */
+export function formatCurrency(value: number): string {
+  return new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+  }).format(value);
+}
+
+/**
+ * Formatar duração em minutos para formato legível (horas e minutos)
+ * 
+ * @param minutes - Duração em minutos
+ * @returns String formatada no estilo "1h 30min" ou "45min"
+ * 
+ * @example
+ * formatDuration(30) // "30min"
+ * formatDuration(60) // "1h"
+ * formatDuration(90) // "1h 30min"
+ * formatDuration(150) // "2h 30min"
+ */
+export function formatDuration(minutes: number): string {
+  const hours = Math.floor(minutes / 60);
+  const mins = minutes % 60;
+
+  if (hours > 0 && mins > 0) {
+    return `${hours}h ${mins}min`;
+  }
+
+  if (hours > 0) {
+    return `${hours}h`;
+  }
+
+  return `${mins}min`;
+}
