@@ -21,6 +21,14 @@ export function applyPhoneMask(value: string): string {
 }
 
 /**
+ * Remover máscara de telefone - retorna apenas números
+ * Exemplo: "(11) 98765-4321" -> "11987654321"
+ */
+export function removePhoneMask(value: string): string {
+  return value.replace(/\D/g, '');
+}
+
+/**
  * Aplicar máscara de CEP 99999-999
  */
 export function applyZipCodeMask(value: string): string {

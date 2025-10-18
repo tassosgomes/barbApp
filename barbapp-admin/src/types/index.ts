@@ -28,6 +28,14 @@ export type {
 	UpdateBarberRequest,
 } from './barber';
 
+// Barbeiro types (aliases from Task 9.0)
+export type {
+	Barbeiro,
+	CreateBarbeiroInput,
+	UpdateBarbeiroInput,
+	ListBarbeirosParams,
+} from './barbeiro';
+
 // Service types
 export type {
 	BarbershopService,
