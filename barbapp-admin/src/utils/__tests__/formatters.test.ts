@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { formatCurrency, formatDuration } from '../formatters';
+import { formatCurrency, formatDuration, formatDateTime, formatDateOnly, formatTimeOnly } from '../formatters';
 
 describe('formatters', () => {
   describe('formatCurrency', () => {
@@ -72,6 +72,39 @@ describe('formatters', () => {
 
     it('formata 1 hora e 1 minuto', () => {
       expect(formatDuration(61)).toBe('1h 1min');
+    });
+  });
+
+  describe('formatDateTime', () => {
+    it('formata data e hora corretamente', () => {
+      const isoDate = '2024-01-15T14:30:00Z';
+      const formatted = formatDateTime(isoDate);
+      // Formato PT-BR: dd/MM/yyyy, HH:mm (com vírgula)
+      expect(formatted).toMatch(/\d{2}\/\d{2}\/\d{4},\s\d{2}:\d{2}/);
+    });
+
+    it('formata data com timezone', () => {
+      const isoDate = '2024-12-25T09:00:00-03:00';
+      const formatted = formatDateTime(isoDate);
+      expect(formatted).toMatch(/\d{2}\/\d{2}\/\d{4},\s\d{2}:\d{2}/);
+    });
+  });
+
+  describe('formatDateOnly', () => {
+    it('formata apenas a data', () => {
+      const isoDate = '2024-01-15';
+      const formatted = formatDateOnly(isoDate);
+      expect(formatted).toMatch(/\d{2}\/\d{2}\/\d{4}/);
+      expect(formatted).not.toContain(':');
+    });
+  });
+
+  describe('formatTimeOnly', () => {
+    it('formata apenas a hora', () => {
+      const isoDate = '2024-01-15T14:30:00Z';
+      const formatted = formatTimeOnly(isoDate);
+      expect(formatted).toMatch(/\d{2}:\d{2}/);
+      expect(formatted).not.toContain('/');
     });
   });
 });
