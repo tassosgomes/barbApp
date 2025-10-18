@@ -31,6 +31,12 @@ public record AuthResponse
     public string NomeBarbearia { get; init; } = string.Empty;
 
     /// <summary>
+    /// Código da barbearia (null para AdminCentral)
+    /// </summary>
+    /// <example>6SJJRFPD</example>
+    public string? CodigoBarbearia { get; init; }
+
+    /// <summary>
     /// Data e hora de expiração do token
     /// </summary>
     /// <example>2024-01-15T18:00:00Z</example>

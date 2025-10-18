@@ -55,6 +55,7 @@ public class AuthenticateAdminBarbeariaUseCase : IAuthenticateAdminBarbeariaUseC
             TipoUsuario = "AdminBarbearia",
             BarbeariaId = barbearia.Id,
             NomeBarbearia = barbearia.Name,
+            CodigoBarbearia = barbearia.Code.Value,
             ExpiresAt = token.ExpiresAt
         };
     }

@@ -10,7 +10,18 @@ export interface LoginAdminBarbeariaRequest {
 }
 
 /**
- * Response from Admin Barbearia login endpoint
+ * Response from Admin Barbearia login endpoint (from backend)
+ */
+interface BackendAuthResponse {
+  token: string;
+  barbeariaId: string;
+  nomeBarbearia: string;
+  codigoBarbearia: string;
+  expiresAt: string;
+}
+
+/**
+ * Response from Admin Barbearia login endpoint (mapped to frontend format)
  */
 export interface LoginAdminBarbeariaResponse {
   token: string;
@@ -35,7 +46,7 @@ export const adminBarbeariaAuthService = {
    * @returns Authentication response with token and barbershop info
    */
   login: async (request: LoginAdminBarbeariaRequest): Promise<LoginAdminBarbeariaResponse> => {
-    const response = await api.post<LoginAdminBarbeariaResponse>(
+    const response = await api.post<BackendAuthResponse>(
       '/auth/admin-barbearia/login',
       request
     );
@@ -43,7 +54,14 @@ export const adminBarbeariaAuthService = {
     // Store token in localStorage
     localStorage.setItem(TOKEN_KEY, response.data.token);
 
-    return response.data;
+    // Map backend response to frontend format
+    return {
+      token: response.data.token,
+      barbeariaId: response.data.barbeariaId,
+      nome: response.data.nomeBarbearia,
+      codigo: response.data.codigoBarbearia,
+      expiresAt: response.data.expiresAt,
+    };
   },
 
   /**
