@@ -160,3 +160,59 @@ export function formatDuration(minutes: number): string {
 
   return `${mins}min`;
 }
+
+/**
+ * Formatar data e hora ISO para formato brasileiro
+ * 
+ * @param isoDateTime - String de data/hora em formato ISO 8601
+ * @returns String formatada "dd/MM/yyyy HH:mm"
+ * 
+ * @example
+ * formatDateTime('2024-01-15T14:30:00Z') // "15/01/2024 14:30"
+ * formatDateTime('2024-12-25T09:00:00-03:00') // "25/12/2024 09:00"
+ */
+export function formatDateTime(isoDateTime: string): string {
+  const date = new Date(isoDateTime);
+  return new Intl.DateTimeFormat('pt-BR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(date);
+}
+
+/**
+ * Formatar apenas a data ISO para formato brasileiro
+ * 
+ * @param isoDate - String de data em formato ISO
+ * @returns String formatada "dd/MM/yyyy"
+ * 
+ * @example
+ * formatDateOnly('2024-01-15') // "15/01/2024"
+ */
+export function formatDateOnly(isoDate: string): string {
+  const date = new Date(isoDate);
+  return new Intl.DateTimeFormat('pt-BR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  }).format(date);
+}
+
+/**
+ * Formatar apenas a hora ISO para formato brasileiro
+ * 
+ * @param isoDateTime - String de data/hora em formato ISO
+ * @returns String formatada "HH:mm"
+ * 
+ * @example
+ * formatTimeOnly('2024-01-15T14:30:00Z') // "14:30"
+ */
+export function formatTimeOnly(isoDateTime: string): string {
+  const date = new Date(isoDateTime);
+  return new Intl.DateTimeFormat('pt-BR', {
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(date);
+}
