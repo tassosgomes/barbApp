@@ -43,6 +43,16 @@ export type {
 	UpdateServiceRequest,
 } from './service';
 
+// Servico types (aliases from Task 11.0)
+export type {
+	Servico,
+	CreateServicoInput,
+	UpdateServicoInput,
+	ListServicosParams,
+	ServicoSummary,
+	ServicoFilters,
+} from './servico';
+
 // Schedule types
 export type {
 	Appointment,

@@ -4,3 +4,4 @@ export { barbersService } from './barbers.service';
 export { barbeiroService } from './barbeiro.service';
 export { scheduleService } from './schedule.service';
 export { servicesService } from './services.service';
+export { servicoService } from './servico.service';
