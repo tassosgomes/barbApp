@@ -98,7 +98,7 @@ describe('useBarbeariaCode Hook', () => {
 
   it('should handle 404 error (barbearia not found)', async () => {
     const error = new Error('Barbearia não encontrada');
-    (error as any).status = 404;
+    Object.assign(error, { status: 404 });
 
     mockUseParams.mockReturnValue({ codigo: 'INVALIDX' }); // Valid format (8 chars, uppercase) but will fail API call
     mockBarbershopService.validateCode.mockRejectedValue(error);
@@ -115,7 +115,7 @@ describe('useBarbeariaCode Hook', () => {
 
   it('should handle 403 error (barbearia inactive)', async () => {
     const error = new Error('Barbearia temporariamente indisponível');
-    (error as any).status = 403;
+    Object.assign(error, { status: 403 });
 
     mockUseParams.mockReturnValue({ codigo: 'INACTIVE' });
     mockBarbershopService.validateCode.mockRejectedValue(error);
