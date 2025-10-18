@@ -40,10 +40,11 @@ export function LoginAdminBarbearia() {
       }),
     onSuccess: (response) => {
       // Store barbershop context
+      // Use codigo from hook instead of response (backend may not return it)
       setBarbearia({
         barbeariaId: response.barbeariaId,
         nome: response.nome,
-        codigo: response.codigo,
+        codigo: codigo!,
         isActive: true,
       });
 
