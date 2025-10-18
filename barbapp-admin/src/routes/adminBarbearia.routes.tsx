@@ -1,34 +1,56 @@
 import { RouteObject } from 'react-router-dom';
 import { LoginAdminBarbearia } from '@/pages/LoginAdminBarbearia';
-
-/**
- * Temporary Dashboard component for testing
- */
-function TempDashboard() {
-  return (
-    <div className="flex min-h-screen items-center justify-center">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold">🎉 Dashboard Admin Barbearia</h1>
-        <p className="mt-4 text-xl">Login realizado com sucesso!</p>
-        <p className="mt-2 text-gray-600">Esta é uma página temporária para testes.</p>
-      </div>
-    </div>
-  );
-}
+import { ProtectedBarbeariaRoute } from '@/components/ProtectedBarbeariaRoute';
+import { AdminBarbeariaLayout } from '@/layouts/AdminBarbeariaLayout';
+import { Dashboard } from '@/pages/Dashboard';
+import { BarbeirosPage } from '@/pages/Barbeiros';
+import { ServicosPage } from '@/pages/Servicos';
+import { AgendaPage } from '@/pages/Agenda';
 
 /**
  * Routes for Admin Barbearia
- * All routes are prefixed with /:codigo
+ * All routes are prefixed with /:codigo for tenant isolation
+ *
+ * Structure:
+ * - /:codigo/login - Public login page
+ * - /:codigo/* - Protected routes (require authentication)
+ *   - dashboard - Main dashboard with metrics
+ *   - barbeiros - Barbers management (placeholder)
+ *   - servicos - Services management (placeholder)
+ *   - agenda - Schedule view (placeholder)
  */
 export const adminBarbeariaRoutes: RouteObject[] = [
+  // Public login route
   {
     path: '/:codigo/login',
     element: <LoginAdminBarbearia />,
   },
+
+  // Protected routes with layout
   {
-    path: '/:codigo/dashboard',
-    element: <TempDashboard />,
+    path: '/:codigo',
+    element: (
+      <ProtectedBarbeariaRoute>
+        <AdminBarbeariaLayout />
+      </ProtectedBarbeariaRoute>
+    ),
+    children: [
+      {
+        path: 'dashboard',
+        element: <Dashboard />,
+      },
+      {
+        path: 'barbeiros',
+        element: <BarbeirosPage />,
+      },
+      {
+        path: 'servicos',
+        element: <ServicosPage />,
+      },
+      {
+        path: 'agenda',
+        element: <AgendaPage />,
+      },
+    ],
   },
-  // TODO: Add protected routes for dashboard, barbers, services, schedule
-  // These will be added in task 7.0
 ];
