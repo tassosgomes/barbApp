@@ -3,7 +3,7 @@ import { LoginAdminBarbearia } from '@/pages/LoginAdminBarbearia';
 import { ProtectedBarbeariaRoute } from '@/components/ProtectedBarbeariaRoute';
 import { AdminBarbeariaLayout } from '@/layouts/AdminBarbeariaLayout';
 import { Dashboard } from '@/pages/Dashboard';
-import { BarbeirosPage } from '@/pages/Barbeiros';
+import { BarbeirosListPage, BarbeiroFormPage } from '@/pages/Barbeiros';
 import { ServicosPage } from '@/pages/Servicos';
 import { AgendaPage } from '@/pages/Agenda';
 
@@ -41,7 +41,15 @@ export const adminBarbeariaRoutes: RouteObject[] = [
       },
       {
         path: 'barbeiros',
-        element: <BarbeirosPage />,
+        element: <BarbeirosListPage />,
+      },
+      {
+        path: 'barbeiros/novo',
+        element: <BarbeiroFormPage />,
+      },
+      {
+        path: 'barbeiros/:id',
+        element: <BarbeiroFormPage />,
       },
       {
         path: 'servicos',
