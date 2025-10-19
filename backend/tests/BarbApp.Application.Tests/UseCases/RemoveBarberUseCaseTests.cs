@@ -2,6 +2,7 @@ using BarbApp.Application.Interfaces;
 using BarbApp.Application.Interfaces.UseCases;
 using BarbApp.Application.UseCases;
 using BarbApp.Domain.Entities;
+using BarbApp.Domain.Enums;
 using BarbApp.Domain.Exceptions;
 using BarbApp.Domain.Interfaces;
 using BarbApp.Domain.Interfaces.Repositories;
@@ -49,12 +50,12 @@ public class RemoveBarberUseCaseTests
         var appointment1 = (Appointment)Activator.CreateInstance(typeof(Appointment), true)!;
         typeof(Appointment).GetProperty("Id")!.SetValue(appointment1, Guid.NewGuid());
         typeof(Appointment).GetProperty("BarberId")!.SetValue(appointment1, barberId);
-        typeof(Appointment).GetProperty("Status")!.SetValue(appointment1, "Confirmed");
+        typeof(Appointment).GetProperty("Status")!.SetValue(appointment1, AppointmentStatus.Confirmed);
         
         var appointment2 = (Appointment)Activator.CreateInstance(typeof(Appointment), true)!;
         typeof(Appointment).GetProperty("Id")!.SetValue(appointment2, Guid.NewGuid());
         typeof(Appointment).GetProperty("BarberId")!.SetValue(appointment2, barberId);
-        typeof(Appointment).GetProperty("Status")!.SetValue(appointment2, "Pending");
+        typeof(Appointment).GetProperty("Status")!.SetValue(appointment2, AppointmentStatus.Pending);
         
         var futureAppointments = new List<Appointment> { appointment1, appointment2 };
 

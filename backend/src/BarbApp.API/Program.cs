@@ -159,6 +159,11 @@ builder.Services.AddScoped<IUpdateBarbershopServiceUseCase, UpdateBarbershopServ
 builder.Services.AddScoped<IDeleteBarbershopServiceUseCase, DeleteBarbershopServiceUseCase>();
 builder.Services.AddScoped<IListBarbershopServicesUseCase, ListBarbershopServicesUseCase>();
 builder.Services.AddScoped<IGetBarbershopServiceByIdUseCase, GetBarbershopServiceByIdUseCase>();
+builder.Services.AddScoped<IGetBarberScheduleUseCase, GetBarberScheduleUseCase>();
+builder.Services.AddScoped<IGetAppointmentDetailsUseCase, GetAppointmentDetailsUseCase>();
+builder.Services.AddScoped<IConfirmAppointmentUseCase, ConfirmAppointmentUseCase>();
+builder.Services.AddScoped<ICancelAppointmentUseCase, CancelAppointmentUseCase>();
+builder.Services.AddScoped<ICompleteAppointmentUseCase, CompleteAppointmentUseCase>();
 
 // ══════════════════════════════════════════════════════════
 // AUTHENTICATION & AUTHORIZATION
