@@ -1,13 +1,109 @@
-# BarbApp API Documentation
+# BarbApp Backend
 
-## Visão Geral
-API REST para sistema de gerenciamento de barbearias com suporte multi-tenant.
+## 📋 Visão Geral
+API REST em .NET 8 para sistema de gerenciamento de barbearias com suporte multi-tenant, seguindo os princípios de Clean Architecture.
 
-## Base URL
-- **Development**: `http://localhost:5000`
-- **Production**: `https://api.barbapp.com`
+## 📚 Documentação
 
-## Autenticação
+- **[Endpoints da API](./endpoints.md)** - Documentação completa de todos os endpoints com exemplos
+- **[Schema do Banco de Dados](./bd_schema.md)** - Estrutura das tabelas e relacionamentos
+- **[Roles e Permissões](./roles.md)** - Mapeamento de acessos por perfil de usuário
+
+## 🏗️ Arquitetura
+
+O projeto segue Clean Architecture com separação clara de responsabilidades em camadas:
+
+```
+backend/
+├── BarbApp.sln
+├── src/
+│   ├── BarbApp.Domain/          # Domínio (entidades, value objects, interfaces)
+│   ├── BarbApp.Application/     # Casos de uso e lógica de aplicação
+│   ├── BarbApp.Infrastructure/  # Implementações (EF Core, JWT, etc)
+│   └── BarbApp.API/            # Controllers e endpoints
+└── tests/
+    ├── BarbApp.Domain.Tests/
+    ├── BarbApp.Application.Tests/
+    └── BarbApp.IntegrationTests/
+```
+
+### Fluxo de Dependências
+
+```
+API → Infrastructure → Application → Domain
+                    ↓
+                  Domain (Core - sem dependências)
+```
+
+**Princípio**: As dependências sempre apontam para dentro (em direção ao Domain).
+
+### Camadas
+
+#### 🎯 BarbApp.Domain
+- **Responsabilidade**: Núcleo do negócio, regras de domínio, entidades e value objects
+- **Características**: Sem dependências externas (zero acoplamento)
+- **Exemplos**: `BarbeariaCode`, `Barbershop`, `Barber`, `Customer`, `ITenantContext`
+
+#### 📋 BarbApp.Application
+- **Responsabilidade**: Casos de uso, orquestração de regras de negócio, DTOs e validações
+- **Características**: Depende apenas do Domain
+- **Exemplos**: Use Cases, DTOs, Validações com FluentValidation
+- **Dependências**: `BarbApp.Domain`
+
+#### 🔧 BarbApp.Infrastructure
+- **Responsabilidade**: Implementações concretas, acesso a dados, serviços externos
+- **Características**: Entity Framework Core, Repositórios, Serviços de autenticação
+- **Dependências**: `BarbApp.Domain`, `BarbApp.Application`, EF Core, BCrypt
+
+#### 🌐 BarbApp.API
+- **Responsabilidade**: Camada de apresentação, endpoints HTTP, configuração da aplicação
+- **Características**: Controllers, DI, Middlewares, Swagger
+- **Dependências**: `BarbApp.Application`, `BarbApp.Infrastructure`
+
+## 🚀 Como Executar
+
+### Pré-requisitos
+- .NET 8 SDK
+- PostgreSQL (para produção/desenvolvimento completo)
+
+### Build
+```bash
+dotnet build
+```
+
+### Executar API
+```bash
+cd src/BarbApp.API
+dotnet run
+```
+
+Ou usando watch mode (hot reload):
+```bash
+cd src/BarbApp.API
+dotnet watch run
+```
+
+A API estará disponível em: `https://localhost:7xxx` ou `http://localhost:5xxx`
+
+### Executar Testes
+```bash
+# Todos os testes
+dotnet test
+
+# Com verbosidade detalhada
+dotnet test --verbosity detailed
+
+# Apenas um projeto específico
+dotnet test tests/BarbApp.Domain.Tests
+```
+
+### Executar com Coverage
+```bash
+dotnet test /p:CollectCoverage=true
+```
+
+## 🔐 Autenticação
+
 Todos os endpoints protegidos requerem autenticação JWT Bearer token.
 
 ### Obtendo um Token
@@ -470,21 +566,13 @@ Precedência de configuração: variáveis de ambiente sobrescrevem `appsettings
 dotnet test /p:CollectCoverage=true
 ```
 
-## 📚 Documentação Adicional
-
-- [Estrutura Detalhada](src/README.md)
-- [Variáveis de Ambiente](../docs/environment-variables.md)
-- [Regras de Código](../rules/code-standard.md)
-- [PRD Sistema Multi-tenant](../tasks/prd-sistema-multi-tenant/prd.md)
-- [Tech Spec](../tasks/prd-sistema-multi-tenant/techspec.md)
-
-## 🛠️ Comandos Úteis
+## ️ Comandos Úteis
 
 ```bash
 # Adicionar novo pacote
 dotnet add src/BarbApp.Infrastructure package Npgsql.EntityFrameworkCore.PostgreSQL
 
-# Criar nova migration (quando EF Core estiver configurado)
+# Criar nova migration
 dotnet ef migrations add NomeDaMigration --project src/BarbApp.Infrastructure --startup-project src/BarbApp.API
 
 # Aplicar migrations
@@ -497,11 +585,49 @@ dotnet clean
 dotnet restore
 ```
 
-## 🎯 Próximos Passos
+## 📚 Documentação Adicional
 
-1. ✅ Setup e Dependências (Tarefa 1.0)
-2. ⬜ Implementar Domain Layer Base (Tarefa 2.0)
-3. ⬜ Implementar Entidades de Usuários (Tarefa 3.0)
-4. ⬜ Configurar DbContext e Migrations (Tarefa 4.0)
+- [Variáveis de Ambiente](../docs/environment-variables.md)
+- [Regras de Código](../rules/code-standard.md)
+- [Guia Admin Barbearia](../docs/admin-barbearia-guide.md)
+- [Admin Central vs Admin Barbearia](../docs/admin-central-vs-admin-barbearia.md)
+- [PRD Sistema Multi-tenant](../tasks/prd-sistema-multi-tenant/prd.md)
+- [Tech Spec](../tasks/prd-sistema-multi-tenant/techspec.md)
+- [Postman Collection](./BarbApp.postman_collection.json)
 
-Ver roadmap completo em: [../tasks/prd-sistema-multi-tenant/tasks.md](../tasks/prd-sistema-multi-tenant/tasks.md)
+## 🌐 Swagger UI
+
+Acesse a documentação interativa em: http://localhost:5000/swagger
+
+## 📦 Pacotes Principais
+
+| Pacote | Versão | Propósito |
+|--------|--------|-----------|
+| Microsoft.AspNetCore.Authentication.JwtBearer | 8.0.10 | Autenticação JWT |
+| BCrypt.Net-Next | 4.0.3 | Hash de senhas |
+| FluentValidation | 11.x | Validação de DTOs |
+| FluentAssertions | 8.7.1 | Asserções em testes |
+| Moq | 4.20.72 | Mocking em testes |
+
+## 🔧 Convenções de Código
+
+Siga as regras definidas em `../rules/code-standard.md`:
+
+- **Naming**:
+  - Classes/Interfaces: `PascalCase`
+  - Métodos/Funções: `camelCase`
+  - Variáveis: `camelCase`
+  - Constantes: `PascalCase`
+  - Arquivos/Diretórios: `kebab-case`
+
+- **Estrutura**:
+  - Métodos < 50 linhas
+  - Classes < 300 linhas
+  - Early returns
+  - Evitar aninhamento > 2 níveis
+
+## 📖 Referências
+
+- [Clean Architecture - Uncle Bob](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
+- [ASP.NET Core Best Practices](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/best-practices)
+- [Entity Framework Core](https://learn.microsoft.com/en-us/ef/core/)
