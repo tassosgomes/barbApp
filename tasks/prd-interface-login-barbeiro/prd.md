@@ -2,7 +2,7 @@
 
 ## Visão Geral
 
-A Interface de Login do Barbeiro é a porta de entrada para profissionais acessarem o sistema de agendamentos. Esta interface deve ser simples, mobile-first e permitir autenticação usando telefone e código da barbearia. O sistema já possui o backend de autenticação implementado (PRD Multi-tenant), precisando apenas da implementação da interface frontend.
+A Interface de Login do Barbeiro é a porta de entrada para profissionais acessarem o sistema de agendamentos. Esta interface deve ser simples, mobile-first e permitir autenticação usando e-mail e senha. O sistema já possui o backend de autenticação implementado (PRD Multi-tenant), precisando apenas da implementação da interface frontend.
 
 ## Objetivos
 
@@ -23,16 +23,15 @@ Profissional que presta serviços de barbearia e precisa acessar sua agenda de t
 
 **Histórias Principais:**
 
-- Como Barbeiro, eu quero **fazer login com meu telefone e código da barbearia** para que eu possa acessar minha agenda de forma rápida e segura
+- Como Barbeiro, eu quero **fazer login com meu e-mail e senha** para que eu possa acessar minha agenda de forma rápida e segura
 - Como Barbeiro, eu quero **ver validação em tempo real dos campos** para que eu saiba imediatamente se há erros no que digitei
 - Como Barbeiro, eu quero **ver mensagens de erro claras** quando o login falha para que eu entenda o que preciso corrigir
-- Como Barbeiro, eu quero **que o sistema lembre do código da barbearia** (quando tenho apenas uma) para que eu não precise digitá-lo sempre
+- Como Barbeiro, eu quero **que o sistema lembre minha sessão** (dentro do prazo de expiração) para não precisar autenticar repetidamente
 
 **Casos de Uso Secundários:**
 
 - Como Barbeiro, eu quero **ver um indicador de carregamento** durante o login para saber que o sistema está processando
-- Como Barbeiro, eu quero **ter campos otimizados para mobile** (teclado numérico para telefone) para facilitar a digitação
-- Como Barbeiro novo, eu quero **ver instruções claras** sobre onde encontrar o código da barbearia para fazer meu primeiro login
+- Como Barbeiro, eu quero **ter campos otimizados para mobile** (teclado apropriado para e-mail; mostrar/ocultar senha) para facilitar a digitação
 - Como Barbeiro, eu quero **fazer logout facilmente** quando termino meu trabalho
 
 ## Funcionalidades Principais
@@ -45,46 +44,44 @@ Profissional que presta serviços de barbearia e precisa acessar sua agenda de t
 
 **Como funciona**:
 - Barbeiro acessa aplicação
-- Vê tela de login com campos de código da barbearia e telefone
+- Vê tela de login com campos de e-mail e senha
 - Preenche os campos
 - Clica em "Entrar"
-- Sistema valida e redireciona para agenda
+- Sistema valida e redireciona para agenda (ou seleção de barbearia se multi-vínculo)
 
 **Requisitos Funcionais:**
 
-1.1. A tela deve ter campo "Código da Barbearia" (texto)
+1.1. A tela deve ter campo "E-mail" (teclado apropriado; validação de formato)
 
-1.2. A tela deve ter campo "Telefone" com máscara (formato brasileiro: (XX) XXXXX-XXXX)
+1.2. A tela deve ter campo "Senha" com opção mostrar/ocultar
 
-1.3. Campo telefone deve abrir teclado numérico em dispositivos mobile
+1.3. Botão "Entrar" deve estar desabilitado até todos os campos serem preenchidos corretamente
 
-1.4. Botão "Entrar" deve estar desabilitado até todos os campos serem preenchidos corretamente
+1.4. Ao clicar em "Entrar", sistema deve exibir loading e desabilitar formulário
 
-1.5. Ao clicar em "Entrar", sistema deve exibir loading e desabilitar formulário
-
-1.6. Sistema deve fazer requisição `POST /api/auth/barbeiro/login` com dados:
+1.5. Sistema deve fazer requisição `POST /api/auth/barbeiro/login` com dados:
 ```json
 {
-  "barbershopCode": "ABC123",
-  "phone": "+5511999999999"
+  "email": "barbeiro@example.com",
+  "password": "SenhaSegura123!"
 }
 ```
 
-1.7. Em caso de sucesso (200), armazenar token JWT no localStorage
+1.6. Em caso de sucesso (200), armazenar token JWT com segurança
 
-1.8. Após armazenar token, redirecionar para:
+1.7. Após armazenar token, redirecionar para:
    - `/barber/schedule` se barbeiro trabalha em apenas 1 barbearia
    - `/barber/select-barbershop` se barbeiro trabalha em múltiplas
 
-1.9. Em caso de erro (401), exibir mensagem: "Código ou telefone inválidos. Verifique e tente novamente."
+1.8. Em caso de erro (401), exibir mensagem: "E-mail ou senha inválidos. Verifique e tente novamente."
 
-1.10. Em caso de erro (500), exibir mensagem: "Erro ao conectar. Tente novamente em instantes."
+1.9. Em caso de erro (500), exibir mensagem: "Erro ao conectar. Tente novamente em instantes."
 
-1.11. Validações no frontend:
-   - Código da barbearia: obrigatório, mínimo 6 caracteres
-   - Telefone: obrigatório, formato válido brasileiro
+1.10. Validações no frontend:
+   - E-mail: obrigatório, formato válido
+   - Senha: obrigatória
 
-1.12. Exibir mensagens de validação abaixo de cada campo
+1.11. Exibir mensagens de validação abaixo de cada campo
 
 ### 2. Persistência de Sessão
 
@@ -100,11 +97,11 @@ Profissional que presta serviços de barbearia e precisa acessar sua agenda de t
 
 **Requisitos Funcionais:**
 
-2.1. Token JWT deve ser armazenado no `localStorage` com chave `barbapp-barber-token`
+2.1. Token JWT deve ser armazenado no `localStorage` (ou armazenamento seguro no mobile) com chave `barbapp-barber-token`
 
 2.2. Ao carregar aplicação, verificar se existe token no localStorage
 
-2.3. Se token existe, tentar validá-lo fazendo requisição autenticada (ex: `GET /api/barber/profile` ou similar)
+2.3. Se token existe, tentar validá-lo fazendo requisição autenticada (ex: endpoint de perfil `GET /api/auth/me` se disponível; ou via `/api/schedule/my-schedule`)
 
 2.4. Se validação bem-sucedida, redirecionar para última tela acessada ou `/barber/schedule`
 
@@ -166,8 +163,7 @@ Profissional que presta serviços de barbearia e precisa acessar sua agenda de t
 4.7. Erros de API devem ser exibidos em toast/alert no topo da tela
 
 4.8. Mensagens de erro devem ser específicas:
-   - "Telefone inválido. Use o formato (XX) XXXXX-XXXX"
-   - "Código da barbearia muito curto. Mínimo 6 caracteres"
+   - "E-mail inválido. Use um formato válido (ex.: nome@dominio.com)"
    - "Este campo é obrigatório"
 
 ### 5. Primeiro Acesso (Onboarding Mínimo)
@@ -182,11 +178,11 @@ Profissional que presta serviços de barbearia e precisa acessar sua agenda de t
 
 **Requisitos Funcionais:**
 
-5.1. Abaixo do formulário, exibir texto: "Primeiro acesso? Peça o código da barbearia ao seu gerente."
+5.1. Abaixo do formulário, exibir texto: "Primeiro acesso? Peça ao administrador da sua barbearia para criar/habilitar seu usuário e definir sua senha."
 
 5.2. Link "Precisa de ajuda?" abre modal ou página com:
-   - "O código da barbearia é fornecido pelo administrador da sua barbearia"
-   - "Use seu número de telefone cadastrado para entrar"
+   - "Seu usuário é seu e-mail cadastrado"
+   - "Sua senha é definida pelo administrador ou via recuperação (pós-MVP)"
    - "Em caso de dúvidas, contate o administrador"
 
 5.3. Modal/página deve ter botão "Entendi" para fechar
@@ -204,24 +200,23 @@ Profissional que presta serviços de barbearia e precisa acessar sua agenda de t
 1. Barbeiro abre aplicação
 2. Sistema verifica localStorage - não há token ou está expirado
 3. Exibe tela de login
-4. Barbeiro digita código da barbearia: "BARB001"
-5. Barbeiro digita telefone: "(11) 99999-9999"
-6. Campos são validados e botão "Entrar" fica habilitado
-7. Barbeiro clica em "Entrar"
-8. Botão mostra loading e fica desabilitado
-9. Sistema envia requisição ao backend
-10. Backend valida e retorna token JWT
-11. Frontend armazena token no localStorage
-12. Sistema redireciona para `/barber/schedule`
-13. Barbeiro vê sua agenda do dia
+4. Barbeiro digita e-mail e senha
+5. Campos são validados e botão "Entrar" fica habilitado
+6. Barbeiro clica em "Entrar"
+7. Botão mostra loading e fica desabilitado
+8. Sistema envia requisição ao backend (`POST /api/auth/barbeiro/login`)
+9. Backend valida e retorna token JWT
+10. Frontend armazena token no localStorage
+11. Sistema redireciona para `/barber/schedule` (ou seleção de barbearia)
+12. Barbeiro vê sua agenda do dia
 
 ### Fluxo Alternativo: Erro de Autenticação
 
-1. Barbeiro digita código ou telefone incorretos
+1. Barbeiro digita e-mail ou senha incorretos
 2. Clica em "Entrar"
 3. Sistema tenta autenticar
 4. Backend retorna 401 Unauthorized
-5. Frontend exibe toast vermelho: "Código ou telefone inválidos. Verifique e tente novamente."
+5. Frontend exibe toast vermelho: "E-mail ou senha inválidos. Verifique e tente novamente."
 6. Campos permanecem preenchidos (não limpar)
 7. Barbeiro corrige dados e tenta novamente
 
@@ -279,9 +274,9 @@ Para o MVP, seguir boas práticas básicas:
 - **Styling**: Tailwind CSS
 
 ### Autenticação
-- Login sem senha (apenas telefone + código da barbearia)
+- Login com e-mail e senha
 - Token JWT retornado pelo backend
-- Token armazenado em localStorage (MVP - considerações de segurança para versão futura)
+- Token armazenado em localStorage (MVP) ou armazenamento seguro no mobile
 - Token incluído em todas as requisições via interceptor Axios
 
 ### Integração com Backend
@@ -289,8 +284,8 @@ Para o MVP, seguir boas práticas básicas:
 - Input:
 ```typescript
 {
-  barbershopCode: string;
-  phone: string; // formato: +5511999999999
+  email: string;
+  password: string;
 }
 ```
 - Output (sucesso):
@@ -300,7 +295,7 @@ Para o MVP, seguir boas práticas básicas:
   user: {
     id: string;
     name: string;
-    phone: string;
+    email: string;
     role: "Barbeiro";
   }
 }
@@ -326,19 +321,19 @@ Para o MVP, seguir boas práticas básicas:
 
 ### Explicitamente Excluído do MVP
 
-- **Recuperação de Senha**: Não há senha no sistema, apenas telefone
+- **Recuperação de Senha**: Pós-MVP
 - **Cadastro de Novo Barbeiro**: Barbeiro é cadastrado pelo Admin da Barbearia
-- **Autenticação por SMS**: Validação de telefone por código SMS fica para Fase 2
+- **Autenticação por SMS**: Fase 2
 - **Login com Biometria**: Face ID, Touch ID ficam para versão futura
-- **Múltiplos Métodos de Login**: Apenas telefone + código (sem email, social login, etc.)
-- **Remember Me**: Sessão sempre persiste por 24h, sem opção de "lembrar"
+- **Múltiplos Métodos de Login**: Apenas e-mail + senha (sem social login)
+- **Remember Me**: Sessão persiste por 24h, sem opção de "lembrar"
 - **Histórico de Logins**: Não há registro de acessos no MVP
-- **Autenticação 2FA**: Autenticação de dois fatores fica para Fase 2
+- **Autenticação 2FA**: Fica para Fase 2
 - **Modo Offline**: Aplicação requer conexão para login
 
 ### Considerações Futuras (Pós-MVP)
 
-- Validação de telefone por SMS/WhatsApp
+- Recuperação de senha (e-mail) e/ou SMS
 - Biometria (Face ID/Touch ID)
 - Refresh token automático
 - Histórico de acessos e dispositivos
@@ -361,23 +356,21 @@ Para o MVP, seguir boas práticas básicas:
 
 5. **Refresh Token**: Backend implementa refresh token ou apenas access token de 24h?
 
-6. **Validação de Telefone**: Backend aceita qualquer formato de telefone ou espera formato específico (+55...)?
+6. **Endpoint de Perfil**: Teremos `GET /api/auth/me` para validar sessão e recuperar perfil/claims?
 
-7. **Redirect após Login**: Como saber se barbeiro tem múltiplas barbearias? Há endpoint específico ou vem no response do login?
+7. **Redirect após Login**: Como detectar multi-vínculo? Usar `GET /api/barbeiro/barbearias` e, se >1, direcionar à seleção?
 
 ### Questões de UX
 
-8. **Persistência de Código**: Salvar código da barbearia no localStorage para facilitar logins futuros?
+8. **Tela de Splash**: Mostrar logo/splash screen enquanto valida token ao abrir app?
 
-9. **Máscara de Telefone**: Permitir diferentes formatos (fixo/celular) ou apenas celular?
+9. **Manter conectado**: Exibir opção ou considerar implícito pela expiração do token?
 
-10. **Tela de Splash**: Mostrar logo/splash screen enquanto valida token ao abrir app?
-
-11. **Deep Links**: Suportar links diretos (ex: abrir agendamento específico) que requerem autenticação?
+10. **Deep Links**: Suportar links diretos (ex: abrir agendamento específico) que requerem autenticação?
 
 ---
 
 **Data de Criação**: 2025-10-19  
-**Versão**: 1.0  
+**Versão**: 1.1  
 **Status**: Rascunho para Revisão  
 **Dependências**: PRD Sistema Multi-tenant (Backend - DONE)
