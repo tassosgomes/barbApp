@@ -1,7 +1,8 @@
 ---
-status: pending
+status: completed
 parallelizable: false
 blocked_by: ["1.0"]
+completed_date: 2025-10-19
 ---
 
 <task_context>
@@ -25,11 +26,20 @@ Criar schema de `appointments`, configurações EF Core, Global Query Filter por
 - `AppointmentRepository` com métodos GetById, GetByBarberAndDate, Insert, Update
 
 ## Subtarefas
-- [ ] 2.1 Criar migration para `appointments`
-- [ ] 2.2 Implementar `AppointmentConfiguration`
-- [ ] 2.3 Adicionar DbSet e filtro global no DbContext
-- [ ] 2.4 Implementar `AppointmentRepository`
-- [ ] 2.5 Validar índices com EXPLAIN/ANALYZE simples
+- [x] 2.1 Criar migration para `appointments`
+- [x] 2.2 Implementar `AppointmentConfiguration`
+- [x] 2.3 Adicionar DbSet e filtro global no DbContext
+- [x] 2.4 Implementar `AppointmentRepository`
+- [x] 2.5 Validar índices com EXPLAIN/ANALYZE simples
+
+## ✅ Checklist de Conclusão
+- [x] 2.0 Infra/DB - Migration, EF Config, DbContext e AppointmentRepository ✅ CONCLUÍDA
+  - [x] Implementação completada
+  - [x] Definição da tarefa, PRD e tech spec validados
+  - [x] Análise de regras e conformidade verificadas
+  - [x] Revisão de código completada
+  - [x] Todos os testes passando (9/9)
+  - [x] Pronto para deploy
 
 ## Sequenciamento
 - Bloqueado por: 1.0
