@@ -75,3 +75,26 @@ Este controller gerencia os serviços oferecidos por uma barbearia. O acesso é 
 | `/api/barbershop-services/{id}`| `GET`    | `AdminBarbearia`   | Obtém os detalhes de um serviço.        |
 | `/api/barbershop-services/{id}`| `PUT`    | `AdminBarbearia`   | Atualiza as informações de um serviço.  |
 | `/api/barbershop-services/{id}`| `DELETE` | `AdminBarbearia`   | Remove um serviço da barbearia.         |
+
+---
+
+### 5. `ScheduleController`
+
+Este controller permite que barbeiros visualizem suas agendas. O acesso é restrito ao perfil `Barbeiro`.
+
+| Rota                        | Método | Perfil Permitido | Descrição                                                                 |
+| --------------------------- | ------ | ---------------- | ------------------------------------------------------------------------- |
+| `/api/schedule/my-schedule` | `GET`  | `Barbeiro`       | Obtém a agenda do barbeiro autenticado para uma data específica.          |
+
+---
+
+### 6. `AppointmentsController`
+
+Este controller permite que barbeiros gerenciem seus agendamentos (visualizar, confirmar, cancelar e concluir). O acesso é restrito ao perfil `Barbeiro`.
+
+| Rota                            | Método | Perfil Permitido | Descrição                                                                 |
+| ------------------------------- | ------ | ---------------- | ------------------------------------------------------------------------- |
+| `/api/appointments/{id}`        | `GET`  | `Barbeiro`       | Obtém detalhes de um agendamento específico do barbeiro.                  |
+| `/api/appointments/{id}/confirm`| `POST` | `Barbeiro`       | Confirma um agendamento pendente.                                         |
+| `/api/appointments/{id}/cancel` | `POST` | `Barbeiro`       | Cancela um agendamento (pendente ou confirmado).                          |
+| `/api/appointments/{id}/complete`| `POST` | `Barbeiro`      | Marca um agendamento confirmado como concluído.                           |

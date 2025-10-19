@@ -283,3 +283,74 @@ Este documento detalha todos os endpoints da API BarbApp, incluindo descrições
 - **Parâmetros de Entrada**:
   - `id` (Guid, na rota): ID do serviço.
 - **Parâmetros de Saída**: `204 No Content`.
+
+---
+
+## Agenda do Barbeiro (`/api/schedule`)
+
+### `GET /api/schedule/my-schedule`
+
+- **Descrição**: Retorna a agenda do barbeiro autenticado para uma data específica. O sistema extrai o `BarbeariaId` e `BarberId` do token JWT do barbeiro logado e retorna todos os agendamentos desse barbeiro naquela data, incluindo informações do cliente, serviço e status do agendamento.
+- **Role Necessária**: `Barbeiro`.
+- **Parâmetros de Entrada (Query)**:
+  - `date` (DateTime?): Data para consultar a agenda (formato: YYYY-MM-DD). Se não informado, utiliza a data atual.
+- **Parâmetros de Saída**: `BarberScheduleOutput`
+  - `Date` (DateTime): Data da agenda.
+  - `BarberId` (Guid): ID do barbeiro.
+  - `BarberName` (string): Nome do barbeiro.
+  - `Appointments` (List<BarberAppointmentOutput>): Lista de agendamentos.
+    - `Id` (Guid): ID do agendamento.
+    - `CustomerName` (string): Nome do cliente.
+    - `ServiceTitle` (string): Nome do serviço.
+    - `StartTime` (DateTime): Horário de início.
+    - `EndTime` (DateTime): Horário de término.
+    - `Status` (AppointmentStatus): Status do agendamento (Pending, Confirmed, Completed, Cancelled).
+
+---
+
+## Gerenciamento de Agendamentos (`/api/appointments`)
+
+### `GET /api/appointments/{id}`
+
+- **Descrição**: Retorna os detalhes completos de um agendamento específico. O sistema valida que o agendamento pertence ao barbeiro autenticado antes de retornar os dados.
+- **Role Necessária**: `Barbeiro`.
+- **Parâmetros de Entrada**:
+  - `id` (Guid, na rota): ID do agendamento.
+- **Parâmetros de Saída**: `AppointmentDetailsOutput`
+  - `Id` (Guid): ID do agendamento.
+  - `CustomerName` (string): Nome do cliente.
+  - `CustomerPhone` (string): Telefone do cliente.
+  - `ServiceTitle` (string): Nome do serviço.
+  - `ServicePrice` (decimal): Preço do serviço.
+  - `ServiceDurationMinutes` (int): Duração do serviço em minutos.
+  - `StartTime` (DateTime): Horário de início.
+  - `EndTime` (DateTime): Horário de término.
+  - `Status` (AppointmentStatus): Status atual.
+  - `CreatedAt` (DateTime): Data de criação.
+  - `ConfirmedAt` (DateTime?): Data de confirmação (se confirmado).
+  - `CancelledAt` (DateTime?): Data de cancelamento (se cancelado).
+  - `CompletedAt` (DateTime?): Data de conclusão (se concluído).
+
+### `POST /api/appointments/{id}/confirm`
+
+- **Descrição**: Confirma um agendamento que está com status "Pending". O sistema valida a propriedade do agendamento e a transição de status válida. Se o status já foi alterado para outro valor, retorna erro 409 (Conflict).
+- **Role Necessária**: `Barbeiro`.
+- **Parâmetros de Entrada**:
+  - `id` (Guid, na rota): ID do agendamento.
+- **Parâmetros de Saída**: `AppointmentDetailsOutput` (com status atualizado para "Confirmed").
+
+### `POST /api/appointments/{id}/cancel`
+
+- **Descrição**: Cancela um agendamento que está com status "Pending" ou "Confirmed". O sistema valida a propriedade do agendamento e a transição de status válida. Agendamentos já concluídos ou cancelados não podem ser cancelados novamente.
+- **Role Necessária**: `Barbeiro`.
+- **Parâmetros de Entrada**:
+  - `id` (Guid, na rota): ID do agendamento.
+- **Parâmetros de Saída**: `AppointmentDetailsOutput` (com status atualizado para "Cancelled").
+
+### `POST /api/appointments/{id}/complete`
+
+- **Descrição**: Marca um agendamento confirmado como concluído. O sistema valida que o agendamento está no status "Confirmed" e que o horário de início já passou. Se o agendamento ainda não começou, retorna erro 400 (Bad Request).
+- **Role Necessária**: `Barbeiro`.
+- **Parâmetros de Entrada**:
+  - `id` (Guid, na rota): ID do agendamento.
+- **Parâmetros de Saída**: `AppointmentDetailsOutput` (com status atualizado para "Completed").

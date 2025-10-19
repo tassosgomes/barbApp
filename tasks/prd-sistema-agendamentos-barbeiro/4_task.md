@@ -1,7 +1,8 @@
 ---
-status: pending
+status: completed
 parallelizable: true
 blocked_by: ["3.0"]
+completed_date: 2025-10-19
 ---
 
 <task_context>
@@ -26,10 +27,11 @@ Implementar controladores REST para agenda do barbeiro e ações de agendamentos
 - Swagger com exemplos
 
 ## Subtarefas
-- [ ] 4.1 Implementar `ScheduleController`
-- [ ] 4.2 Implementar `AppointmentsController`
-- [ ] 4.3 Configurar Authorization e policies
-- [ ] 4.4 Documentar no Swagger
+- [x] 4.1 Implementar `ScheduleController`
+- [x] 4.2 Implementar `AppointmentsController`
+- [x] 4.3 Configurar Authorization e policies
+- [x] 4.4 Documentar no Swagger
+- [x] 4.5 Documentar no arquivo `roles.md`
 
 ## Sequenciamento
 - Bloqueado por: 3.0
