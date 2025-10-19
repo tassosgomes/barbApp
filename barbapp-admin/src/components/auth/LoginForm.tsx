@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { getAuthErrorToast } from '@/lib/auth-errors';
+import { useState } from 'react';
 
 /**
  * Formulário de login para barbeiros
@@ -17,8 +19,10 @@ import { useToast } from '@/hooks/use-toast';
  * Features:
  * - Validação em tempo real com mensagens de erro claras
  * - Estados de loading durante autenticação
- * - Feedback visual de erros da API
+ * - Feedback visual de erros da API com mensagens contextuais
  * - Desabilitação de campos durante submit
+ * - Animações de erro (shake) para feedback visual
+ * - Acessibilidade completa (ARIA labels, keyboard navigation)
  * 
  * @example
  * ```tsx
@@ -28,6 +32,7 @@ import { useToast } from '@/hooks/use-toast';
 export function LoginForm() {
   const { login } = useAuth();
   const { toast } = useToast();
+  const [hasError, setHasError] = useState(false);
   
   const {
     register,
@@ -39,37 +44,37 @@ export function LoginForm() {
   
   const onSubmit = async (data: BarberLoginFormData) => {
     try {
+      setHasError(false);
       await login(data);
       // Navegação é feita automaticamente pelo useAuth
     } catch (error: any) {
-      // Tratamento de erros baseado no status HTTP
-      if (error.response?.status === 401) {
-        toast({
-          variant: 'destructive',
-          title: 'Erro de autenticação',
-          description: 'E-mail ou senha inválidos. Verifique e tente novamente.',
-        });
-      } else if (error.response?.status === 400) {
-        toast({
-          variant: 'destructive',
-          title: 'Dados inválidos',
-          description: 'Verifique se os dados estão corretos e tente novamente.',
-        });
-      } else {
-        toast({
-          variant: 'destructive',
-          title: 'Erro de conexão',
-          description: 'Não foi possível conectar ao servidor. Tente novamente em instantes.',
-        });
-      }
+      // Trigger shake animation
+      setHasError(true);
+      setTimeout(() => setHasError(false), 300);
+      
+      // Mostra mensagem de erro contextual
+      const { title, description } = getAuthErrorToast(error);
+      toast({
+        variant: 'destructive',
+        title,
+        description,
+      });
     }
   };
   
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" data-testid="login-form">
+    <form 
+      onSubmit={handleSubmit(onSubmit)} 
+      className={`space-y-4 ${hasError ? 'shake' : ''}`}
+      data-testid="login-form"
+      noValidate
+    >
       {/* Campo de E-mail */}
       <div className="space-y-2">
-        <Label htmlFor="email">E-mail</Label>
+        <Label htmlFor="email">
+          E-mail
+          <span className="sr-only">(obrigatório)</span>
+        </Label>
         <Input
           id="email"
           type="email"
@@ -77,11 +82,20 @@ export function LoginForm() {
           {...register('email')}
           placeholder="seu.email@exemplo.com"
           disabled={isSubmitting}
-          className={errors.email ? 'border-red-500' : ''}
+          className={`transition-smooth ${errors.email ? 'border-red-500 focus:ring-red-500' : ''}`}
+          style={{ fontSize: '16px' }} // Previne zoom no iOS
+          aria-invalid={!!errors.email}
+          aria-describedby={errors.email ? 'email-error' : undefined}
           data-testid="email-input"
         />
         {errors.email && (
-          <p className="text-sm text-red-600" role="alert" data-testid="email-error">
+          <p 
+            id="email-error"
+            className="text-sm text-red-600" 
+            role="alert" 
+            aria-live="polite"
+            data-testid="email-error"
+          >
             {errors.email.message}
           </p>
         )}
@@ -89,7 +103,10 @@ export function LoginForm() {
       
       {/* Campo de Senha */}
       <div className="space-y-2">
-        <Label htmlFor="password">Senha</Label>
+        <Label htmlFor="password">
+          Senha
+          <span className="sr-only">(obrigatório)</span>
+        </Label>
         <Input
           id="password"
           type="password"
@@ -97,11 +114,20 @@ export function LoginForm() {
           {...register('password')}
           placeholder="••••••"
           disabled={isSubmitting}
-          className={errors.password ? 'border-red-500' : ''}
+          className={`transition-smooth ${errors.password ? 'border-red-500 focus:ring-red-500' : ''}`}
+          style={{ fontSize: '16px' }} // Previne zoom no iOS
+          aria-invalid={!!errors.password}
+          aria-describedby={errors.password ? 'password-error' : undefined}
           data-testid="password-input"
         />
         {errors.password && (
-          <p className="text-sm text-red-600" role="alert" data-testid="password-error">
+          <p 
+            id="password-error"
+            className="text-sm text-red-600" 
+            role="alert"
+            aria-live="polite"
+            data-testid="password-error"
+          >
             {errors.password.message}
           </p>
         )}
@@ -110,14 +136,15 @@ export function LoginForm() {
       {/* Botão de Submit */}
       <Button
         type="submit"
-        className="w-full"
+        className="w-full min-h-[44px] transition-smooth" // Touch target adequado
         disabled={isSubmitting}
+        aria-busy={isSubmitting}
         data-testid="submit-button"
       >
         {isSubmitting ? (
           <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Entrando...
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
+            <span>Entrando...</span>
           </>
         ) : (
           'Entrar'

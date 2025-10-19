@@ -52,6 +52,17 @@ Requisitos funcionais:
 1.5 Persistir sessão por 24h; em token inválido/expirado, voltar ao login.
 1.6 Recuperação de senha e primeiro acesso por autoatendimento: pós-MVP.
 
+Contrato de API (login):
+Request
+```json
+{
+  "email": "barbeiro@example.com",
+  "password": "SenhaSegura123!"
+}
+```
+Response
+- 200 OK com token JWT (conforme backend) e metadados necessários ao contexto.
+
 ### 2) Seleção de Barbearia (Multi-tenant)
 
 O que faz: permite escolher em qual barbearia operar quando o barbeiro tem múltiplos vínculos.
@@ -157,7 +168,7 @@ Requisitos funcionais:
 - Multi-tenant e segurança: todas as chamadas devem incluir contexto (barbeiro + barbearia); backend valida vínculo e escopo; zero vazamento entre tenants.
 - Autenticação: login por e-mail + senha; token com expiração (~24h); armazenamento seguro; interceptador nas chamadas.
 - Integrações (back-end atual):
-  - `POST /api/auth/barbeiro/login` (input: `{ Email, Senha }`) — autenticação do barbeiro.
+  - `POST /api/auth/barbeiro/login` (input: `{ email, password }`) — autenticação do barbeiro.
   - `GET /api/barbeiro/barbearias` — lista barbearias do barbeiro autenticado (para seleção de contexto, quando multi-vínculo).
   - `POST /api/auth/barbeiro/trocar-contexto` — troca de contexto para outra barbearia (gera novo token com `NovaBarbeariaId`).
   - `GET /api/schedule/my-schedule?date=YYYY-MM-DD` — agenda do barbeiro autenticado (por dia).
