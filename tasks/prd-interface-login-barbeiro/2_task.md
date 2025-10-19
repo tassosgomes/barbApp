@@ -46,14 +46,13 @@ Implementar o serviço de autenticação que consome o endpoint do backend e con
 ```typescript
 // src/services/auth.service.ts
 import { api } from '@/lib/api';
-import { formatPhoneToAPI } from '@/lib/phone-utils';
 import type { LoginInput, AuthResponse, User } from '@/types/auth.types';
 
 export const authService = {
   login: async (data: LoginInput): Promise<AuthResponse> => {
     const response = await api.post<AuthResponse>('/auth/barbeiro/login', {
-      barbershopCode: data.barbershopCode.toUpperCase(),
-      phone: formatPhoneToAPI(data.phone)
+      email: data.email,
+      password: data.password
     });
     
     return response.data;
@@ -118,24 +117,22 @@ api.interceptors.response.use(
 // Request
 POST /api/auth/barbeiro/login
 {
-  "barbershopCode": "BARB001",
-  "phone": "+5511999999999"
+  "email": "barbeiro@example.com",
+  "password": "senha123"
 }
 
 // Response Success (200)
 {
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "user": {
-    "id": "uuid",
-    "name": "João Silva",
-    "phone": "+5511999999999",
-    "role": "Barbeiro"
-  }
+  "tipoUsuario": "Barbeiro",
+  "barbeariaId": "uuid",
+  "nomeBarbearia": "Barbearia Teste",
+  "expiresAt": "2025-10-20T18:00:00Z"
 }
 
 // Response Error (401)
 {
-  "message": "Invalid credentials"
+  "message": "E-mail ou senha inválidos"
 }
 ```
 
