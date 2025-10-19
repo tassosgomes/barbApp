@@ -571,6 +571,28 @@ namespace BarbApp.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.OwnsOne("BarbApp.Domain.ValueObjects.UniqueCode", "Code", b1 =>
+                        {
+                            b1.Property<Guid>("BarbershopId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasMaxLength(8)
+                                .HasColumnType("character varying(8)")
+                                .HasColumnName("code");
+
+                            b1.HasKey("BarbershopId");
+
+                            b1.HasIndex("Value")
+                                .IsUnique();
+
+                            b1.ToTable("barbershops", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("BarbershopId");
+                        });
+
                     b.OwnsOne("BarbApp.Domain.ValueObjects.Document", "Document", b1 =>
                         {
                             b1.Property<Guid>("BarbershopId")
@@ -591,29 +613,7 @@ namespace BarbApp.Infrastructure.Migrations
                             b1.HasIndex("Value")
                                 .IsUnique();
 
-                            b1.ToTable("barbershops");
-
-                            b1.WithOwner()
-                                .HasForeignKey("BarbershopId");
-                        });
-
-                    b.OwnsOne("BarbApp.Domain.ValueObjects.UniqueCode", "Code", b1 =>
-                        {
-                            b1.Property<Guid>("BarbershopId")
-                                .HasColumnType("uuid");
-
-                            b1.Property<string>("Value")
-                                .IsRequired()
-                                .HasMaxLength(8)
-                                .HasColumnType("character varying(8)")
-                                .HasColumnName("code");
-
-                            b1.HasKey("BarbershopId");
-
-                            b1.HasIndex("Value")
-                                .IsUnique();
-
-                            b1.ToTable("barbershops");
+                            b1.ToTable("barbershops", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("BarbershopId");
