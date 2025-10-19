@@ -35,8 +35,6 @@ public class CompleteAppointmentUseCase : ICompleteAppointmentUseCase
 
     public async Task<AppointmentDetailsOutput> ExecuteAsync(Guid appointmentId, CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Completing appointment {AppointmentId}", appointmentId);
-
         var barbeariaId = _tenantContext.BarbeariaId;
         Guid barberId;
         try
@@ -52,6 +50,9 @@ public class CompleteAppointmentUseCase : ICompleteAppointmentUseCase
         {
             throw new BarbApp.Domain.Exceptions.UnauthorizedAccessException("Contexto de barbearia não definido");
         }
+
+        _logger.LogInformation("Completing appointment {AppointmentId} for barber {BarberId} in barbearia {BarbeariaId}", 
+            appointmentId, barberId, barbeariaId.Value);
 
         // Get appointment
         var appointment = await _appointmentRepository.GetByIdAsync(appointmentId, cancellationToken);
@@ -73,7 +74,11 @@ public class CompleteAppointmentUseCase : ICompleteAppointmentUseCase
         try
         {
             appointment.Complete();
-            _logger.LogInformation("Appointment {AppointmentId} completed successfully", appointmentId);
+            _logger.LogInformation("Appointment {AppointmentId} completed successfully for barber {BarberId} in barbearia {BarbeariaId}", 
+                appointmentId, barberId, barbeariaId.Value);
+
+            // Record metric
+            BarbAppMetrics.AppointmentStatusChangedCounter.WithLabels(barbeariaId.Value.ToString(), "Completed").Inc();
         }
         catch (InvalidAppointmentStatusTransitionException ex)
         {
