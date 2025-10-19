@@ -277,10 +277,18 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 
-    // Include XML comments
+    // Include XML comments from API project
     var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
     c.IncludeXmlComments(xmlPath);
+
+    // Include XML comments from Application project (DTOs)
+    var applicationXmlFile = "BarbApp.Application.xml";
+    var applicationXmlPath = Path.Combine(AppContext.BaseDirectory, applicationXmlFile);
+    if (File.Exists(applicationXmlPath))
+    {
+        c.IncludeXmlComments(applicationXmlPath);
+    }
 
     // Custom schema IDs
     c.CustomSchemaIds(type => type.FullName);
