@@ -31,8 +31,6 @@ public class GetAppointmentDetailsUseCase : IGetAppointmentDetailsUseCase
 
     public async Task<AppointmentDetailsOutput> ExecuteAsync(Guid appointmentId, CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Getting appointment details for ID {AppointmentId}", appointmentId);
-
         var barbeariaId = _tenantContext.BarbeariaId;
         Guid barberId;
         try
@@ -48,6 +46,9 @@ public class GetAppointmentDetailsUseCase : IGetAppointmentDetailsUseCase
         {
             throw new BarbApp.Domain.Exceptions.UnauthorizedAccessException("Contexto de barbearia não definido");
         }
+
+        _logger.LogInformation("Getting appointment details for appointment {AppointmentId}, barber {BarberId} in barbearia {BarbeariaId}", 
+            appointmentId, barberId, barbeariaId.Value);
 
         // Get appointment
         var appointment = await _appointmentRepository.GetByIdAsync(appointmentId, cancellationToken);
@@ -83,7 +84,8 @@ public class GetAppointmentDetailsUseCase : IGetAppointmentDetailsUseCase
             throw new NotFoundException("Serviço não encontrado");
         }
 
-        _logger.LogInformation("Appointment {AppointmentId} details retrieved successfully", appointmentId);
+        _logger.LogInformation("Appointment {AppointmentId} details retrieved successfully for barber {BarberId} in barbearia {BarbeariaId}", 
+            appointmentId, barberId, barbeariaId.Value);
 
         return new AppointmentDetailsOutput(
             appointment.Id,

@@ -35,8 +35,6 @@ public class CancelAppointmentUseCase : ICancelAppointmentUseCase
 
     public async Task<AppointmentDetailsOutput> ExecuteAsync(Guid appointmentId, CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Cancelling appointment {AppointmentId}", appointmentId);
-
         var barbeariaId = _tenantContext.BarbeariaId;
         Guid barberId;
         try
@@ -52,6 +50,9 @@ public class CancelAppointmentUseCase : ICancelAppointmentUseCase
         {
             throw new BarbApp.Domain.Exceptions.UnauthorizedAccessException("Contexto de barbearia não definido");
         }
+
+        _logger.LogInformation("Cancelling appointment {AppointmentId} for barber {BarberId} in barbearia {BarbeariaId}", 
+            appointmentId, barberId, barbeariaId.Value);
 
         // Get appointment
         var appointment = await _appointmentRepository.GetByIdAsync(appointmentId, cancellationToken);
@@ -73,7 +74,11 @@ public class CancelAppointmentUseCase : ICancelAppointmentUseCase
         try
         {
             appointment.Cancel();
-            _logger.LogInformation("Appointment {AppointmentId} cancelled successfully", appointmentId);
+            _logger.LogInformation("Appointment {AppointmentId} cancelled successfully for barber {BarberId} in barbearia {BarbeariaId}", 
+                appointmentId, barberId, barbeariaId.Value);
+
+            // Record metric
+            BarbAppMetrics.AppointmentStatusChangedCounter.WithLabels(barbeariaId.Value.ToString(), "Cancelled").Inc();
         }
         catch (InvalidAppointmentStatusTransitionException ex)
         {

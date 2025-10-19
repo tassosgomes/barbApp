@@ -37,4 +37,18 @@ public static class BarbAppMetrics
         {
             LabelNames = new[] { "barbearia_id" }
         });
+
+    // Counter for appointment status changes
+    public static readonly Counter AppointmentStatusChangedCounter = Metrics
+        .CreateCounter("barbapp_appointments_status_changed_total", "Total number of appointment status changes", new CounterConfiguration
+        {
+            LabelNames = new[] { "barbearia_id", "status" }
+        });
+
+    // Histogram for schedule load duration
+    public static readonly Histogram ScheduleLoadDuration = Metrics
+        .CreateHistogram("barbapp_schedule_load_duration_seconds", "Duration of barber schedule loading operations", new HistogramConfiguration
+        {
+            LabelNames = new[] { "barbearia_id" }
+        });
 }

@@ -23,9 +23,9 @@ Adicionar logs estruturados e métricas Prometheus para mudanças de status e te
 - Métricas: contador de mudanças de status; histograma de duração de carregamento
 
 ## Subtarefas
-- [ ] 7.1 Inserir logs nos use cases
-- [ ] 7.2 Implementar métricas e registrar
-- [ ] 7.3 Documentar painéis básicos no Grafana
+- [x] 7.1 Inserir logs nos use cases
+- [x] 7.2 Implementar métricas e registrar
+- [x] 7.3 Documentar painéis básicos no Grafana
 
 ## Sequenciamento
 - Bloqueado por: 3.0

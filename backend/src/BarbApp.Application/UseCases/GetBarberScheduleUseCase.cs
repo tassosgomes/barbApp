@@ -4,6 +4,7 @@ using BarbApp.Domain.Exceptions;
 using BarbApp.Domain.Interfaces;
 using BarbApp.Domain.Interfaces.Repositories;
 using Microsoft.Extensions.Logging;
+using System.Diagnostics;
 
 namespace BarbApp.Application.UseCases;
 
@@ -34,7 +35,7 @@ public class GetBarberScheduleUseCase : IGetBarberScheduleUseCase
 
     public async Task<BarberScheduleOutput> ExecuteAsync(DateTime date, CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Getting barber schedule for date {Date}", date);
+        var stopwatch = Stopwatch.StartNew();
 
         var barbeariaId = _tenantContext.BarbeariaId;
         Guid barberId;
@@ -51,6 +52,9 @@ public class GetBarberScheduleUseCase : IGetBarberScheduleUseCase
         {
             throw new BarbApp.Domain.Exceptions.UnauthorizedAccessException("Contexto de barbearia não definido");
         }
+
+        _logger.LogInformation("Loading barber schedule for barber {BarberId} in barbearia {BarbeariaId} on date {Date}", 
+            barberId, barbeariaId.Value, date);
 
         // Get barber info
         var barber = await _barberRepository.GetByIdAsync(barberId, cancellationToken);
@@ -88,8 +92,14 @@ public class GetBarberScheduleUseCase : IGetBarberScheduleUseCase
             ));
         }
 
-        _logger.LogInformation("Retrieved {Count} appointments for barber {BarberId} on date {Date}",
-            appointmentOutputs.Count, barberId, date);
+        stopwatch.Stop();
+        var duration = stopwatch.Elapsed.TotalSeconds;
+
+        // Record metrics
+        BarbAppMetrics.ScheduleLoadDuration.WithLabels(barbeariaId.Value.ToString()).Observe(duration);
+
+        _logger.LogInformation("Retrieved {Count} appointments for barber {BarberId} in barbearia {BarbeariaId} on date {Date} in {Duration}s",
+            appointmentOutputs.Count, barberId, barbeariaId.Value, date, duration);
 
         return new BarberScheduleOutput(
             date,
