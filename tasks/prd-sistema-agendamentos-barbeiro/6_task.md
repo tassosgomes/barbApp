@@ -1,5 +1,5 @@
 ---
-status: pending
+status: completed
 parallelizable: true
 blocked_by: ["4.0"]
 ---
@@ -24,10 +24,10 @@ Criar testes de integração com TestContainers para validar autorização do ro
 - Verificações de 403/404/409 apropriados e 200 em sucesso
 
 ## Subtarefas
-- [ ] 6.1 Configurar TestContainers e WebApplicationFactory
-- [ ] 6.2 Testes de autorização e acesso restrito
-- [ ] 6.3 Testes de conflito de status (optimistic concurrency)
-- [ ] 6.4 Testes de isolamento (não acessar agendas de outras barbearias/barbeiros)
+- [x] 6.1 Configurar TestContainers e WebApplicationFactory
+- [x] 6.2 Testes de autorização e acesso restrito
+- [x] 6.3 Testes de conflito de status (optimistic concurrency)
+- [x] 6.4 Testes de isolamento (não acessar agendas de outras barbearias/barbeiros)
 
 ## Sequenciamento
 - Bloqueado por: 4.0
