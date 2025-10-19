@@ -14,6 +14,14 @@ export type {
 	User,
 } from './auth';
 
+// Auth types (Barbeiro Login - Task 1.0)
+export type {
+	LoginInput,
+	AuthResponse,
+	User as BarberUser,
+	AuthContextType,
+} from './auth.types';
+
 // Pagination types
 export type {
 	PaginatedResponse,
