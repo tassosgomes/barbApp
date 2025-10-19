@@ -513,7 +513,7 @@ public class BarbersControllerIntegrationTests : IAsyncLifetime
         result.Appointments.Should().ContainSingle();
         result.Appointments[0].BarberName.Should().Be("Henrique Alves");
         result.Appointments[0].CustomerName.Should().Be("Cliente Hoje");
-        result.Appointments[0].Status.Should().Be("Confirmado");
+        result.Appointments[0].Status.Should().Be("Confirmed");
     }
 
     [Fact]
