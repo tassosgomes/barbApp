@@ -1,4 +1,5 @@
 export { default as api } from './api';
+export { authService } from './auth.service';
 export { barbershopService } from './barbershop.service';
 export { barbersService } from './barbers.service';
 export { barbeiroService } from './barbeiro.service';
