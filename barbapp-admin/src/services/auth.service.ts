@@ -1,12 +1,11 @@
 import api from './api';
-import { formatPhoneToAPI } from '@/lib/phone-utils';
 import type { LoginInput, AuthResponse, User } from '@/types/auth.types';
 
 /**
  * Serviço de autenticação para barbeiros
  * 
  * Responsável por:
- * - Login de barbeiros usando telefone e código da barbearia
+ * - Login de barbeiros usando e-mail e senha
  * - Validação de token JWT
  * - Logout (remoção de token)
  */
@@ -14,13 +13,13 @@ export const authService = {
   /**
    * Realiza login de barbeiro
    * 
-   * @param data - Dados de login (código da barbearia e telefone)
+   * @param data - Dados de login (e-mail e senha)
    * @returns Promise com token JWT e dados do usuário
    * 
    * @example
    * const response = await authService.login({
-   *   barbershopCode: 'BARB001',
-   *   phone: '(11) 99999-9999'
+   *   email: 'barbeiro@example.com',
+   *   password: 'SenhaSegura123!'
    * });
    * 
    * @throws {Error} 401 - Credenciais inválidas
@@ -29,8 +28,8 @@ export const authService = {
    */
   login: async (data: LoginInput): Promise<AuthResponse> => {
     const response = await api.post<AuthResponse>('/auth/barbeiro/login', {
-      barbershopCode: data.barbershopCode.toUpperCase(),
-      phone: formatPhoneToAPI(data.phone)
+      email: data.email,
+      password: data.password
     });
     
     return response.data;

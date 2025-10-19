@@ -6,11 +6,6 @@ import type { LoginInput, AuthResponse, User } from '@/types/auth.types';
 // Mock do módulo api
 vi.mock('../api');
 
-// Mock do phone-utils
-vi.mock('@/lib/phone-utils', () => ({
-  formatPhoneToAPI: (phone: string) => `+55${phone.replace(/\D/g, '')}`
-}));
-
 describe('authService', () => {
   beforeEach(() => {
     // Limpar localStorage antes de cada teste
@@ -27,8 +22,8 @@ describe('authService', () => {
     it('deve fazer login com sucesso e retornar token e usuário', async () => {
       // Arrange
       const loginData: LoginInput = {
-        barbershopCode: 'barb001',
-        phone: '(11) 99999-9999'
+        email: 'barbeiro@example.com',
+        password: 'SenhaSegura123!'
       };
 
       const expectedResponse: AuthResponse = {
@@ -36,7 +31,7 @@ describe('authService', () => {
         user: {
           id: 'user-123',
           name: 'João Silva',
-          phone: '+5511999999999',
+          email: 'barbeiro@example.com',
           role: 'Barbeiro',
           barbershopId: 'barbershop-123'
         }
@@ -56,17 +51,17 @@ describe('authService', () => {
 
       // Assert
       expect(api.post).toHaveBeenCalledWith('/auth/barbeiro/login', {
-        barbershopCode: 'BARB001', // Deve converter para UPPERCASE
-        phone: '+5511999999999' // Deve formatar para API
+        email: 'barbeiro@example.com',
+        password: 'SenhaSegura123!'
       });
       expect(result).toEqual(expectedResponse);
     });
 
-    it('deve converter barbershopCode para uppercase', async () => {
+    it('deve enviar email e password sem transformações', async () => {
       // Arrange
       const loginData: LoginInput = {
-        barbershopCode: 'barb001',
-        phone: '(11) 99999-9999'
+        email: 'TESTE@EXAMPLE.COM',
+        password: 'MinhaSenh@123'
       };
 
       vi.mocked(api.post).mockResolvedValue({
@@ -84,7 +79,8 @@ describe('authService', () => {
       expect(api.post).toHaveBeenCalledWith(
         expect.any(String),
         expect.objectContaining({
-          barbershopCode: 'BARB001'
+          email: 'TESTE@EXAMPLE.COM',
+          password: 'MinhaSenh@123'
         })
       );
     });
@@ -92,8 +88,8 @@ describe('authService', () => {
     it('deve lançar erro quando credenciais são inválidas (401)', async () => {
       // Arrange
       const loginData: LoginInput = {
-        barbershopCode: 'INVALID',
-        phone: '(11) 99999-9999'
+        email: 'invalido@example.com',
+        password: 'senhaerrada'
       };
 
       const error = {
@@ -112,8 +108,8 @@ describe('authService', () => {
     it('deve lançar erro quando dados são inválidos (400)', async () => {
       // Arrange
       const loginData: LoginInput = {
-        barbershopCode: '',
-        phone: ''
+        email: '',
+        password: ''
       };
 
       const error = {
@@ -132,8 +128,8 @@ describe('authService', () => {
     it('deve lançar erro quando servidor retorna 500', async () => {
       // Arrange
       const loginData: LoginInput = {
-        barbershopCode: 'BARB001',
-        phone: '(11) 99999-9999'
+        email: 'barbeiro@example.com',
+        password: 'SenhaSegura123!'
       };
 
       const error = {
@@ -156,7 +152,7 @@ describe('authService', () => {
       const expectedUser: User = {
         id: 'user-123',
         name: 'João Silva',
-        phone: '+5511999999999',
+        email: 'barbeiro@example.com',
         role: 'Barbeiro',
         barbershopId: 'barbershop-123'
       };

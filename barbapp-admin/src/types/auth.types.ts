@@ -6,8 +6,8 @@
  * Dados de entrada para login
  */
 export interface LoginInput {
-  barbershopCode: string;
-  phone: string;
+  email: string;
+  password: string;
 }
 
 /**
@@ -24,7 +24,7 @@ export interface AuthResponse {
 export interface User {
   id: string;
   name: string;
-  phone: string;
+  email: string;
   role: 'Barbeiro';
   barbershopId?: string;
 }

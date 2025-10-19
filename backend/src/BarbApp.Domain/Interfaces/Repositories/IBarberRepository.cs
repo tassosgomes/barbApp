@@ -6,6 +6,7 @@ public interface IBarberRepository
 {
     Task<Barber?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
     Task<Barber?> GetByEmailAsync(Guid barbeariaId, string email, CancellationToken cancellationToken = default);
+    Task<Barber?> GetByEmailGlobalAsync(string email, CancellationToken cancellationToken = default);
     Task<List<Barber>> ListAsync(
         Guid barbeariaId,
         bool? isActive = null,

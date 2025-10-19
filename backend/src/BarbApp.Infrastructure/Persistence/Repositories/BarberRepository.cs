@@ -31,6 +31,14 @@ public class BarberRepository : IBarberRepository
                 b.BarbeariaId == barbeariaId, cancellationToken);
     }
 
+    public async Task<Barber?> GetByEmailGlobalAsync(string email, CancellationToken cancellationToken = default)
+    {
+        return await _context.Barbers
+            .IgnoreQueryFilters()
+            .Include(b => b.Barbearia)
+            .FirstOrDefaultAsync(b => b.Email == email.ToLowerInvariant(), cancellationToken);
+    }
+
     public async Task<List<Barber>> ListAsync(
         Guid barbeariaId,
         bool? isActive = null,

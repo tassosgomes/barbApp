@@ -7,11 +7,12 @@ public class LoginBarbeiroInputValidator : AbstractValidator<DTOs.LoginBarbeiroI
 {
     public LoginBarbeiroInputValidator()
     {
-        RuleFor(x => x.Codigo)
-            .NotEmpty().WithMessage("Código da barbearia é obrigatório");
+        RuleFor(x => x.Email)
+            .NotEmpty().WithMessage("E-mail é obrigatório")
+            .EmailAddress().WithMessage("E-mail inválido");
 
-        RuleFor(x => x.Telefone)
-            .NotEmpty().WithMessage("Telefone é obrigatório")
-            .Matches(@"^\d{10,11}$").WithMessage("Telefone deve conter 10 ou 11 dígitos (formato brasileiro)");
+        RuleFor(x => x.Password)
+            .NotEmpty().WithMessage("Senha é obrigatória")
+            .MinimumLength(6).WithMessage("Senha deve ter no mínimo 6 caracteres");
     }
 }

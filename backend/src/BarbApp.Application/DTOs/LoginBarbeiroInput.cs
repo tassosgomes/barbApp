@@ -7,14 +7,14 @@ namespace BarbApp.Application.DTOs;
 public record LoginBarbeiroInput
 {
     /// <summary>
-    /// Código único da barbearia onde o barbeiro trabalha (8 caracteres alfanuméricos maiúsculos)
+    /// E-mail do barbeiro
     /// </summary>
-    /// <example>ABC12345</example>
-    public string Codigo { get; init; } = string.Empty;
+    /// <example>barbeiro@example.com</example>
+    public string Email { get; init; } = string.Empty;
 
     /// <summary>
-    /// Telefone do barbeiro (apenas números, formato brasileiro: 10 ou 11 dígitos)
+    /// Senha do barbeiro
     /// </summary>
-    /// <example>11987654321</example>
-    public string Telefone { get; init; } = string.Empty;
+    /// <example>SenhaSegura123!</example>
+    public string Password { get; init; } = string.Empty;
 }
