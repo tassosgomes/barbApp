@@ -37,16 +37,17 @@ Este documento detalha todos os endpoints da API BarbApp, incluindo descrições
 
 ### `POST /api/auth/barbeiro/login`
 
-- **Descrição**: Autentica um usuário com perfil de "Barbeiro". O sistema valida o código da barbearia e o telefone do barbeiro. Se o barbeiro for encontrado e estiver associado à barbearia, um token JWT é gerado.
+- **Descrição**: Autentica um usuário com perfil de "Barbeiro". O sistema valida o e-mail e a senha do barbeiro. Se o barbeiro for encontrado e suas credenciais forem válidas, um token JWT é gerado com o contexto da barbearia à qual ele está associado.
 - **Role Necessária**: Nenhuma (Público).
 - **Parâmetros de Entrada**:
-  - `Codigo` (string): Código único da barbearia.
-  - `Telefone` (string): Número de telefone do barbeiro.
+  - `Email` (string): E-mail do barbeiro.
+  - `Password` (string): Senha do barbeiro.
 - **Parâmetros de Saída**:
   - `Token` (string): Token JWT para autenticação.
   - `TipoUsuario` (string): "Barbeiro".
   - `BarbeariaId` (Guid?): ID da barbearia autenticada.
   - `NomeBarbearia` (string): Nome da barbearia.
+  - `CodigoBarbearia` (string?): Código da barbearia.
   - `ExpiresAt` (DateTime): Data e hora de expiração do token.
 
 ### `POST /api/auth/cliente/login`
