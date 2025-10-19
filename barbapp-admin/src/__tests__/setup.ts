@@ -6,22 +6,29 @@ import { server } from './mocks/server';
 vi.stubEnv('VITE_API_URL', 'http://localhost:5000/api');
 vi.stubEnv('VITE_APP_NAME', 'BarbApp Admin');
 
-// Mock localStorage and sessionStorage
-const localStorageMock = {
-  getItem: vi.fn(),
-  setItem: vi.fn(),
-  removeItem: vi.fn(),
-  clear: vi.fn(),
-};
-const sessionStorageMock = {
-  getItem: vi.fn(),
-  setItem: vi.fn(),
-  removeItem: vi.fn(),
-  clear: vi.fn(),
-};
+// Mock localStorage and sessionStorage with real implementation
+class LocalStorageMock {
+  private store: Record<string, string> = {};
 
-global.localStorage = localStorageMock as unknown as Storage;
-global.sessionStorage = sessionStorageMock as unknown as Storage;
+  getItem(key: string): string | null {
+    return this.store[key] || null;
+  }
+
+  setItem(key: string, value: string): void {
+    this.store[key] = value;
+  }
+
+  removeItem(key: string): void {
+    delete this.store[key];
+  }
+
+  clear(): void {
+    this.store = {};
+  }
+}
+
+global.localStorage = new LocalStorageMock() as unknown as Storage;
+global.sessionStorage = new LocalStorageMock() as unknown as Storage;
 
 // Mock window.location
 Object.defineProperty(window, 'location', {

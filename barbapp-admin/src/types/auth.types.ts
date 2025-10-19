@@ -15,7 +15,11 @@ export interface LoginInput {
  */
 export interface AuthResponse {
   token: string;
-  user: User;
+  tipoUsuario: string;
+  barbeariaId: string | null;
+  nomeBarbearia: string;
+  codigoBarbearia: string | null;
+  expiresAt: string;
 }
 
 /**
@@ -26,7 +30,8 @@ export interface User {
   name: string;
   email: string;
   role: 'Barbeiro';
-  barbershopId?: string;
+  barbeariaId: string;
+  nomeBarbearia: string;
 }
 
 /**
