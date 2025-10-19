@@ -75,6 +75,11 @@ public class CompleteAppointmentUseCase : ICompleteAppointmentUseCase
             appointment.Complete();
             _logger.LogInformation("Appointment {AppointmentId} completed successfully", appointmentId);
         }
+        catch (InvalidAppointmentStatusTransitionException ex)
+        {
+            _logger.LogWarning("Failed to complete appointment {AppointmentId}: {Message}", appointmentId, ex.Message);
+            throw new ConflictException($"Não é possível concluir o agendamento: {ex.Message}");
+        }
         catch (InvalidOperationException ex)
         {
             _logger.LogWarning("Failed to complete appointment {AppointmentId}: {Message}", appointmentId, ex.Message);
