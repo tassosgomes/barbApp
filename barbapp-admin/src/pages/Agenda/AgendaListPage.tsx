@@ -150,12 +150,12 @@ export function AgendaListPage() {
             {/* Filtro: Barbeiro */}
             <div className="space-y-2">
               <Label htmlFor="barbeiro">Barbeiro</Label>
-              <Select value={barbeiroId} onValueChange={setBarbeiroId}>
+              <Select value={barbeiroId || 'all'} onValueChange={(value) => setBarbeiroId(value === 'all' ? '' : value)}>
                 <SelectTrigger id="barbeiro">
                   <SelectValue placeholder="Todos os barbeiros" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Todos os barbeiros</SelectItem>
+                  <SelectItem value="all">Todos os barbeiros</SelectItem>
                   {barbeiros?.items.map((barbeiro) => (
                     <SelectItem key={barbeiro.id} value={barbeiro.id}>
                       {barbeiro.name}
@@ -190,12 +190,12 @@ export function AgendaListPage() {
             {/* Filtro: Status */}
             <div className="space-y-2">
               <Label htmlFor="status">Status</Label>
-              <Select value={status} onValueChange={setStatus}>
+              <Select value={status || 'all'} onValueChange={(value) => setStatus(value === 'all' ? '' : value)}>
                 <SelectTrigger id="status">
                   <SelectValue placeholder="Todos os status" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Todos os status</SelectItem>
+                  <SelectItem value="all">Todos os status</SelectItem>
                   <SelectItem value="Pending">Pendente</SelectItem>
                   <SelectItem value="Confirmed">Confirmado</SelectItem>
                   <SelectItem value="Completed">Concluído</SelectItem>

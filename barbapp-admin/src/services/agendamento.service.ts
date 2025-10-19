@@ -29,7 +29,7 @@ export const appointmentService = {
    * });
    */
   list: async (params: ListAppointmentsParams = {}): Promise<PaginatedResponse<Appointment>> => {
-    const response = await api.get<PaginatedResponse<Appointment>>('/api/appointments', {
+    const response = await api.get<PaginatedResponse<Appointment>>('/appointments', {
       params: {
         pageNumber: params.page,
         pageSize: params.pageSize,
@@ -52,7 +52,7 @@ export const appointmentService = {
    * const agendamento = await appointmentService.getById('uuid-agendamento');
    */
   getById: async (id: string): Promise<Appointment> => {
-    const response = await api.get<Appointment>(`/api/appointments/${id}`);
+    const response = await api.get<Appointment>(`/appointments/${id}`);
     return response.data;
   },
 };

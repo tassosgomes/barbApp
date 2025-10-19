@@ -16,8 +16,14 @@ const api = axios.create({
  */
 api.interceptors.request.use(
   (config) => {
-    // Add token if available
-    const token = localStorage.getItem('auth_token');
+    // Determine which token to use based on the current route
+    const path = window.location.pathname;
+    const isAdminBarbearia = path.match(/^\/[A-Z0-9]+\//); // Pattern: /{CODIGO}/...
+    
+    // Select appropriate token key
+    const tokenKey = isAdminBarbearia ? 'admin_barbearia_token' : 'auth_token';
+    const token = localStorage.getItem(tokenKey);
+    
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -56,10 +62,22 @@ api.interceptors.response.use(
     }
 
     if (error.response?.status === 401) {
-      // Unauthorized - clear token, set expiry flag, and redirect
-      localStorage.removeItem('auth_token');
-      sessionStorage.setItem('session_expired', 'true');
-      window.location.href = '/login';
+      // Determine which token to clear and where to redirect based on current route
+      const path = window.location.pathname;
+      const isAdminBarbearia = path.match(/^\/([A-Z0-9]+)\//);
+      
+      if (isAdminBarbearia) {
+        // Admin Barbearia: clear specific token and redirect to barbearia login
+        const codigo = isAdminBarbearia[1];
+        localStorage.removeItem('admin_barbearia_token');
+        sessionStorage.setItem('session_expired', 'true');
+        window.location.href = `/${codigo}/login`;
+      } else {
+        // Admin Central: clear central token and redirect to central login
+        localStorage.removeItem('auth_token');
+        sessionStorage.setItem('session_expired', 'true');
+        window.location.href = '/login';
+      }
     }
 
     // TODO: Future - Implement token refresh logic for 401 errors when token is expired but refresh token is available

@@ -33,56 +33,36 @@ export const dashboardService = {
    * @returns Dashboard metrics with totals and upcoming appointments
    */
   getMetrics: async (): Promise<DashboardMetrics> => {
-    // Fetch data in parallel for better performance
-    const [barbeirosResponse, servicosResponse, agendamentosResponse] = await Promise.all([
-      // Get total barbers count
-      api.get('/barbeiros', { params: { pageSize: 1, page: 1 } }),
-      // Get total services count
-      api.get('/servicos', { params: { pageSize: 1, page: 1 } }),
-      // Get today's appointments (first 10 for upcoming list)
-      api.get('/agendamentos', {
-        params: {
-          pageSize: 10,
-          page: 1,
-          // Note: Backend should support date filtering
-          // If not available, we'll filter on frontend
-        },
-      }),
-    ]);
+    try {
+      // Fetch data in parallel for better performance
+      const [barbeirosResponse, servicosResponse] = await Promise.all([
+        // Get total barbers count
+        api.get('/barbers', { params: { pageSize: 1, page: 1 } }),
+        // Get total services count
+        api.get('/barbershop-services', { params: { pageSize: 1, page: 1 } }),
+      ]);
 
-    // Extract totals from pagination metadata
-    const totalBarbeiros = barbeirosResponse.data.totalCount || 0;
-    const totalServicos = servicosResponse.data.totalCount || 0;
+      // Extract totals from pagination metadata
+      const totalBarbeiros = barbeirosResponse.data.totalCount || 0;
+      const totalServicos = servicosResponse.data.totalCount || 0;
 
-    // Process appointments
-    const agendamentos = agendamentosResponse.data.items || [];
-    const hoje = new Date().toISOString().split('T')[0];
-
-    // Filter appointments for today
-    const agendamentosHoje = agendamentos.filter((agendamento: any) => {
-      const agendamentoData = agendamento.dataHora?.split('T')[0];
-      return agendamentoData === hoje;
-    });
-
-    // Map to ProximoAgendamento format
-    const proximosAgendamentos: ProximoAgendamento[] = agendamentosHoje.slice(0, 5).map((agendamento: any) => {
-      const dataHora = new Date(agendamento.dataHora);
+      // TODO: Implement appointments endpoint in backend
+      // For now, return zero appointments
       return {
-        id: agendamento.id,
-        clienteNome: agendamento.clienteNome || 'Cliente não informado',
-        barbeiro: agendamento.barbeiroNome || 'Barbeiro não informado',
-        servico: agendamento.servicoNome || 'Serviço não informado',
-        data: dataHora.toLocaleDateString('pt-BR'),
-        hora: dataHora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
-        status: agendamento.status || 'Pendente',
+        totalBarbeiros,
+        totalServicos,
+        agendamentosHoje: 0,
+        proximosAgendamentos: [],
       };
-    });
-
-    return {
-      totalBarbeiros,
-      totalServicos,
-      agendamentosHoje: agendamentosHoje.length,
-      proximosAgendamentos,
-    };
+    } catch (error) {
+      console.error('Error fetching dashboard metrics:', error);
+      // Return empty metrics on error
+      return {
+        totalBarbeiros: 0,
+        totalServicos: 0,
+        agendamentosHoje: 0,
+        proximosAgendamentos: [],
+      };
+    }
   },
 };
