@@ -1,5 +1,8 @@
 export * from './barbershop.schema';
 
+// Login schemas (Barbeiro Login - Task 1.0)
+export * from './login.schema';
+
 // Barber schemas
 export * from './barber';
 
