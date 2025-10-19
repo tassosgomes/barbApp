@@ -2,7 +2,7 @@
 
 ## Tarefas
 
-- [ ] 1.0 Domain: Entidade Appointment, Enum e Exceções (com testes)
+- [x] 1.0 Domain: Entidade Appointment, Enum e Exceções (com testes)
 - [ ] 2.0 Infra/DB: Migration, EF Config, DbContext e AppointmentRepository
 - [ ] 3.0 Application: DTOs, Validators e Use Cases (com testes)
 - [ ] 4.0 API: ScheduleController e AppointmentsController + Swagger

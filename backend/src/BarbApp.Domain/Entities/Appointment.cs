@@ -1,7 +1,8 @@
+using BarbApp.Domain.Enums;
+using BarbApp.Domain.Exceptions;
+
 namespace BarbApp.Domain.Entities;
 
-// Placeholder for Appointment entity (to be fully implemented in future tasks)
-// This allows IAppointmentRepository to be defined for Task 1.0
 public class Appointment
 {
     public Guid Id { get; private set; }
@@ -11,37 +12,100 @@ public class Appointment
     public Guid ServiceId { get; private set; }
     public DateTime StartTime { get; private set; }
     public DateTime EndTime { get; private set; }
-    public string ServiceName { get; private set; }
-    public string Status { get; private set; }
+    public AppointmentStatus Status { get; private set; }
+    public DateTime CreatedAt { get; private set; }
+    public DateTime UpdatedAt { get; private set; }
+    public DateTime? ConfirmedAt { get; private set; }
+    public DateTime? CancelledAt { get; private set; }
+    public DateTime? CompletedAt { get; private set; }
+
+    // Navigation properties (optional, can be used by EF Core)
+    public Barbershop? Barbearia { get; private set; }
+    public Barber? Barber { get; private set; }
+    public BarbershopService? Service { get; private set; }
 
     private Appointment()
     {
-        ServiceName = null!;
-        Status = null!;
+        // EF Core constructor
     }
 
-    public Appointment(
+    public static Appointment Create(
         Guid barbeariaId,
-        Guid customerId,
         Guid barberId,
+        Guid customerId,
         Guid serviceId,
         DateTime startTime,
-        DateTime endTime,
-        string status)
+        DateTime endTime)
     {
-        Id = Guid.NewGuid();
-        BarbeariaId = barbeariaId;
-        CustomerId = customerId;
-        BarberId = barberId;
-        ServiceId = serviceId;
-        StartTime = startTime;
-        EndTime = endTime;
-        ServiceName = string.Empty; // Will be populated from service
-        Status = status;
+        // Validations
+        if (barbeariaId == Guid.Empty)
+            throw new ArgumentException("BarbeariaId is required", nameof(barbeariaId));
+
+        if (barberId == Guid.Empty)
+            throw new ArgumentException("BarberId is required", nameof(barberId));
+
+        if (customerId == Guid.Empty)
+            throw new ArgumentException("CustomerId is required", nameof(customerId));
+
+        if (serviceId == Guid.Empty)
+            throw new ArgumentException("ServiceId is required", nameof(serviceId));
+
+        if (startTime == default)
+            throw new ArgumentException("StartTime is required", nameof(startTime));
+
+        if (endTime == default)
+            throw new ArgumentException("EndTime is required", nameof(endTime));
+
+        if (endTime <= startTime)
+            throw new ArgumentException("EndTime must be after StartTime", nameof(endTime));
+
+        var now = DateTime.UtcNow;
+
+        return new Appointment
+        {
+            Id = Guid.NewGuid(),
+            BarbeariaId = barbeariaId,
+            BarberId = barberId,
+            CustomerId = customerId,
+            ServiceId = serviceId,
+            StartTime = startTime,
+            EndTime = endTime,
+            Status = AppointmentStatus.Pending,
+            CreatedAt = now,
+            UpdatedAt = now
+        };
     }
 
-    public void UpdateStatus(string newStatus)
+    public void Confirm()
     {
-        Status = newStatus;
+        if (Status != AppointmentStatus.Pending)
+            throw new InvalidAppointmentStatusTransitionException(Status.ToString(), "confirm");
+
+        Status = AppointmentStatus.Confirmed;
+        ConfirmedAt = DateTime.UtcNow;
+        UpdatedAt = DateTime.UtcNow;
+    }
+
+    public void Cancel()
+    {
+        if (Status == AppointmentStatus.Completed || Status == AppointmentStatus.Cancelled)
+            throw new InvalidAppointmentStatusTransitionException(Status.ToString(), "cancel");
+
+        Status = AppointmentStatus.Cancelled;
+        CancelledAt = DateTime.UtcNow;
+        UpdatedAt = DateTime.UtcNow;
+    }
+
+    public void Complete()
+    {
+        if (Status != AppointmentStatus.Confirmed)
+            throw new InvalidAppointmentStatusTransitionException(Status.ToString(), "complete");
+
+        if (StartTime > DateTime.UtcNow)
+            throw new InvalidOperationException("Cannot complete an appointment that has not started yet.");
+
+        Status = AppointmentStatus.Completed;
+        CompletedAt = DateTime.UtcNow;
+        UpdatedAt = DateTime.UtcNow;
     }
 }

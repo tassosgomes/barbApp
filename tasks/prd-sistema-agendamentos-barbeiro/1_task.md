@@ -1,5 +1,5 @@
 ---
-status: pending
+status: completed
 parallelizable: false
 blocked_by: []
 ---
@@ -25,10 +25,10 @@ Implementar a entidade `Appointment`, enum `AppointmentStatus` e exceções `App
 - Testes unitários de máquina de estados e validações
 
 ## Subtarefas
-- [ ] 1.1 Implementar enum `AppointmentStatus`
-- [ ] 1.2 Implementar entidade `Appointment` com regras
-- [ ] 1.3 Implementar exceções customizadas
-- [ ] 1.4 Testes unitários cobrindo transições válidas/ inválidas
+- [x] 1.1 Implementar enum `AppointmentStatus`
+- [x] 1.2 Implementar entidade `Appointment` com regras
+- [x] 1.3 Implementar exceções customizadas
+- [x] 1.4 Testes unitários cobrindo transições válidas/ inválidas
 
 ## Sequenciamento
 - Bloqueado por: —
