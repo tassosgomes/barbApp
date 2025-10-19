@@ -47,7 +47,12 @@ public class UpdateBarbershopServiceUseCase : IUpdateBarbershopServiceUseCase
         }
 
         // Update service
-        service.Update(input.Name, input.Description, input.DurationMinutes, input.Price);
+        var name = input.Name ?? service.Name;
+        var description = input.Description ?? service.Description;
+        var durationMinutes = input.DurationMinutes ?? service.DurationMinutes;
+        var price = input.Price ?? service.Price;
+        
+        service.Update(name, description, durationMinutes, price);
 
         await _serviceRepository.UpdateAsync(service, cancellationToken);
         await _unitOfWork.Commit(cancellationToken);

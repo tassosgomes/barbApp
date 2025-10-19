@@ -158,6 +158,31 @@ public class BarbersController : ControllerBase
     }
 
     /// <summary>
+    /// Desativa um barbeiro da barbearia (não poderá receber novos agendamentos)
+    /// </summary>
+    /// <param name="id">ID do barbeiro</param>
+    /// <returns>Sem conteúdo</returns>
+    /// <response code="204">Barbeiro desativado com sucesso</response>
+    /// <response code="401">Usuário não autenticado</response>
+    /// <response code="403">Usuário não tem permissão para acessar este recurso</response>
+    /// <response code="404">Barbeiro não encontrado</response>
+    [HttpPut("{id}/deactivate")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DeactivateBarber(Guid id)
+    {
+        _logger.LogInformation("Deactivating barber {Id}", id);
+
+        await _removeBarberUseCase.ExecuteAsync(id, HttpContext.RequestAborted);
+
+        _logger.LogInformation("Barber deactivated successfully: {Id}", id);
+
+        return NoContent();
+    }
+
+    /// <summary>
     /// Remove um barbeiro da barbearia (desativa e cancela agendamentos futuros)
     /// </summary>
     /// <param name="id">ID do barbeiro</param>

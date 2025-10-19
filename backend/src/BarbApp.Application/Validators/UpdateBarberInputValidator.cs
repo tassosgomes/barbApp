@@ -7,19 +7,21 @@ public class UpdateBarberInputValidator : AbstractValidator<UpdateBarberInput>
 {
     public UpdateBarberInputValidator()
     {
-        RuleFor(x => x.Id)
-            .NotEmpty().WithMessage("ID do barbeiro é obrigatório");
+        // Id vem da rota, não precisa validar no body
 
-        RuleFor(x => x.Name)
-            .NotEmpty().WithMessage("Nome é obrigatório")
-            .MaximumLength(100).WithMessage("Nome deve ter no máximo 100 caracteres");
+        When(x => x.Name != null, () =>
+        {
+            RuleFor(x => x.Name)
+                .NotEmpty().WithMessage("Nome não pode ser vazio")
+                .MaximumLength(100).WithMessage("Nome deve ter no máximo 100 caracteres");
+        });
 
-        RuleFor(x => x.Phone)
-            .NotEmpty().WithMessage("Telefone é obrigatório")
-            .Must(BeValidPhone).WithMessage("Telefone deve ser válido (formato brasileiro)");
-
-        RuleFor(x => x.ServiceIds)
-            .NotNull().WithMessage("Lista de serviços é obrigatória");
+        When(x => x.Phone != null, () =>
+        {
+            RuleFor(x => x.Phone)
+                .NotEmpty().WithMessage("Telefone não pode ser vazio")
+                .Must(BeValidPhone!).WithMessage("Telefone deve ser válido (formato brasileiro)");
+        });
     }
 
     private bool BeValidPhone(string phone)

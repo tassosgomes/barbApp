@@ -33,7 +33,7 @@ public class UpdateBarberUseCase : IUpdateBarberUseCase
 
     public async Task<BarberOutput> ExecuteAsync(UpdateBarberInput input, CancellationToken cancellationToken)
     {
-        var maskedPhone = MaskPhone(input.Phone);
+        var maskedPhone = input.Phone != null ? MaskPhone(input.Phone) : "***";
         _logger.LogInformation("Starting update of barber with ID {BarberId} and phone {MaskedPhone}", input.Id, maskedPhone);
 
         var barbeariaId = _tenantContext.BarbeariaId;
@@ -52,7 +52,11 @@ public class UpdateBarberUseCase : IUpdateBarberUseCase
         }
 
         // Update barber
-        barber.Update(input.Name, input.Phone, input.ServiceIds);
+        var name = input.Name ?? barber.Name;
+        var phone = input.Phone ?? barber.Phone;
+        var serviceIds = input.ServiceIds ?? barber.ServiceIds;
+        
+        barber.Update(name, phone, serviceIds);
 
         await _barberRepository.UpdateAsync(barber, cancellationToken);
         await _unitOfWork.Commit(cancellationToken);

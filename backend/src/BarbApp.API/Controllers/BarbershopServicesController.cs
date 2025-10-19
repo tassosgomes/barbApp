@@ -155,6 +155,31 @@ public class BarbershopServicesController : ControllerBase
     }
 
     /// <summary>
+    /// Desativa um serviço oferecido pela barbearia
+    /// </summary>
+    /// <param name="id">ID do serviço</param>
+    /// <returns>Sem conteúdo</returns>
+    /// <response code="204">Serviço desativado com sucesso</response>
+    /// <response code="401">Usuário não autenticado</response>
+    /// <response code="403">Usuário não tem permissão para acessar este recurso</response>
+    /// <response code="404">Serviço não encontrado</response>
+    [HttpPut("{id}/deactivate")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DeactivateService(Guid id)
+    {
+        _logger.LogInformation("Deactivating service {Id}", id);
+
+        await _deleteServiceUseCase.ExecuteAsync(id, HttpContext.RequestAborted);
+
+        _logger.LogInformation("Service deactivated successfully: {Id}", id);
+
+        return NoContent();
+    }
+
+    /// <summary>
     /// Remove um serviço oferecido pela barbearia
     /// </summary>
     /// <param name="id">ID do serviço</param>
