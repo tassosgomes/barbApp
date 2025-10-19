@@ -40,7 +40,9 @@ public class ScheduleController : ControllerBase
     [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<BarberScheduleOutput>> GetMySchedule([FromQuery] DateTime? date = null)
     {
-        var scheduleDate = date ?? DateTime.UtcNow.Date;
+        var scheduleDate = date.HasValue 
+            ? DateTime.SpecifyKind(date.Value.Date, DateTimeKind.Utc)
+            : DateTime.SpecifyKind(DateTime.UtcNow.Date, DateTimeKind.Utc);
         
         _logger.LogInformation("Getting schedule for barber on date: {Date}", scheduleDate);
 

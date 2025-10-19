@@ -53,6 +53,7 @@ public class GlobalExceptionHandlerMiddleware
             Domain.Exceptions.InvalidUniqueCodeException => (HttpStatusCode.Unauthorized, "Código da barbearia inválido"),
             ForbiddenException => (HttpStatusCode.Forbidden, exception.Message),
             NotFoundException => (HttpStatusCode.NotFound, exception.Message),
+            ConflictException => (HttpStatusCode.Conflict, exception.Message),
             DuplicateDocumentException => (HttpStatusCode.UnprocessableEntity, exception.Message),
             DuplicateBarberException => (HttpStatusCode.Conflict, exception.Message),
             InvalidDocumentException => (HttpStatusCode.BadRequest, exception.Message),
