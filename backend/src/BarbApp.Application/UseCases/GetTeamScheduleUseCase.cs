@@ -124,7 +124,7 @@ public class GetTeamScheduleUseCase : IGetTeamScheduleUseCase
             appointment.StartTime,
             appointment.EndTime,
             appointment.ServiceName,
-            appointment.Status
+            appointment.StatusString
         );
     }
 }

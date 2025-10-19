@@ -420,25 +420,26 @@ public class BarbersControllerIntegrationTests : IAsyncLifetime
         var customer = Customer.Create(_testBarbeariaId, "(11) 99999-9999", "Cliente Teste");
         dbContext.Customers.Add(customer);
 
-        var appointment1 = new Appointment(
+        var appointment1 = Appointment.Create(
             _testBarbeariaId,
-            customer.Id,
             createdBarber!.Id,
+            customer.Id,
             _testServiceIds[0],
             DateTime.UtcNow.AddDays(1).Date.AddHours(10),
-            DateTime.UtcNow.AddDays(1).Date.AddHours(10).AddMinutes(30),
-            "Pendente"
+            DateTime.UtcNow.AddDays(1).Date.AddHours(10).AddMinutes(30)
         );
 
-        var appointment2 = new Appointment(
+        var appointment2 = Appointment.Create(
             _testBarbeariaId,
-            customer.Id,
             createdBarber.Id,
+            customer.Id,
             _testServiceIds[0],
             DateTime.UtcNow.AddDays(2).Date.AddHours(14),
-            DateTime.UtcNow.AddDays(2).Date.AddHours(14).AddMinutes(30),
-            "Confirmado"
+            DateTime.UtcNow.AddDays(2).Date.AddHours(14).AddMinutes(30)
         );
+        
+        // Confirm the second appointment
+        appointment2.Confirm();
 
         dbContext.Appointments.AddRange(appointment1, appointment2);
         await dbContext.SaveChangesAsync();
@@ -457,7 +458,7 @@ public class BarbersControllerIntegrationTests : IAsyncLifetime
 
         cancelledAppointments.Should().HaveCount(2);
         cancelledAppointments.Should().AllSatisfy(appointment =>
-            appointment.Status.Should().Be("Cancelled"));
+            appointment.Status.Should().Be(Domain.Enums.AppointmentStatus.Cancelled));
     }
 
     [Fact]
@@ -485,15 +486,17 @@ public class BarbersControllerIntegrationTests : IAsyncLifetime
         var customer = Customer.Create(_testBarbeariaId, "(11) 99999-9998", "Cliente Hoje");
         dbContext.Customers.Add(customer);
 
-        var todayAppointment = new Appointment(
+        var todayAppointment = Appointment.Create(
             _testBarbeariaId,
-            customer.Id,
             barber!.Id,
+            customer.Id,
             _testServiceIds[0],
             DateTime.UtcNow.Date.AddHours(9),
-            DateTime.UtcNow.Date.AddHours(9).AddMinutes(30),
-            "Confirmado"
+            DateTime.UtcNow.Date.AddHours(9).AddMinutes(30)
         );
+        
+        // Confirm the appointment
+        todayAppointment.Confirm();
 
         dbContext.Appointments.Add(todayAppointment);
         await dbContext.SaveChangesAsync();

@@ -1,5 +1,6 @@
 // BarbApp.Infrastructure/Persistence/Configurations/AppointmentConfiguration.cs
 using BarbApp.Domain.Entities;
+using BarbApp.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -23,8 +24,24 @@ public class AppointmentConfiguration : IEntityTypeConfiguration<Appointment>
         builder.Property(a => a.ServiceId).HasColumnName("service_id").IsRequired();
         builder.Property(a => a.StartTime).HasColumnName("start_time").IsRequired();
         builder.Property(a => a.EndTime).HasColumnName("end_time").IsRequired();
-        builder.Property(a => a.ServiceName).HasColumnName("service_name").IsRequired().HasMaxLength(100);
-        builder.Property(a => a.Status).HasColumnName("status").IsRequired().HasMaxLength(20);
+        
+        // Status as enum stored as string
+        builder.Property(a => a.Status)
+            .HasColumnName("status")
+            .HasConversion<string>()
+            .IsRequired()
+            .HasMaxLength(20);
+
+        // Timestamps
+        builder.Property(a => a.CreatedAt).HasColumnName("created_at").IsRequired();
+        builder.Property(a => a.UpdatedAt).HasColumnName("updated_at").IsRequired();
+        builder.Property(a => a.ConfirmedAt).HasColumnName("confirmed_at");
+        builder.Property(a => a.CancelledAt).HasColumnName("cancelled_at");
+        builder.Property(a => a.CompletedAt).HasColumnName("completed_at");
+
+        // Ignore computed properties
+        builder.Ignore(a => a.ServiceName);
+        builder.Ignore(a => a.StatusString);
 
         // Indexes for performance
         builder.HasIndex(a => a.BarbeariaId)
@@ -45,20 +62,20 @@ public class AppointmentConfiguration : IEntityTypeConfiguration<Appointment>
         builder.HasIndex(a => new { a.BarberId, a.StartTime })
             .HasDatabaseName("ix_appointments_barber_start_time");
 
-        // Relationships
-        builder.HasOne<Barbershop>()
+        // Navigation properties
+        builder.HasOne(a => a.Barbearia)
             .WithMany()
             .HasForeignKey(a => a.BarbeariaId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasOne<Barber>()
+        builder.HasOne(a => a.Barber)
             .WithMany()
             .HasForeignKey(a => a.BarberId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasOne<Customer>()
+        builder.HasOne(a => a.Service)
             .WithMany()
-            .HasForeignKey(a => a.CustomerId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .HasForeignKey(a => a.ServiceId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

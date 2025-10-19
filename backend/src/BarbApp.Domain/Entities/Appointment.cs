@@ -24,6 +24,12 @@ public class Appointment
     public Barber? Barber { get; private set; }
     public BarbershopService? Service { get; private set; }
 
+    // Computed property for backwards compatibility
+    public string ServiceName => Service?.Name ?? string.Empty;
+    
+    // Status as string for backwards compatibility
+    public string StatusString => Status.ToString();
+
     private Appointment()
     {
         // EF Core constructor
