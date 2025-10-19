@@ -6,10 +6,16 @@ import { ServicesListPage } from '@/pages/Services';
 import { SchedulePage } from '@/pages/Schedule';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { adminBarbeariaRoutes } from './adminBarbearia.routes';
+import { barberRoutes } from './barber.routes';
 
 export const router = createBrowserRouter([
-  // Admin Barbearia routes (must come first to match /:codigo patterns)
+  // Barber routes (login and /barber/*)
+  barberRoutes,
+  
+  // Admin Barbearia routes (must come after barber to avoid conflicts)
   ...adminBarbeariaRoutes,
+  
+  // Admin Central routes
   {
     path: '/login',
     element: <Login />,
