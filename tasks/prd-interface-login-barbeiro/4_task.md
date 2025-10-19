@@ -1,5 +1,5 @@
 ---
-status: pending
+status: completed
 parallelizable: true
 blocked_by: ["1.0","3.0"]
 ---
@@ -27,22 +27,22 @@ Criar os componentes visuais da tela de login: formulário com validação em te
 - Design mobile-first com Shadcn UI
 
 ## Subtarefas
-- [ ] 4.1 Criar `src/components/auth/LoginForm.tsx`:
+- [x] 4.1 Criar `src/components/auth/LoginForm.tsx`:
   - Integração com React Hook Form
   - Validação com schema Zod
   - Aplicação de máscara no campo telefone
   - Estados de loading e erro
   - Integração com useAuth().login()
-- [ ] 4.2 Criar `src/pages/auth/LoginPage.tsx`:
+- [x] 4.2 Criar `src/pages/auth/LoginPage.tsx`:
   - Layout centralizado
   - Card com título e descrição
   - Inclusão do LoginForm
   - Texto de ajuda e link
-- [ ] 4.3 Criar `src/components/auth/HelpModal.tsx` (opcional):
+- [x] 4.3 Criar `src/components/auth/HelpModal.tsx` (opcional):
   - Modal com instruções para primeiro acesso
   - Informações sobre código da barbearia
-- [ ] 4.4 Estilizar com Shadcn UI e Tailwind
-- [ ] 4.5 Testar responsividade mobile
+- [x] 4.4 Estilizar com Shadcn UI e Tailwind
+- [x] 4.5 Testar responsividade mobile
 
 ## Sequenciamento
 - Bloqueado por: 1.0 (Tipos, Schemas), 3.0 (useAuth)

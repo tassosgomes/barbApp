@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { authService } from '@/services/auth.service';
 import type { AuthContextType, User, LoginInput } from '@/types/auth.types';
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 interface AuthProviderProps {
   children: ReactNode;
