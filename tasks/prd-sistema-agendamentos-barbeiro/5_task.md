@@ -1,7 +1,8 @@
 ---
-status: pending
+status: completed
 parallelizable: true
 blocked_by: ["3.0","4.0"]
+completed_date: 2025-10-19
 ---
 
 <task_context>
@@ -24,8 +25,8 @@ Definir contrato de agenda (payload) e diretrizes de polling (10s) para o fronte
 - Orientações para exibir loading/empty states e indicadores de atualização
 
 ## Subtarefas
-- [ ] 5.1 Consolidar contrato com exemplos
-- [ ] 5.2 Documentar diretrizes de polling e edge cases
+- [x] 5.1 Consolidar contrato com exemplos
+- [x] 5.2 Documentar diretrizes de polling e edge cases
 
 ## Sequenciamento
 - Bloqueado por: 3.0, 4.0
