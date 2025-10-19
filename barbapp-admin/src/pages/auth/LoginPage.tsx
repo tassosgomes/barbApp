@@ -16,7 +16,9 @@ import { HelpCircle } from 'lucide-react';
  * - Layout responsivo e mobile-first
  * - Card centralizado com formulário de login
  * - Modal de ajuda para primeiro acesso
+ * - Animações de entrada suaves (fade in)
  * - Design consistente com Shadcn UI
+ * - Otimizações para mobile (touch targets, font-size)
  * 
  * @example
  * ```tsx
@@ -27,11 +29,11 @@ export function LoginPage() {
   const [showHelp, setShowHelp] = useState(false);
   
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gray-50" data-testid="login-page">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="text-2xl">Login Barbeiro</CardTitle>
-          <CardDescription>
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-gray-50 to-gray-100" data-testid="login-page">
+      <Card className="w-full max-w-md fade-in shadow-lg">
+        <CardHeader className="space-y-1">
+          <CardTitle className="text-2xl font-bold tracking-tight">Login Barbeiro</CardTitle>
+          <CardDescription className="text-base">
             Entre com seu e-mail e senha para acessar sua agenda
           </CardDescription>
         </CardHeader>
@@ -40,14 +42,15 @@ export function LoginPage() {
           <LoginForm />
           
           {/* Link de Ajuda */}
-          <div className="text-center">
+          <div className="text-center pt-2">
             <p className="text-sm text-gray-600">
               Primeiro acesso?{' '}
               <button
                 type="button"
-                className="text-blue-600 hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded"
+                className="text-blue-600 hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-1 min-h-[44px] inline-flex items-center transition-smooth"
                 onClick={() => setShowHelp(true)}
                 data-testid="help-button"
+                aria-label="Abrir ajuda para primeiro acesso"
               >
                 Precisa de ajuda?
               </button>
@@ -58,22 +61,22 @@ export function LoginPage() {
       
       {/* Modal de Ajuda */}
       <Dialog open={showHelp} onOpenChange={setShowHelp}>
-        <DialogContent data-testid="help-modal">
+        <DialogContent data-testid="help-modal" className="scale-in">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <HelpCircle className="h-5 w-5 text-blue-600" />
+            <DialogTitle className="flex items-center gap-2 text-lg">
+              <HelpCircle className="h-5 w-5 text-blue-600" aria-hidden="true" />
               Como fazer login
             </DialogTitle>
             <DialogDescription className="space-y-3 pt-4 text-left">
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <p className="text-sm text-gray-700">
-                  <strong>📧 E-mail:</strong> Use o e-mail que foi cadastrado pelo administrador da sua barbearia.
+                  <strong className="text-gray-900">📧 E-mail:</strong> Use o e-mail que foi cadastrado pelo administrador da sua barbearia.
                 </p>
                 <p className="text-sm text-gray-700">
-                  <strong>🔒 Senha:</strong> Use a senha fornecida pelo administrador. Você pode alterá-la depois do primeiro acesso.
+                  <strong className="text-gray-900">🔒 Senha:</strong> Use a senha fornecida pelo administrador. Você pode alterá-la depois do primeiro acesso.
                 </p>
                 <p className="text-sm text-gray-700">
-                  <strong>❓ Não tem acesso?</strong> Entre em contato com o administrador da sua barbearia.
+                  <strong className="text-gray-900">❓ Não tem acesso?</strong> Entre em contato com o administrador da sua barbearia.
                 </p>
               </div>
             </DialogDescription>
@@ -82,7 +85,7 @@ export function LoginPage() {
           <div className="pt-4">
             <Button 
               onClick={() => setShowHelp(false)} 
-              className="w-full"
+              className="w-full min-h-[44px] transition-smooth"
               data-testid="help-close-button"
             >
               Entendi
