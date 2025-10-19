@@ -100,13 +100,12 @@ public class AuthController : ControllerBase
     public async Task<ActionResult<AuthResponse>> LoginBarbeiro([FromBody] LoginBarbeiroInput input)
     {
         _logger.LogInformation(
-            "Barbeiro login attempt for telefone: {Telefone}, Codigo: {Codigo}",
-            input.Telefone,
-            input.Codigo);
+            "Barbeiro login attempt for email: {Email}",
+            input.Email);
 
         var response = await _authenticateBarbeiro.ExecuteAsync(input);
 
-        _logger.LogInformation("Barbeiro login successful for telefone: {Telefone}", input.Telefone);
+        _logger.LogInformation("Barbeiro login successful for email: {Email}", input.Email);
 
         return Ok(response);
     }

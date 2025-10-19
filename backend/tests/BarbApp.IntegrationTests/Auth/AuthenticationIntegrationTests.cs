@@ -161,13 +161,13 @@ public class AuthenticationIntegrationTests
         using var scope = _factory.Services.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<BarbAppDbContext>();
 
-        var (barbeariaId, barbeiroId, telefone, codigo) =
+        var (barbeariaId, barbeiroId, email, senha) =
             await TestHelper.CreateBarbeiroAsync(context);
 
         var loginInput = new LoginBarbeiroInput
         {
-            Codigo = codigo,
-            Telefone = telefone
+            Email = email,
+            Password = senha
         };
 
         // Act
@@ -189,8 +189,8 @@ public class AuthenticationIntegrationTests
         // Arrange
         var loginInput = new LoginBarbeiroInput
         {
-            Codigo = "INVALID",
-            Telefone = "11999999999"
+            Email = "invalid@test.com",
+            Password = "wrongpassword"
         };
 
         // Act
@@ -304,18 +304,18 @@ public class AuthenticationIntegrationTests
         var context = scope.ServiceProvider.GetRequiredService<BarbAppDbContext>();
 
         // Barbearia 1 with barber
-        var (barbearia1Id, barbeiro1Id, telefone1, codigo1) =
+        var (barbearia1Id, barbeiro1Id, email1, senha1) =
             await TestHelper.CreateBarbeiroAsync(context);
 
         // Barbearia 2 with barber
-        var (barbearia2Id, barbeiro2Id, telefone2, codigo2) =
+        var (barbearia2Id, barbeiro2Id, email2, senha2) =
             await TestHelper.CreateBarbeiroAsync(context);
 
         // Authenticate as barber from barbearia1
         var loginInput = new LoginBarbeiroInput
         {
-            Codigo = codigo1,
-            Telefone = telefone1
+            Email = email1,
+            Password = senha1
         };
 
         var authResponse = await _client.PostAsJsonAsync("/api/auth/barbeiro/login", loginInput);
@@ -346,7 +346,6 @@ public class AuthenticationIntegrationTests
         barbers.Should().NotBeNull();
         barbers!.Should().HaveCount(1);
         barbers[0].Id.Should().Be(barbeiro1Id);
-        barbers[0].Telefone.Should().Be(telefone1);
         barbers[0].BarbeariaId.Should().Be(barbearia1Id);
     }
 }

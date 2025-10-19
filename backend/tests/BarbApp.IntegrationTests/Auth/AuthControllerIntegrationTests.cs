@@ -122,8 +122,8 @@ public class AuthControllerIntegrationTests : IClassFixture<WebApplicationFactor
 
         var response = await client.PostAsJsonAsync("/api/auth/barbeiro/login", new LoginBarbeiroInput
         {
-            Codigo = "BARB123",
-            Telefone = "11999998888"
+            Email = "barbeiro@test.com",
+            Password = "password123"
         });
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);

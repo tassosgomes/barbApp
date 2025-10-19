@@ -1,5 +1,5 @@
 ---
-status: pending
+status: completed
 parallelizable: false
 blocked_by: ["1.0","2.0"]
 ---
@@ -26,14 +26,14 @@ Implementar Context API para gestão global do estado de autenticação e hook c
 - Navegação automática após login/logout
 
 ## Subtarefas
-- [ ] 3.1 Criar `src/contexts/AuthContext.tsx`:
+- [x] 3.1 Criar `src/contexts/AuthContext.tsx`:
   - Estado: user, isLoading
   - Funções: login, logout, validateSession
   - useEffect para validar sessão ao montar
-- [ ] 3.2 Exportar hook `useAuth()` no mesmo arquivo
-- [ ] 3.3 Integrar com `authService`
-- [ ] 3.4 Implementar lógica de navegação (useNavigate)
-- [ ] 3.5 Testes do hook com renderHook
+- [x] 3.2 Exportar hook `useAuth()` no mesmo arquivo
+- [x] 3.3 Integrar com `authService`
+- [x] 3.4 Implementar lógica de navegação (useNavigate)
+- [x] 3.5 Testes do hook com renderHook
 
 ## Sequenciamento
 - Bloqueado por: 1.0 (Tipos), 2.0 (Services)

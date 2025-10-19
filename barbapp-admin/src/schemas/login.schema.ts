@@ -4,22 +4,18 @@ import { z } from 'zod';
  * Schema de validação para o formulário de login de barbeiros
  * 
  * Regras:
- * - barbershopCode: obrigatório, mínimo 6 caracteres, convertido para maiúsculas
- * - phone: obrigatório, formato brasileiro (XX) XXXXX-XXXX
+ * - email: obrigatório, formato de e-mail válido
+ * - password: obrigatório, mínimo 6 caracteres
  */
 export const barberLoginSchema = z.object({
-  barbershopCode: z
+  email: z
     .string()
-    .min(1, 'Código da barbearia é obrigatório')
-    .min(6, 'Código da barbearia muito curto. Mínimo 6 caracteres')
-    .transform((val) => val.toUpperCase()),
-  phone: z
+    .min(1, 'E-mail é obrigatório')
+    .email('E-mail inválido'),
+  password: z
     .string()
-    .min(1, 'Telefone é obrigatório')
-    .regex(
-      /^\(\d{2}\) \d{5}-\d{4}$/,
-      'Telefone inválido. Use o formato (XX) XXXXX-XXXX'
-    ),
+    .min(1, 'Senha é obrigatória')
+    .min(6, 'Senha deve ter no mínimo 6 caracteres'),
 });
 
 /**

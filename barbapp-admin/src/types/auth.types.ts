@@ -6,8 +6,8 @@
  * Dados de entrada para login
  */
 export interface LoginInput {
-  barbershopCode: string;
-  phone: string;
+  email: string;
+  password: string;
 }
 
 /**
@@ -15,7 +15,11 @@ export interface LoginInput {
  */
 export interface AuthResponse {
   token: string;
-  user: User;
+  tipoUsuario: string;
+  barbeariaId: string | null;
+  nomeBarbearia: string;
+  codigoBarbearia: string | null;
+  expiresAt: string;
 }
 
 /**
@@ -24,9 +28,10 @@ export interface AuthResponse {
 export interface User {
   id: string;
   name: string;
-  phone: string;
+  email: string;
   role: 'Barbeiro';
-  barbershopId?: string;
+  barbeariaId: string;
+  nomeBarbearia: string;
 }
 
 /**

@@ -19,9 +19,18 @@ api.interceptors.request.use(
     // Determine which token to use based on the current route
     const path = window.location.pathname;
     const isAdminBarbearia = path.match(/^\/[A-Z0-9]+\//); // Pattern: /{CODIGO}/...
+    const isBarbeiro = path.startsWith('/barber'); // Pattern: /barber/...
     
-    // Select appropriate token key
-    const tokenKey = isAdminBarbearia ? 'admin_barbearia_token' : 'auth_token';
+    // Select appropriate token key based on context
+    let tokenKey: string;
+    if (isBarbeiro) {
+      tokenKey = 'barbapp-barber-token';
+    } else if (isAdminBarbearia) {
+      tokenKey = 'admin_barbearia_token';
+    } else {
+      tokenKey = 'auth_token';
+    }
+    
     const token = localStorage.getItem(tokenKey);
     
     if (token) {
@@ -65,8 +74,16 @@ api.interceptors.response.use(
       // Determine which token to clear and where to redirect based on current route
       const path = window.location.pathname;
       const isAdminBarbearia = path.match(/^\/([A-Z0-9]+)\//);
+      const isBarbeiro = path.startsWith('/barber');
       
-      if (isAdminBarbearia) {
+      if (isBarbeiro) {
+        // Barbeiro: clear barber token and redirect to barber login
+        localStorage.removeItem('barbapp-barber-token');
+        // Only redirect if not already on login page
+        if (!path.includes('/login')) {
+          window.location.href = '/login';
+        }
+      } else if (isAdminBarbearia) {
         // Admin Barbearia: clear specific token and redirect to barbearia login
         const codigo = isAdminBarbearia[1];
         localStorage.removeItem('admin_barbearia_token');

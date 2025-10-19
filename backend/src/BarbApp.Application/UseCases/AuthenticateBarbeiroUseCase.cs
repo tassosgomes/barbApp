@@ -11,37 +11,42 @@ public class AuthenticateBarbeiroUseCase : IAuthenticateBarbeiroUseCase
     private readonly IBarbershopRepository _barbershopRepository;
     private readonly IBarberRepository _repository;
     private readonly IJwtTokenGenerator _tokenGenerator;
+    private readonly IPasswordHasher _passwordHasher;
 
     public AuthenticateBarbeiroUseCase(
         IBarbershopRepository barbershopRepository,
         IBarberRepository repository,
-        IJwtTokenGenerator tokenGenerator)
+        IJwtTokenGenerator tokenGenerator,
+        IPasswordHasher passwordHasher)
     {
         _barbershopRepository = barbershopRepository;
         _repository = repository;
         _tokenGenerator = tokenGenerator;
+        _passwordHasher = passwordHasher;
     }
 
     public async Task<AuthResponse> ExecuteAsync(LoginBarbeiroInput input, CancellationToken cancellationToken = default)
     {
-        var barbearia = await _barbershopRepository.GetByCodeAsync(input.Codigo, cancellationToken);
+        // Buscar barbeiro por email
+        var barber = await _repository.GetByEmailGlobalAsync(input.Email, cancellationToken);
+
+        if (barber == null || !_passwordHasher.Verify(input.Password, barber.PasswordHash))
+        {
+            throw new BarbApp.Domain.Exceptions.UnauthorizedAccessException("E-mail ou senha inválidos");
+        }
+
+        // Buscar barbearia do barbeiro
+        var barbearia = await _barbershopRepository.GetByIdAsync(barber.BarbeariaId, cancellationToken);
 
         if (barbearia == null || !barbearia.IsActive)
         {
-            throw new BarbApp.Domain.Exceptions.UnauthorizedAccessException("Código da barbearia inválido");
-        }
-
-        var barber = await _repository.GetByTelefoneAndBarbeariaIdAsync(input.Telefone, barbearia.Id, cancellationToken);
-
-        if (barber == null)
-        {
-            throw new BarbApp.Domain.Exceptions.UnauthorizedAccessException("Barbeiro não encontrado");
+            throw new BarbApp.Domain.Exceptions.UnauthorizedAccessException("Barbearia inativa ou não encontrada");
         }
 
         var token = _tokenGenerator.GenerateToken(
             userId: barber.Id.ToString(),
             userType: "Barbeiro",
-            email: barber.Phone, // use Phone instead of Telefone
+            email: barber.Email,
             barbeariaId: barbearia.Id,
             barbeariaCode: barbearia.Code.Value
         );

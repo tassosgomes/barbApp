@@ -16,6 +16,7 @@ public class AuthenticateBarbeiroUseCaseTests
     private readonly Mock<IBarbershopRepository> _barbershopRepoMock;
     private readonly Mock<IBarberRepository> _repositoryMock;
     private readonly Mock<IJwtTokenGenerator> _tokenGeneratorMock;
+    private readonly Mock<IPasswordHasher> _passwordHasherMock;
     private readonly AuthenticateBarbeiroUseCase _useCase;
 
     public AuthenticateBarbeiroUseCaseTests()
@@ -23,10 +24,12 @@ public class AuthenticateBarbeiroUseCaseTests
         _barbershopRepoMock = new Mock<IBarbershopRepository>();
         _repositoryMock = new Mock<IBarberRepository>();
         _tokenGeneratorMock = new Mock<IJwtTokenGenerator>();
+        _passwordHasherMock = new Mock<IPasswordHasher>();
         _useCase = new AuthenticateBarbeiroUseCase(
             _barbershopRepoMock.Object,
             _repositoryMock.Object,
-            _tokenGeneratorMock.Object
+            _tokenGeneratorMock.Object,
+            _passwordHasherMock.Object
         );
     }
 
@@ -43,21 +46,25 @@ public class AuthenticateBarbeiroUseCaseTests
         // Arrange
         var input = new LoginBarbeiroInput
         {
-            Codigo = "ABC23456",
-            Telefone = "11987654321"
+            Email = "joao@test.com",
+            Password = "password123"
         };
 
         var barbeariaCode = UniqueCode.Create("ABC23456");
         var barbearia = CreateTestBarbershop("Barbearia Teste", barbeariaCode);
         var barber = Barber.Create(barbearia.Id, "João Silva", "joao@test.com", "hashedpassword", "11987654321");
 
-        _barbershopRepoMock
-            .Setup(x => x.GetByCodeAsync(input.Codigo, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(barbearia);
-
         _repositoryMock
-            .Setup(x => x.GetByTelefoneAndBarbeariaIdAsync(input.Telefone, barbearia.Id, It.IsAny<CancellationToken>()))
+            .Setup(x => x.GetByEmailGlobalAsync(input.Email, It.IsAny<CancellationToken>()))
             .ReturnsAsync(barber);
+
+        _passwordHasherMock
+            .Setup(x => x.Verify(input.Password, barber.PasswordHash))
+            .Returns(true);
+
+        _barbershopRepoMock
+            .Setup(x => x.GetByIdAsync(barbearia.Id, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(barbearia);
 
         var expectedToken = new JwtToken("jwt-token", DateTime.UtcNow.AddHours(24));
 
@@ -65,7 +72,7 @@ public class AuthenticateBarbeiroUseCaseTests
             .Setup(x => x.GenerateToken(
                 It.Is<string>(id => id == barber.Id.ToString()),
                 It.Is<string>(type => type == "Barbeiro"),
-                It.Is<string>(email => email == barber.Phone),
+                It.Is<string>(email => email == barber.Email),
                 It.Is<Guid?>(barbeariaId => barbeariaId == barbearia.Id),
                 It.Is<string>(barbeariaCode => barbeariaCode == barbearia.Code.Value)))
             .Returns(expectedToken);
@@ -81,61 +88,29 @@ public class AuthenticateBarbeiroUseCaseTests
         result.NomeBarbearia.Should().Be(barbearia.Name);
         result.ExpiresAt.Should().Be(expectedToken.ExpiresAt);
 
-        _barbershopRepoMock.Verify(x => x.GetByCodeAsync(input.Codigo, It.IsAny<CancellationToken>()), Times.Once);
-        _repositoryMock.Verify(x => x.GetByTelefoneAndBarbeariaIdAsync(input.Telefone, barbearia.Id, It.IsAny<CancellationToken>()), Times.Once);
+        _repositoryMock.Verify(x => x.GetByEmailGlobalAsync(input.Email, It.IsAny<CancellationToken>()), Times.Once);
+        _passwordHasherMock.Verify(x => x.Verify(input.Password, barber.PasswordHash), Times.Once);
+        _barbershopRepoMock.Verify(x => x.GetByIdAsync(barbearia.Id, It.IsAny<CancellationToken>()), Times.Once);
         _tokenGeneratorMock.Verify(x => x.GenerateToken(
             It.Is<string>(id => id == barber.Id.ToString()),
             It.Is<string>(type => type == "Barbeiro"),
-            It.Is<string>(email => email == barber.Phone),
+            It.Is<string>(email => email == barber.Email),
             It.Is<Guid?>(barbeariaId => barbeariaId == barbearia.Id),
             It.Is<string>(barbeariaCode => barbeariaCode == barbearia.Code.Value)), Times.Once);
     }
 
     [Fact]
-    public async Task Execute_InvalidUniqueCode_ShouldThrowUnauthorizedAccessException()
+    public async Task Execute_InvalidEmail_ShouldThrowUnauthorizedAccessException()
     {
         // Arrange
         var input = new LoginBarbeiroInput
         {
-            Codigo = "INVALID",
-            Telefone = "11987654321"
+            Email = "invalid@test.com",
+            Password = "password123"
         };
-
-        _barbershopRepoMock
-            .Setup(x => x.GetByCodeAsync(input.Codigo, It.IsAny<CancellationToken>()))
-            .ReturnsAsync((Barbershop?)null);
-
-        // Act
-        Func<Task> act = async () => await _useCase.ExecuteAsync(input, CancellationToken.None);
-
-        // Assert
-        await act.Should().ThrowAsync<BarbApp.Domain.Exceptions.UnauthorizedAccessException>()
-            .WithMessage("Código da barbearia inválido");
-
-        _barbershopRepoMock.Verify(x => x.GetByCodeAsync(input.Codigo, It.IsAny<CancellationToken>()), Times.Once);
-        _repositoryMock.Verify(x => x.GetByTelefoneAndBarbeariaIdAsync(It.IsAny<string>(), It.IsAny<Guid>(), It.IsAny<CancellationToken>()), Times.Never);
-        _tokenGeneratorMock.Verify(x => x.GenerateToken(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Guid?>(), It.IsAny<string>()), Times.Never);
-    }
-
-    [Fact]
-    public async Task Execute_BarberNotFound_ShouldThrowUnauthorizedAccessException()
-    {
-        // Arrange
-        var input = new LoginBarbeiroInput
-        {
-            Codigo = "ABC23456",
-            Telefone = "11987654321"
-        };
-
-        var barbeariaCode = UniqueCode.Create("ABC23456");
-        var barbearia = CreateTestBarbershop("Barbearia Teste", barbeariaCode);
-
-        _barbershopRepoMock
-            .Setup(x => x.GetByCodeAsync(input.Codigo, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(barbearia);
 
         _repositoryMock
-            .Setup(x => x.GetByTelefoneAndBarbeariaIdAsync(input.Telefone, barbearia.Id, It.IsAny<CancellationToken>()))
+            .Setup(x => x.GetByEmailGlobalAsync(input.Email, It.IsAny<CancellationToken>()))
             .ReturnsAsync((Barber?)null);
 
         // Act
@@ -143,10 +118,46 @@ public class AuthenticateBarbeiroUseCaseTests
 
         // Assert
         await act.Should().ThrowAsync<BarbApp.Domain.Exceptions.UnauthorizedAccessException>()
-            .WithMessage("Barbeiro não encontrado");
+            .WithMessage("E-mail ou senha inválidos");
 
-        _barbershopRepoMock.Verify(x => x.GetByCodeAsync(input.Codigo, It.IsAny<CancellationToken>()), Times.Once);
-        _repositoryMock.Verify(x => x.GetByTelefoneAndBarbeariaIdAsync(input.Telefone, barbearia.Id, It.IsAny<CancellationToken>()), Times.Once);
+        _repositoryMock.Verify(x => x.GetByEmailGlobalAsync(input.Email, It.IsAny<CancellationToken>()), Times.Once);
+        _passwordHasherMock.Verify(x => x.Verify(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+        _barbershopRepoMock.Verify(x => x.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()), Times.Never);
+        _tokenGeneratorMock.Verify(x => x.GenerateToken(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Guid?>(), It.IsAny<string>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task Execute_InvalidPassword_ShouldThrowUnauthorizedAccessException()
+    {
+        // Arrange
+        var input = new LoginBarbeiroInput
+        {
+            Email = "joao@test.com",
+            Password = "wrongpassword"
+        };
+
+        var barbeariaCode = UniqueCode.Create("ABC23456");
+        var barbearia = CreateTestBarbershop("Barbearia Teste", barbeariaCode);
+        var barber = Barber.Create(barbearia.Id, "João Silva", "joao@test.com", "hashedpassword", "11987654321");
+
+        _repositoryMock
+            .Setup(x => x.GetByEmailGlobalAsync(input.Email, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(barber);
+
+        _passwordHasherMock
+            .Setup(x => x.Verify(input.Password, barber.PasswordHash))
+            .Returns(false);
+
+        // Act
+        Func<Task> act = async () => await _useCase.ExecuteAsync(input, CancellationToken.None);
+
+        // Assert
+        await act.Should().ThrowAsync<BarbApp.Domain.Exceptions.UnauthorizedAccessException>()
+            .WithMessage("E-mail ou senha inválidos");
+
+        _repositoryMock.Verify(x => x.GetByEmailGlobalAsync(input.Email, It.IsAny<CancellationToken>()), Times.Once);
+        _passwordHasherMock.Verify(x => x.Verify(input.Password, barber.PasswordHash), Times.Once);
+        _barbershopRepoMock.Verify(x => x.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()), Times.Never);
         _tokenGeneratorMock.Verify(x => x.GenerateToken(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Guid?>(), It.IsAny<string>()), Times.Never);
     }
 }
