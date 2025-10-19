@@ -1,7 +1,8 @@
 ---
-status: pending
+status: completed
 parallelizable: false
 blocked_by: ["1.0","2.0"]
+completed_date: 2025-10-19
 ---
 
 <task_context>
@@ -25,13 +26,13 @@ Implementar DTOs e use cases: `GetBarberSchedule`, `GetAppointmentDetails`, `Con
 - Testes unitários com mocks do repositório
 
 ## Subtarefas
-- [ ] 3.1 Implementar DTOs (Outputs e Inputs)
-- [ ] 3.2 Implementar `GetBarberScheduleUseCase`
-- [ ] 3.3 Implementar `GetAppointmentDetailsUseCase`
-- [ ] 3.4 Implementar `ConfirmAppointmentUseCase`
-- [ ] 3.5 Implementar `CancelAppointmentUseCase`
-- [ ] 3.6 Implementar `CompleteAppointmentUseCase`
-- [ ] 3.7 Testes unitários para todos os use cases
+- [x] 3.1 Implementar DTOs (Outputs e Inputs)
+- [x] 3.2 Implementar `GetBarberScheduleUseCase`
+- [x] 3.3 Implementar `GetAppointmentDetailsUseCase`
+- [x] 3.4 Implementar `ConfirmAppointmentUseCase`
+- [x] 3.5 Implementar `CancelAppointmentUseCase`
+- [x] 3.6 Implementar `CompleteAppointmentUseCase`
+- [x] 3.7 Testes unitários para todos os use cases
 
 ## Sequenciamento
 - Bloqueado por: 1.0, 2.0
