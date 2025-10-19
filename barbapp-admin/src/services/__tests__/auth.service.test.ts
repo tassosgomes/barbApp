@@ -204,28 +204,40 @@ describe('authService', () => {
 
   describe('logout', () => {
     it('deve remover token do localStorage', () => {
+      // Arrange - coloca um token no localStorage
+      localStorage.setItem('barbapp-barber-token', 'fake-token');
+      expect(localStorage.getItem('barbapp-barber-token')).toBe('fake-token');
+      
       // Act
       authService.logout();
 
-      // Assert
-      expect(localStorage.removeItem).toHaveBeenCalledWith('barbapp-barber-token');
+      // Assert - verifica que foi removido
+      expect(localStorage.getItem('barbapp-barber-token')).toBeNull();
     });
 
     it('deve funcionar mesmo se token não existir', () => {
+      // Arrange - garante que não há token
+      localStorage.removeItem('barbapp-barber-token');
+      
       // Act & Assert - não deve lançar erro
       expect(() => authService.logout()).not.toThrow();
-      expect(localStorage.removeItem).toHaveBeenCalledWith('barbapp-barber-token');
+      expect(localStorage.getItem('barbapp-barber-token')).toBeNull();
     });
 
     it('deve remover apenas o token do barbeiro', () => {
+      // Arrange - coloca múltiplos tokens
+      localStorage.setItem('barbapp-barber-token', 'fake-token');
+      localStorage.setItem('barbapp-admin-token', 'admin-token');
+      localStorage.setItem('other-key', 'other-value');
+      
       // Act
       authService.logout();
 
       // Assert - deve remover apenas o token do barbeiro
-      expect(localStorage.removeItem).toHaveBeenCalledWith('barbapp-barber-token');
-      // Verifica que a chave específica foi usada
-      const calls = vi.mocked(localStorage.removeItem).mock.calls;
-      expect(calls[calls.length - 1][0]).toBe('barbapp-barber-token');
+      expect(localStorage.getItem('barbapp-barber-token')).toBeNull();
+      // Outros tokens devem permanecer
+      expect(localStorage.getItem('barbapp-admin-token')).toBe('admin-token');
+      expect(localStorage.getItem('other-key')).toBe('other-value');
     });
   });
 });
