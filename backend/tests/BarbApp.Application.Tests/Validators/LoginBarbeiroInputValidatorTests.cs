@@ -21,8 +21,8 @@ public class LoginBarbeiroInputValidatorTests
         // Arrange
         var input = new LoginBarbeiroInput
         {
-            Codigo = "ABC23456",
-            Telefone = "11987654321"
+            Email = "test@test.com",
+            Password = "password123"
         };
 
         // Act
@@ -35,62 +35,81 @@ public class LoginBarbeiroInputValidatorTests
     [Theory]
     [InlineData("")]
     [InlineData(null)]
-    public void Validate_EmptyCodigo_ShouldHaveValidationError(string codigo)
+    public void Validate_EmptyEmail_ShouldHaveValidationError(string email)
     {
         // Arrange
         var input = new LoginBarbeiroInput
         {
-            Codigo = codigo,
-            Telefone = "11987654321"
+            Email = email,
+            Password = "password123"
         };
 
         // Act
         var result = _validator.TestValidate(input);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Codigo)
-            .WithErrorMessage("Código da barbearia é obrigatório");
+        result.ShouldHaveValidationErrorFor(x => x.Email)
+            .WithErrorMessage("E-mail é obrigatório");
+    }
+
+    [Theory]
+    [InlineData("invalid")]
+    [InlineData("invalid@")]
+    [InlineData("@invalid.com")]
+    public void Validate_InvalidEmail_ShouldHaveValidationError(string email)
+    {
+        // Arrange
+        var input = new LoginBarbeiroInput
+        {
+            Email = email,
+            Password = "password123"
+        };
+
+        // Act
+        var result = _validator.TestValidate(input);
+
+        // Assert
+        result.ShouldHaveValidationErrorFor(x => x.Email)
+            .WithErrorMessage("E-mail inválido");
     }
 
     [Theory]
     [InlineData("")]
     [InlineData(null)]
-    public void Validate_EmptyTelefone_ShouldHaveValidationError(string telefone)
+    public void Validate_EmptyPassword_ShouldHaveValidationError(string password)
     {
         // Arrange
         var input = new LoginBarbeiroInput
         {
-            Codigo = "ABC23456",
-            Telefone = telefone
+            Email = "test@test.com",
+            Password = password
         };
 
         // Act
         var result = _validator.TestValidate(input);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Telefone)
-            .WithErrorMessage("Telefone é obrigatório");
+        result.ShouldHaveValidationErrorFor(x => x.Password)
+            .WithErrorMessage("Senha é obrigatória");
     }
 
     [Theory]
-    [InlineData("123456789")]
-    [InlineData("123456789012")]
-    [InlineData("abcdefghij")]
-    [InlineData("11a98765432")]
-    public void Validate_InvalidTelefone_ShouldHaveValidationError(string telefone)
+    [InlineData("12345")]
+    [InlineData("abc")]
+    public void Validate_ShortPassword_ShouldHaveValidationError(string password)
     {
         // Arrange
         var input = new LoginBarbeiroInput
         {
-            Codigo = "ABC23456",
-            Telefone = telefone
+            Email = "test@test.com",
+            Password = password
         };
 
         // Act
         var result = _validator.TestValidate(input);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Telefone)
-            .WithErrorMessage("Telefone deve conter 10 ou 11 dígitos (formato brasileiro)");
+        result.ShouldHaveValidationErrorFor(x => x.Password)
+            .WithErrorMessage("A senha deve ter no mínimo 6 caracteres");
     }
 }

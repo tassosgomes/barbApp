@@ -11,15 +11,18 @@ public class AuthenticateBarbeiroUseCase : IAuthenticateBarbeiroUseCase
     private readonly IBarbershopRepository _barbershopRepository;
     private readonly IBarberRepository _repository;
     private readonly IJwtTokenGenerator _tokenGenerator;
+    private readonly IPasswordHasher _passwordHasher;
 
     public AuthenticateBarbeiroUseCase(
         IBarbershopRepository barbershopRepository,
         IBarberRepository repository,
-        IJwtTokenGenerator tokenGenerator)
+        IJwtTokenGenerator tokenGenerator,
+        IPasswordHasher passwordHasher)
     {
         _barbershopRepository = barbershopRepository;
         _repository = repository;
         _tokenGenerator = tokenGenerator;
+        _passwordHasher = passwordHasher;
     }
 
     public async Task<AuthResponse> ExecuteAsync(LoginBarbeiroInput input, CancellationToken cancellationToken = default)
@@ -27,15 +30,11 @@ public class AuthenticateBarbeiroUseCase : IAuthenticateBarbeiroUseCase
         // Buscar barbeiro por email
         var barber = await _repository.GetByEmailGlobalAsync(input.Email, cancellationToken);
 
-        if (barber == null)
+        if (barber == null || !_passwordHasher.Verify(input.Password, barber.PasswordHash))
         {
             throw new BarbApp.Domain.Exceptions.UnauthorizedAccessException("E-mail ou senha inválidos");
         }
 
-        // Verificar senha (assumindo que o campo PasswordHash existe na entidade Barber)
-        // TODO: Implementar verificação de senha quando campo PasswordHash for adicionado
-        // Por ora, vamos aceitar qualquer senha para não quebrar o sistema
-        
         // Buscar barbearia do barbeiro
         var barbearia = await _barbershopRepository.GetByIdAsync(barber.BarbeariaId, cancellationToken);
 

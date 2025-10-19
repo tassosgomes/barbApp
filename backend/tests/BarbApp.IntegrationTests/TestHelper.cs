@@ -59,9 +59,10 @@ public static class TestHelper
         return (barbearia.Id, admin.Id, email, senha, codigo.Value);
     }
 
-    public static async Task<(Guid barbeariaId, Guid barbeiroId, string telefone, string codigo)>
+    public static async Task<(Guid barbeariaId, Guid barbeiroId, string email, string senha)>
         CreateBarbeiroAsync(BarbAppDbContext context)
     {
+        var passwordHasher = new PasswordHasher();
         var document = Document.Create(GenerateUniqueDocument());
         var address = Address.Create("01310100", "Av. Paulista", "1000", null, "Bela Vista", "São Paulo", "SP");
         var codigo = UniqueCode.Create(GenerateUniqueCode());
@@ -77,13 +78,15 @@ public static class TestHelper
 
         await context.Barbershops.AddAsync(barbearia);
 
+        var email = $"barbeiro-{Guid.NewGuid()}@test.com";
+        var senha = "Test@123";
         var telefone = $"119{Random.Shared.Next(10000000, 99999999)}";
 
-        var barbeiro = Barber.Create(barbearia.Id, "Test Barber", "testbarber@test.com", "hashedpassword", telefone);
+        var barbeiro = Barber.Create(barbearia.Id, "Test Barber", email, passwordHasher.Hash(senha), telefone);
         await context.Barbers.AddAsync(barbeiro);
         await context.SaveChangesAsync();
 
-        return (barbearia.Id, barbeiro.Id, telefone, codigo.Value);
+        return (barbearia.Id, barbeiro.Id, email, senha);
     }
 
     public static async Task<(Guid barbeariaId, Guid clienteId, string telefone, string nome, string codigo)>
