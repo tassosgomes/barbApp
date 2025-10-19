@@ -2,6 +2,7 @@ using BarbApp.Application.DTOs;
 using BarbApp.Application.Interfaces.UseCases;
 using BarbApp.Application.UseCases;
 using BarbApp.Domain.Entities;
+using BarbApp.Domain.Enums;
 using BarbApp.Domain.Exceptions;
 using BarbApp.Domain.Interfaces;
 using BarbApp.Domain.Interfaces.Repositories;
@@ -209,14 +210,40 @@ public class GetTeamScheduleUseCaseTests
 
     private static Appointment CreateAppointment(Guid id, Guid barberId, Guid customerId, DateTime startTime, DateTime endTime, string serviceName, string status)
     {
+        var barbeariaId = Guid.NewGuid();
+        var serviceId = Guid.NewGuid();
+        
+        // Create the appointment using reflection to bypass validations for testing
         var appointment = (Appointment)Activator.CreateInstance(typeof(Appointment), true)!;
-        typeof(Appointment).GetProperty("Id")!.SetValue(appointment, id);
-        typeof(Appointment).GetProperty("BarberId")!.SetValue(appointment, barberId);
-        typeof(Appointment).GetProperty("CustomerId")!.SetValue(appointment, customerId);
-        typeof(Appointment).GetProperty("StartTime")!.SetValue(appointment, startTime);
-        typeof(Appointment).GetProperty("EndTime")!.SetValue(appointment, endTime);
-        typeof(Appointment).GetProperty("ServiceName")!.SetValue(appointment, serviceName);
-        typeof(Appointment).GetProperty("Status")!.SetValue(appointment, status);
+        SetProperty(appointment, "Id", id);
+        SetProperty(appointment, "BarbeariaId", barbeariaId);
+        SetProperty(appointment, "BarberId", barberId);
+        SetProperty(appointment, "CustomerId", customerId);
+        SetProperty(appointment, "ServiceId", serviceId);
+        SetProperty(appointment, "StartTime", startTime);
+        SetProperty(appointment, "EndTime", endTime);
+        SetProperty(appointment, "CreatedAt", DateTime.UtcNow);
+        SetProperty(appointment, "UpdatedAt", DateTime.UtcNow);
+        
+        // Set status as enum
+        var appointmentStatus = Enum.Parse<AppointmentStatus>(status);
+        SetProperty(appointment, "Status", appointmentStatus);
+        
+        // Create and set the Service to make ServiceName work
+        var service = (BarbershopService)Activator.CreateInstance(typeof(BarbershopService), true)!;
+        SetProperty(service, "Id", serviceId);
+        SetProperty(service, "Name", serviceName);
+        SetProperty(appointment, "Service", service);
+        
         return appointment;
+    }
+    
+    private static void SetProperty(object obj, string propertyName, object value)
+    {
+        var property = obj.GetType().GetProperty(propertyName, 
+            System.Reflection.BindingFlags.Public | 
+            System.Reflection.BindingFlags.NonPublic | 
+            System.Reflection.BindingFlags.Instance);
+        property?.SetValue(obj, value);
     }
 }
