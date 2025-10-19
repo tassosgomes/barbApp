@@ -1,5 +1,5 @@
 ---
-status: pending
+status: completed
 parallelizable: false
 blocked_by: ["3.0","4.0"]
 ---
@@ -27,18 +27,18 @@ Configurar rotas da aplicação com React Router, implementar componente Protect
 - Redirect automático baseado em autenticação
 
 ## Subtarefas
-- [ ] 5.1 Criar `src/components/auth/ProtectedRoute.tsx`:
+- [x] 5.1 Criar `src/components/auth/ProtectedRoute.tsx`:
   - Verificar isAuthenticated
   - Mostrar loading durante validação
   - Redirecionar para /login se não autenticado
   - Usar Outlet para renderizar rotas filhas
-- [ ] 5.2 Configurar rotas em `src/App.tsx`:
+- [x] 5.2 Configurar rotas em `src/App.tsx`:
   - Envolver com BrowserRouter
   - Adicionar AuthProvider
   - Definir rota pública /login
   - Definir rotas protegidas /barber/*
-- [ ] 5.3 Adicionar rota raiz (/) com redirect para /login
-- [ ] 5.4 Testar navegação e proteção de rotas
+- [x] 5.3 Adicionar rota raiz (/) com redirect para /login
+- [x] 5.4 Testar navegação e proteção de rotas
 
 ## Sequenciamento
 - Bloqueado por: 3.0 (AuthContext), 4.0 (LoginPage)
