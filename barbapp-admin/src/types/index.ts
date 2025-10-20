@@ -62,10 +62,10 @@ export type {
 } from './servico';
 
 // Schedule types
-export type {
-	Appointment,
-	AppointmentStatus,
-} from './schedule';
+// export type {
+//   Appointment,
+//   AppointmentStatus,
+// } from './schedule';
 
 // Filter types
 export type {
@@ -81,3 +81,18 @@ export type {
 	AdminBarbeariaAuth,
 	AdminBarbeariaSession,
 } from './adminBarbearia';
+
+// Appointment types (Task 11.0)
+export type {
+	AppointmentStatus,
+	Appointment,
+	AppointmentDetails,
+	BarberSchedule,
+} from './appointment';
+
+// Schedule filters types
+// export type {
+//   ScheduleFilters,
+//   DateNavigation,
+//   ScheduleViewMode,
+// } from './schedule-filters';

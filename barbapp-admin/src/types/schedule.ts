@@ -1,8 +1,8 @@
 export enum AppointmentStatus {
-  Pending = 'Pending',
-  Confirmed = 'Confirmed',
-  Cancelled = 'Cancelled',
-  Completed = 'Completed',
+  Pending = 0,
+  Confirmed = 1,
+  Completed = 2,
+  Cancelled = 3,
 }
 
 export interface Appointment {
@@ -13,6 +13,6 @@ export interface Appointment {
   customerName: string;
   startTime: string;
   endTime: string;
-  serviceName: string;
+  serviceTitle: string;
   status: AppointmentStatus;
 }
