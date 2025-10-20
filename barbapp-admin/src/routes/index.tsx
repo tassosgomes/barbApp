@@ -17,7 +17,7 @@ export const router = createBrowserRouter([
   
   // Admin Central routes
   {
-    path: '/login',
+    path: '/admin/login',
     element: <Login />,
   },
   {
