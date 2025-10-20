@@ -172,13 +172,13 @@ Usuário final que deseja agendar serviços de barbearia. Pode ser cliente regul
 
 4.8. Sistema deve destacar visualmente horários disponíveis
 
-4.9. **MVP Simplificado**: Sistema não verifica agenda real dos barbeiros (todos os horários são considerados disponíveis)
+4.9. **MVP Simplificado**: Sistema exibe todos os horários como potencialmente disponíveis
 
 4.10. Cliente deve poder voltar e mudar data se desejar
 
 4.11. Horários devem ser exibidos no fuso horário local da barbearia
 
-**Nota MVP**: Validação de disponibilidade real de barbeiros será implementada em fase futura. MVP exibe todos os horários como disponíveis.
+**Nota MVP**: Interface exibe todos os horários. Validação de conflito acontece apenas no momento da confirmação (para evitar complexidade de verificação em tempo real). Se houver conflito, cliente é notificado e pode escolher novo horário.
 
 ### 5. Finalização e Cadastro Automático
 
@@ -218,20 +218,31 @@ Usuário final que deseja agendar serviços de barbearia. Pode ser cliente regul
 5.6. Ao confirmar, sistema deve:
    - Criar/atualizar cliente
    - Se barbeiro escolhido foi "Qualquer um", sortear barbeiro aleatório neste momento
+   - **Validar que barbeiro escolhido não tem agendamento no mesmo dia/horário**
+   - Se houver conflito, sistema deve:
+     - Exibir mensagem: "Horário não está mais disponível. Por favor, escolha outro horário."
+     - Se foi "Qualquer um", tentar sortear outro barbeiro disponível
+     - Se nenhum barbeiro disponível, solicitar nova escolha de horário
    - Criar agendamento com status "Pendente"
    - Gerar identificador único para o agendamento
 
-5.7. O sistema deve exibir confirmação de sucesso com:
+5.7. O sistema deve calcular horário de término baseado na duração total dos serviços
+
+5.8. O sistema deve validar que horário de término não ultrapassa horário de fechamento (20:00)
+
+5.9. O sistema deve exibir confirmação de sucesso com:
    - Mensagem: "Agendamento realizado com sucesso!"
    - Detalhes completos do agendamento
    - Número/código do agendamento
    - Botões: "Ver meus agendamentos" e "Fazer novo agendamento"
 
-5.8. Cliente NÃO precisa fazer login para criar agendamento
+5.10. Cliente NÃO precisa fazer login para criar agendamento
 
-5.9. Após confirmação, cliente pode optar por acessar dashboard (fazendo login com telefone)
+5.11. Após confirmação, cliente pode optar por acessar dashboard (fazendo login com telefone)
 
 **Nota**: Nome não precisa ser completo (aceita apenas primeiro nome). Validação por SMS vem em fase futura.
+
+**Validação de Conflito Crítica**: Sistema DEVE verificar se barbeiro já tem agendamento no horário escolhido antes de confirmar.
 
 ### 6. Login Simples (Apenas Telefone)
 
@@ -386,8 +397,10 @@ Usuário final que deseja agendar serviços de barbearia. Pode ser cliente regul
 
 9.6. Sistema deve exibir resumo das alterações antes de confirmar
 
-9.7. Ao confirmar, sistema deve:
-   - Validar disponibilidade (se mudou horário)
+9.7. Ao confirmar edição, sistema deve:
+   - **Validar que barbeiro não tem conflito no novo horário (se mudou horário ou barbeiro)**
+   - Verificar se horário de término não ultrapassa fechamento (se mudou serviços)
+   - Se houver conflito, exibir mensagem e solicitar nova escolha
    - Atualizar agendamento existente
    - Manter mesmo ID de agendamento
    - Exibir mensagem: "Agendamento atualizado com sucesso"
@@ -397,6 +410,81 @@ Usuário final que deseja agendar serviços de barbearia. Pode ser cliente regul
 9.9. Sistema registra data/hora da última edição
 
 **Nota**: Cliente NÃO pode editar nome ou telefone do cadastro (apenas dados do agendamento).
+
+**Validação de Conflito**: Mesma lógica de validação do agendamento novo se aplica à edição.
+
+---
+
+## Regras de Negócio Críticas
+
+### Validação de Conflito de Horários
+
+**Requisito Obrigatório**: Sistema DEVE garantir que um barbeiro não tenha dois agendamentos sobrepostos.
+
+#### Quando Validar:
+1. No momento da **confirmação** de novo agendamento
+2. No momento da **confirmação** de edição de agendamento (se mudou horário ou barbeiro)
+3. Quando sistema **sorteia barbeiro aleatório** (escolher apenas entre disponíveis)
+
+#### Lógica de Sobreposição:
+
+```
+Agendamento Solicitado:
+- Início: 14:00
+- Duração: 50min (Corte + Barba)
+- Término: 14:50
+
+Conflita SE barbeiro tem agendamento existente onde:
+- (Início_Existente < 14:50) E (Término_Existente > 14:00)
+
+Exemplos:
+✅ OK: Existente 13:00-14:00 (termina quando novo começa)
+✅ OK: Existente 14:50-15:30 (começa quando novo termina)
+❌ CONFLITO: Existente 13:30-14:30 (sobrepõe início)
+❌ CONFLITO: Existente 14:20-15:00 (no meio)
+❌ CONFLITO: Existente 13:00-15:00 (engloba todo)
+```
+
+#### Tratamento de Conflito:
+
+**Caso 1: Barbeiro Específico Escolhido**
+1. Sistema detecta conflito
+2. Exibe mensagem: "❌ Horário não disponível para [Nome do Barbeiro]. Por favor, escolha outro horário ou barbeiro."
+3. Cliente pode:
+   - Escolher novo horário
+   - Escolher outro barbeiro
+   - Escolher "Qualquer barbeiro"
+
+**Caso 2: "Qualquer Barbeiro" Escolhido**
+1. Sistema sorteia barbeiro aleatório
+2. Valida se tem conflito
+3. Se SIM:
+   - Tenta sortear outro barbeiro disponível
+   - Se nenhum barbeiro disponível: "❌ Nenhum barbeiro disponível neste horário. Por favor, escolha outro horário."
+4. Se NÃO:
+   - Cria agendamento com barbeiro sorteado
+
+**Caso 3: Edição de Agendamento**
+1. Cliente muda horário de 14:00 para 16:00
+2. Sistema valida novo horário com mesmo barbeiro
+3. Se conflito, exibe mensagem e mantém dados originais
+4. Cliente pode tentar outro horário ou barbeiro
+
+#### Considerações de Status:
+
+Sistema deve considerar apenas agendamentos com status:
+- ✅ **Pendente**: Conta como ocupado
+- ✅ **Confirmado**: Conta como ocupado
+- ❌ **Cancelado**: NÃO conta (horário liberado)
+- ❌ **Concluído**: NÃO conta (já passou)
+
+#### Edge Cases:
+
+1. **Cliente tenta agendar mesmo horário duas vezes**: Sistema permite (barbeiros diferentes ou mesmo barbeiro em dias diferentes)
+2. **Dois clientes confirmam simultaneamente**: Sistema usa transação de banco para garantir atomicidade (apenas um sucede)
+3. **Cliente edita para horário que ele mesmo já tem outro agendamento**: Sistema permite (desde que barbeiro seja diferente)
+
+---
 
 ### 10. Visualizar Histórico de Serviços
 
@@ -762,17 +850,29 @@ Para o MVP, seguir boas práticas básicas:
 7. **Seleção Aleatória de Barbeiro**: 
    - Quando exatamente sortear? (no momento da confirmação ou ao escolher data/hora?)
    - Critérios de sorteio? (todos iguais? peso por especialidade?)
-   - **Definido MVP**: Sorteio no momento da confirmação, todos barbeiros ativos têm mesma chance
+   - **Definido MVP**: Sorteio no momento da confirmação
+   - **Definido**: Sistema verifica conflito e sorteia entre barbeiros DISPONÍVEIS naquele horário
+   - Se nenhum barbeiro disponível, cliente precisa escolher novo horário
 
 8. **Horários Disponíveis (MVP Simplificado)**:
-   - MVP não valida agenda real de barbeiros
-   - Todos os horários 08:00-20:00 são exibidos como disponíveis
-   - **Futuro**: Validação real de disponibilidade por barbeiro
+   - Interface exibe todos os horários 08:00-20:00 (não filtra em tempo real)
+   - Validação de conflito acontece apenas na confirmação
+   - Justificativa: Evitar complexidade de consulta em tempo real, simplificar MVP
+   - **Futuro**: Filtrar horários indisponíveis em tempo real na interface
 
-9. **Conflito de Agendamento**: 
-   - Como garantir que dois clientes não agendem mesmo horário com mesmo barbeiro simultaneamente?
-   - Lock otimista ou pessimista?
-   - **Decisão Necessária**: Estratégia de concorrência
+9. **Conflito de Agendamento - CRÍTICO**: 
+   - **Definido**: Sistema DEVE validar conflito no momento da confirmação
+   - Validação: Verificar se barbeiro já tem agendamento que se sobrepõe ao horário escolhido
+   - Considerar duração dos serviços para calcular sobreposição
+   - **Decisão Técnica Necessária**: Lock otimista ou pessimista? (para Tech Spec)
+   - Sugestão: Lock otimista com retry (tentativa de criar + catch de conflito)
+
+9.1. **Lógica de Validação de Conflito**:
+   - Horário solicitado: 14:00
+   - Duração total: 50min (término: 14:50)
+   - Conflito SE barbeiro tem agendamento entre 13:10 e 14:50
+   - Exemplo conflito: Agendamento existente 13:30-14:30 (conflita!)
+   - Exemplo OK: Agendamento existente 13:00-14:00 (não conflita)
 
 10. **Persistência de Sessão**: 
     - Cliente precisa fazer login toda vez ou sessão persiste?

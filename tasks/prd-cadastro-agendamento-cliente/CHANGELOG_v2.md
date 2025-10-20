@@ -100,14 +100,17 @@
 
 | Novo Requisito | Descrição | Prioridade |
 |---------------|-----------|-----------|
+| **Validação de conflito** | **Verificar se barbeiro está disponível no horário** | **CRÍTICA** |
 | Múltiplos serviços | Cliente pode selecionar vários serviços | Alta |
-| Opção "Qualquer barbeiro" | Sistema sorteia aleatoriamente | Alta |
+| Opção "Qualquer barbeiro" | Sistema sorteia aleatoriamente entre disponíveis | Alta |
 | Editar agendamento | Modificar serviços, barbeiro, data/hora | Alta |
 | Dashboard completo | Gestão centralizada de agendamentos | Alta |
 | Cadastro automático | Criar cliente na finalização | Crítica |
 | Login apenas telefone | Simplificação de acesso | Alta |
 | Sugestão de data (hoje) | UX melhorada | Média |
 | Confirmação visual | Feedback após agendamento | Alta |
+| Cálculo de sobreposição | Validar conflitos considerando duração | Crítica |
+| Tratamento de erro de conflito | UX para lidar com horários indisponíveis | Alta |
 
 ---
 
@@ -213,6 +216,45 @@ Antes de ir para Tech Spec, precisamos definir:
 
 ---
 
+## ⚠️ ATUALIZAÇÃO CRÍTICA (19/10/2025 - 21:00)
+
+### Validação de Conflito de Horários - REQUISITO OBRIGATÓRIO
+
+**Adicionado**: Regra de negócio crítica para validação de conflito de agendamentos.
+
+**Problema Identificado**: PRD v2.0 inicial não especificava claramente a validação de conflito - barbeiro poderia ter múltiplos agendamentos sobrepostos.
+
+**Solução Implementada**:
+1. ✅ Nova seção "Regras de Negócio Críticas" no PRD
+2. ✅ Validação obrigatória no momento da confirmação/edição
+3. ✅ Lógica matemática de sobreposição documentada
+4. ✅ Tratamento de conflito para 3 cenários:
+   - Barbeiro específico escolhido
+   - "Qualquer barbeiro" (sorteia entre disponíveis)
+   - Edição de agendamento
+5. ✅ Consideração de status dos agendamentos
+6. ✅ Edge cases documentados
+
+**Fórmula de Detecção de Conflito**:
+```
+Conflito SE: (Início_Existente < Término_Novo) E (Término_Existente > Início_Novo)
+```
+
+**Impacto no Desenvolvimento**:
+- ⚠️ Backend: Implementar validação de sobreposição
+- ⚠️ Backend: Garantir transação atômica (evitar race conditions)
+- ⚠️ Backend: Query para buscar agendamentos conflitantes
+- ⚠️ Frontend: Lidar com erro de conflito
+- ⚠️ Frontend: Oferecer alternativas ao cliente (outro horário/barbeiro)
+- ⚠️ UX: Mensagens claras de erro
+
+**Decisões Atualizadas**:
+- ✅ ~~Estratégia de concorrência~~ → **RESOLVIDO: Validação de conflito + transação**
+- ✅ ~~Validação de horário fim~~ → **RESOLVIDO: Cálculo de término + validação de sobreposição**
+
+---
+
 **Revisado por**: Tassos Gomes  
 **Data**: 19/10/2025  
+**Última Atualização**: 19/10/2025 21:00  
 **Aprovação**: Pendente
