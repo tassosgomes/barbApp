@@ -2,6 +2,7 @@ import { RouteObject, Outlet } from 'react-router-dom';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { LoginPage } from '@/pages/auth/LoginPage';
 import { BarberSchedulePage } from '@/pages/barber/SchedulePage';
+import { SelectBarbershopPage } from '@/pages/barber/SelectBarbershopPage';
 import { AuthProvider } from '@/contexts/AuthContext';
 
 /**
@@ -39,6 +40,10 @@ export const barberRoutes: RouteObject = {
         {
           path: 'schedule',
           element: <BarberSchedulePage />,
+        },
+        {
+          path: 'select-barbershop',
+          element: <SelectBarbershopPage />,
         },
         // Futuras rotas do barbeiro:
         // { path: 'profile', element: <BarberProfilePage /> },

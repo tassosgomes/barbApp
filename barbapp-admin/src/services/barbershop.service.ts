@@ -53,6 +53,20 @@ export const barbershopService = {
   },
 
   /**
+   * Lista as barbearias associadas ao barbeiro autenticado
+   * GET /api/barbeiro/barbearias
+   */
+  getMyBarbershops: async (): Promise<Array<{ id: string; nome: string; codigo?: string; isActive: boolean }>> => {
+    const { data } = await api.get<{
+      id: string;
+      nome: string;
+      codigo?: string;
+      isActive: boolean;
+    }[]>('/barbeiro/barbearias');
+    return data;
+  },
+
+  /**
    * Get barbershop by ID
    * @param id - Barbershop unique identifier
    * @returns Barbershop details

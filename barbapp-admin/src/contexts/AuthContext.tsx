@@ -1,6 +1,7 @@
 import { createContext, useState, useEffect, useContext, ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '@/services/auth.service';
+import { barbershopService } from '@/services/barbershop.service';
 import { TokenManager, UserType } from '@/services/tokenManager';
 import type { AuthContextType, User, LoginInput } from '@/types/auth.types';
 
@@ -85,8 +86,20 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const userData = await authService.validateToken();
       setUser(userData);
       
-      // Redirecionar para agenda
-      navigate('/barber/schedule');
+      // Após login, buscar as barbearias vinculadas ao barbeiro
+      try {
+        const myBarbershops = await barbershopService.getMyBarbershops();
+        if (myBarbershops.length <= 1) {
+          // Se apenas 1 barbearia, redireciona direto para agenda
+          navigate('/barber/schedule');
+        } else {
+          // Se múltiplas barbearias, redireciona para página de seleção
+          navigate('/barber/select-barbershop');
+        }
+      } catch (err) {
+        // Se falhar ao buscar barbearias, fallback para agenda
+        navigate('/barber/schedule');
+      }
     } catch (error) {
       // Propagar erro para ser tratado no componente
       throw error;
