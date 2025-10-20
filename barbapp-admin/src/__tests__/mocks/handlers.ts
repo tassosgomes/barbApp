@@ -121,7 +121,7 @@ const mockAppointments = [
     customerName: 'Cliente 1',
     startTime: '2024-10-16T09:00:00Z',
     endTime: '2024-10-16T09:30:00Z',
-    serviceName: 'Corte de Cabelo',
+    serviceTitle: 'Corte de Cabelo',
     status: 'Confirmed',
   },
   {
@@ -132,7 +132,7 @@ const mockAppointments = [
     customerName: 'Cliente 2',
     startTime: '2024-10-16T10:00:00Z',
     endTime: '2024-10-16T10:20:00Z',
-    serviceName: 'Barba',
+    serviceTitle: 'Barba',
     status: 'Pending',
   },
   {
@@ -143,7 +143,7 @@ const mockAppointments = [
     customerName: 'Cliente 3',
     startTime: '2024-10-16T14:00:00Z',
     endTime: '2024-10-16T14:30:00Z',
-    serviceName: 'Corte de Cabelo',
+    serviceTitle: 'Corte de Cabelo',
     status: 'Cancelled',
   },
 ];

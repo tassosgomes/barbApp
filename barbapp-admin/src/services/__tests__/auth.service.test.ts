@@ -28,13 +28,11 @@ describe('authService', () => {
 
       const expectedResponse: AuthResponse = {
         token: 'fake-jwt-token',
-        user: {
-          id: 'user-123',
-          name: 'João Silva',
-          email: 'barbeiro@example.com',
-          role: 'Barbeiro',
-          barbershopId: 'barbershop-123'
-        }
+        tipoUsuario: 'Barbeiro',
+        barbeariaId: 'barbershop-123',
+        nomeBarbearia: 'Barbearia Teste',
+        codigoBarbearia: 'ABC123',
+        expiresAt: new Date(Date.now() + 3600000).toISOString()
       };
 
       // Mock da resposta do axios
@@ -154,7 +152,8 @@ describe('authService', () => {
         name: 'João Silva',
         email: 'barbeiro@example.com',
         role: 'Barbeiro',
-        barbershopId: 'barbershop-123'
+        barbeariaId: 'barbershop-123',
+        nomeBarbearia: 'Barbearia Teste'
       };
 
       vi.mocked(api.get).mockResolvedValue({

@@ -20,7 +20,7 @@ export function SchedulePage() {
   const filters = useMemo(() => ({
     date: dateParam,
     barberId: barberIdParam || undefined,
-    status: statusParam ? (statusParam as AppointmentStatus) : undefined,
+    status: statusParam ? (Number(statusParam) as AppointmentStatus) : undefined,
   }), [dateParam, barberIdParam, statusParam]);
 
   // Fetch schedule data with polling
@@ -47,8 +47,8 @@ export function SchedulePage() {
     }
     
     if (newFilters.status !== undefined) {
-      if (newFilters.status) {
-        params.set('status', newFilters.status);
+      if (newFilters.status !== null) {
+        params.set('status', String(newFilters.status));
       } else {
         params.delete('status');
       }
@@ -160,17 +160,17 @@ export function SchedulePage() {
           <label htmlFor="status-filter" className="text-sm font-medium text-gray-700">Status</label>
           <Select
             value={statusParam || 'all'}
-            onValueChange={(value) => updateFilters({ status: value === 'all' ? undefined : (value as AppointmentStatus) })}
+            onValueChange={(value) => updateFilters({ status: value === 'all' ? undefined : (Number(value) as AppointmentStatus) })}
           >
             <SelectTrigger id="status-filter" aria-label="Filtrar por status">
               <SelectValue placeholder="Todos os status" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Todos os status</SelectItem>
-              <SelectItem value={AppointmentStatus.Pending}>Pendente</SelectItem>
-              <SelectItem value={AppointmentStatus.Confirmed}>Confirmado</SelectItem>
-              <SelectItem value={AppointmentStatus.Cancelled}>Cancelado</SelectItem>
-              <SelectItem value={AppointmentStatus.Completed}>Concluído</SelectItem>
+              <SelectItem value={String(AppointmentStatus.Pending)}>Pendente</SelectItem>
+              <SelectItem value={String(AppointmentStatus.Confirmed)}>Confirmado</SelectItem>
+              <SelectItem value={String(AppointmentStatus.Cancelled)}>Cancelado</SelectItem>
+              <SelectItem value={String(AppointmentStatus.Completed)}>Concluído</SelectItem>
             </SelectContent>
           </Select>
         </div>

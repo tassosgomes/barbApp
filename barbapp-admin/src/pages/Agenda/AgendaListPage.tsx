@@ -20,7 +20,6 @@ import { formatDateTime } from '@/utils/formatters';
 import {
   translateAppointmentStatus,
   getAppointmentStatusClass,
-  type Appointment,
 } from '@/types/agendamento';
 import { Eye, Calendar } from 'lucide-react';
 import { AgendamentoDetailsModal } from '@/components/AgendamentoDetailsModal';
@@ -75,44 +74,44 @@ export function AgendaListPage() {
   // Colunas da tabela
   const columns = [
     {
+      key: 'startTime',
       header: 'Data/Hora',
-      accessorKey: 'startTime',
-      cell: ({ row }: any) => (
+      render: (agendamento: any) => (
         <div className="flex items-center gap-2">
           <Calendar className="h-4 w-4 text-gray-500" />
-          <span>{formatDateTime(row.original.startTime)}</span>
+          <span>{formatDateTime(agendamento.startTime)}</span>
         </div>
       ),
     },
     {
+      key: 'customerName',
       header: 'Cliente',
-      accessorKey: 'customerName',
     },
     {
+      key: 'barberName',
       header: 'Barbeiro',
-      accessorKey: 'barberName',
     },
     {
+      key: 'serviceTitle',
       header: 'Serviço',
-      accessorKey: 'serviceName',
     },
     {
+      key: 'status',
       header: 'Status',
-      accessorKey: 'status',
-      cell: ({ row }: any) => {
-        const status = row.original.status;
-        const customClass = getAppointmentStatusClass(status);
-        const label = translateAppointmentStatus(status);
+      render: (agendamento: any) => {
+        const customClass = getAppointmentStatusClass(agendamento.status);
+        const label = translateAppointmentStatus(agendamento.status);
         return <Badge className={customClass}>{label}</Badge>;
       },
     },
     {
+      key: 'actions',
       header: 'Ações',
-      cell: ({ row }: any) => (
+      render: (agendamento: any) => (
         <Button
           size="sm"
           variant="outline"
-          onClick={() => setSelectedAgendamento(row.original.id)}
+          onClick={() => setSelectedAgendamento(agendamento.id)}
         >
           <Eye className="h-4 w-4 mr-1" />
           Ver Detalhes

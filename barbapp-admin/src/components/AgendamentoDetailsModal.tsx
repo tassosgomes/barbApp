@@ -101,7 +101,7 @@ export function AgendamentoDetailsModal({
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-600">Serviço</p>
-                <p className="font-semibold">{agendamento?.serviceName}</p>
+                <p className="font-semibold">{agendamento?.serviceTitle}</p>
               </div>
             </div>
 
@@ -113,9 +113,9 @@ export function AgendamentoDetailsModal({
               <div>
                 <p className="text-sm font-medium text-gray-600 mb-2">Status</p>
                 <Badge
-                  className={getAppointmentStatusClass(agendamento?.status || '')}
+                  className={getAppointmentStatusClass(agendamento?.status ?? 0)}
                 >
-                  {translateAppointmentStatus(agendamento?.status || '')}
+                  {translateAppointmentStatus(agendamento?.status ?? 0)}
                 </Badge>
               </div>
             </div>

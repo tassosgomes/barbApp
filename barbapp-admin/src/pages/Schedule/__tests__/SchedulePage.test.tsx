@@ -76,7 +76,7 @@ describe('SchedulePage', () => {
             customerName: 'Cliente 1',
             startTime: '2024-10-16T09:00:00Z',
             endTime: '2024-10-16T09:30:00Z',
-            serviceName: 'Corte de Cabelo',
+            serviceTitle: 'Corte de Cabelo',
             status: AppointmentStatus.Confirmed,
           },
           {
@@ -87,7 +87,7 @@ describe('SchedulePage', () => {
             customerName: 'Cliente 2',
             startTime: '2024-10-16T10:00:00Z',
             endTime: '2024-10-16T10:30:00Z',
-            serviceName: 'Barba',
+            serviceTitle: 'Barba',
             status: AppointmentStatus.Pending,
           },
         ],
