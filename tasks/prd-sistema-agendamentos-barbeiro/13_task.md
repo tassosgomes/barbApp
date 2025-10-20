@@ -26,19 +26,19 @@ Implementar custom hooks usando React Query para buscar agenda com polling de 10
 - Tratamento de estados de loading, error e success
 
 ## Subtarefas
-- [ ] 13.1 Criar `src/hooks/useBarberSchedule.ts`:
+- [x] 13.1 Criar `src/hooks/useBarberSchedule.ts`:
   - Query com `refetchInterval: 10000`
   - Recebe `date` como parâmetro
   - Desabilita polling quando fora da tela (refetchIntervalInBackground: false)
-- [ ] 13.2 Criar `src/hooks/useAppointmentDetails.ts`:
+- [x] 13.2 Criar `src/hooks/useAppointmentDetails.ts`:
   - Query para buscar detalhes
   - Enabled somente quando `id` é fornecido
-- [ ] 13.3 Criar `src/hooks/useAppointmentActions.ts`:
+- [x] 13.3 Criar `src/hooks/useAppointmentActions.ts`:
   - Mutations: `confirmAppointment`, `cancelAppointment`, `completeAppointment`
   - Invalidar query de schedule após sucesso
   - onSuccess callbacks para feedback visual
-- [ ] 13.4 Implementar cancelamento de polling ao desmontar componente
-- [ ] 13.5 Adicionar tratamento de erros específicos (403, 404, 409)
+- [x] 13.4 Implementar cancelamento de polling ao desmontar componente
+- [x] 13.5 Adicionar tratamento de erros específicos (403, 404, 409)
 
 ## Sequenciamento
 - Bloqueado por: 11.0 (Tipos), 12.0 (Services)
