@@ -29,8 +29,8 @@ test.describe('Barber Schedule - Fluxo Completo de Navegação', () => {
     expect(authenticated).toBe(true);
     
     // 5. Verifica conteúdo da página de agenda
-    await expect(page.locator('h1:has-text("Minha Agenda")')).toBeVisible();
-    await expect(page.locator(`text=${TEST_BARBER_CREDENTIALS.nome}`)).toBeVisible();
+    // O H1 exibe o nome do barbeiro, não "Minha Agenda"
+    await expect(page.locator(`h1:has-text("${TEST_BARBER_CREDENTIALS.nome}")`)).toBeVisible();
     
     // 6. Recarrega página
     await page.reload();
@@ -75,7 +75,7 @@ test.describe('Barber Schedule - Fluxo Completo de Navegação', () => {
     // Injeta um token inválido no localStorage
     await page.goto('/login');
     await page.evaluate(() => {
-      localStorage.setItem('barber_token', 'token-invalido-xyz123');
+      localStorage.setItem('barbapp-barber-token', 'token-invalido-xyz123');
     });
     
     // Tenta acessar rota protegida
@@ -85,7 +85,7 @@ test.describe('Barber Schedule - Fluxo Completo de Navegação', () => {
     await expect(page).toHaveURL('/login', { timeout: 10000 });
     
     // Token inválido deve ter sido removido
-    const token = await page.evaluate(() => localStorage.getItem('barber_token'));
+    const token = await page.evaluate(() => localStorage.getItem('barbapp-barber-token'));
     expect(token).toBeNull();
   });
 
@@ -95,7 +95,7 @@ test.describe('Barber Schedule - Fluxo Completo de Navegação', () => {
     await page.evaluate(() => {
       // JWT expirado (expired em 2020)
       const expiredToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJleHAiOjE1MTYyMzkwMjJ9.4Adcj0qB0CJbFxe4K4X4K5X4X4X4X4X4X4X4X4X4X4X';
-      localStorage.setItem('barber_token', expiredToken);
+      localStorage.setItem('barbapp-barber-token', expiredToken);
     });
     
     // Tenta acessar rota protegida
@@ -125,8 +125,8 @@ test.describe('Barber Schedule - Fluxo Completo de Navegação', () => {
     await expect(page2).toHaveURL('/barber/schedule');
     
     // Verifica que ambas as abas têm o token
-    const token1 = await page1.evaluate(() => localStorage.getItem('barber_token'));
-    const token2 = await page2.evaluate(() => localStorage.getItem('barber_token'));
+    const token1 = await page1.evaluate(() => localStorage.getItem('barbapp-barber-token'));
+    const token2 = await page2.evaluate(() => localStorage.getItem('barbapp-barber-token'));
     
     expect(token1).toBeTruthy();
     expect(token1).toBe(token2);
@@ -160,8 +160,8 @@ test.describe('Barber Schedule - Fluxo Completo de Navegação', () => {
     await expect(page2).toHaveURL('/login', { timeout: 10000 });
     
     // Verifica que não há token em nenhuma aba
-    const token1 = await page1.evaluate(() => localStorage.getItem('barber_token'));
-    const token2 = await page2.evaluate(() => localStorage.getItem('barber_token'));
+    const token1 = await page1.evaluate(() => localStorage.getItem('barbapp-barber-token'));
+    const token2 = await page2.evaluate(() => localStorage.getItem('barbapp-barber-token'));
     
     expect(token1).toBeNull();
     expect(token2).toBeNull();

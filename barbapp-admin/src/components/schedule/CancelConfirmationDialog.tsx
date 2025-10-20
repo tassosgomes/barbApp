@@ -39,7 +39,7 @@ export function CancelConfirmationDialog({
 }: CancelConfirmationDialogProps) {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent>
+      <AlertDialogContent data-testid="cancel-confirmation-dialog">
         <AlertDialogHeader>
           <div className="flex items-center gap-2">
             <AlertCircle className="h-5 w-5 text-destructive" />
@@ -68,6 +68,7 @@ export function CancelConfirmationDialog({
             }}
             disabled={isLoading}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            data-testid="confirm-cancel-btn"
           >
             {isLoading ? 'Cancelando...' : 'Sim, Cancelar'}
           </AlertDialogAction>

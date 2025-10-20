@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { loginAsAdminBarbearia, clearAuth } from './helpers/admin-barbearia.helper';
 
 /**
  * E2E Tests for Barbers Management Flow
@@ -6,14 +7,16 @@ import { test, expect } from '@playwright/test';
  * Flow: Login → List Barbers → Create → Edit → Deactivate → Reactivate
  */
 
-const BARBEARIA_CODE = 'TEST1234';
+const BARBEARIA_CODE = 'AMG7V8Y9';
 const BASE_URL = `/${BARBEARIA_CODE}`;
 
 test.describe('Barbers Management', () => {
   test.beforeEach(async ({ page }) => {
-    // TODO: Implement login flow
-    // For now, we'll mock the authentication state
-    await page.goto(`${BASE_URL}/barbeiros`);
+    // Clear any existing auth state
+    await clearAuth(page);
+    
+    // Login as Admin Barbearia
+    await loginAsAdminBarbearia(page);
   });
 
   test('should display barbers list page', async ({ page }) => {

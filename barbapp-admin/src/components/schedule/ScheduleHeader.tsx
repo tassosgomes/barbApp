@@ -56,14 +56,14 @@ export function ScheduleHeader({
   };
 
   return (
-    <div className="space-y-4 pb-4 border-b">
+    <div className="space-y-4 pb-4 border-b" data-testid="schedule-header">
       {/* Linha 1: Data e Contador */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">
+          <h1 className="text-2xl font-bold text-foreground" data-testid="current-date">
             {capitalizedDate}
           </h1>
-          <p className="text-sm text-muted-foreground mt-1">
+          <p className="text-sm text-muted-foreground mt-1" data-testid="appointments-count">
             {appointmentsCount === 0 && 'Nenhum agendamento'}
             {appointmentsCount === 1 && '1 agendamento'}
             {appointmentsCount > 1 && `${appointmentsCount} agendamentos`}
@@ -77,6 +77,7 @@ export function ScheduleHeader({
             size="sm"
             onClick={onToday}
             className="gap-2"
+            data-testid="today-btn"
           >
             <CalendarIcon className="h-4 w-4" />
             Hoje
@@ -93,6 +94,7 @@ export function ScheduleHeader({
           onClick={onPrevious}
           aria-label="Dia anterior"
           className="min-h-[44px] min-w-[44px]"
+          data-testid="prev-day-btn"
         >
           <ChevronLeft className="h-5 w-5" />
         </Button>
@@ -117,6 +119,7 @@ export function ScheduleHeader({
           onClick={onNext}
           aria-label="Próximo dia"
           className="min-h-[44px] min-w-[44px]"
+          data-testid="next-day-btn"
         >
           <ChevronRight className="h-5 w-5" />
         </Button>

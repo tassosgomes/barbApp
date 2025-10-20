@@ -5,10 +5,10 @@ import { Page, expect } from '@playwright/test';
  */
 
 export const TEST_CREDENTIALS = {
-  codigo: 'TEST1234',
-  email: 'admin@test.com',
-  senha: 'Test@123',
-  barbeariaNome: 'Barbearia Teste',
+  codigo: 'AMG7V8Y9',
+  email: 'neide.patricio@hotmail.com',
+  senha: 'S4nE23g@Qgu5',
+  barbeariaNome: 'Barbearia da Neide',
 };
 
 /**
@@ -63,6 +63,8 @@ export async function logout(page: Page) {
  * Limpa dados de autenticação
  */
 export async function clearAuth(page: Page) {
+  // Navigate to a page first to be able to access localStorage
+  await page.goto('/');
   await page.evaluate(() => {
     localStorage.clear();
     sessionStorage.clear();
