@@ -1,5 +1,5 @@
 ---
-status: pending
+status: completed
 parallelizable: true
 blocked_by: ["11.0"]
 ---
@@ -27,26 +27,26 @@ Implementar seletor de contexto (dropdown/menu) no header para barbeiros que tra
 - Fluxo de login: redirecionar direto se apenas 1 barbearia
 
 ## Subtarefas
-- [ ] 16.1 Criar `src/components/layout/BarbershopSelector.tsx`:
+- [x] 16.1 Criar `src/components/layout/BarbershopSelector.tsx`:
   - Dropdown com lista de barbearias
   - Exibir nome da barbearia atual
   - Ícone/badge da barbearia selecionada
-- [ ] 16.2 Criar hook `useBarbershopContext.ts`:
+- [x] 16.2 Criar hook `useBarbershopContext.ts`:
   - Gerenciar barbearia selecionada
   - Persistir no sessionStorage
   - Função para trocar contexto
-- [ ] 16.3 Criar `src/pages/barber/SelectBarbershopPage.tsx`:
+- [x] 16.3 Criar `src/pages/barber/SelectBarbershopPage.tsx`:
   - Página de seleção inicial (se múltiplas barbearias)
   - Lista visual de barbearias
   - Redirecionamento após seleção
-- [ ] 16.4 Implementar lógica de login/redirecionamento:
+- [x] 16.4 Implementar lógica de login/redirecionamento:
   - Se 1 barbearia: redirecionar direto para agenda
   - Se múltiplas: mostrar página de seleção
-- [ ] 16.5 Atualizar contexto de autenticação:
+- [x] 16.5 Atualizar contexto de autenticação:
   - Incluir barbeariaId no token/contexto
   - Validar acesso do barbeiro à barbearia selecionada
-- [ ] 16.6 Implementar invalidação de queries ao trocar contexto
-- [ ] 16.7 Testes de fluxo de seleção e troca de contexto
+- [x] 16.6 Implementar invalidação de queries ao trocar contexto
+- [x] 16.7 Testes de fluxo de seleção e troca de contexto
 
 ## Sequenciamento
 - Bloqueado por: 11.0 (Tipos)

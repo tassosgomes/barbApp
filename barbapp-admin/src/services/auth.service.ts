@@ -74,4 +74,16 @@ export const authService = {
   getToken: (): string | null => {
     return TokenManager.getToken(UserType.BARBEIRO);
   }
+  ,
+  /**
+   * Trocar contexto do barbeiro para uma nova barbearia
+   * POST /api/auth/barbeiro/trocar-contexto
+   * @param novaBarbeariaId - ID da nova barbearia
+   */
+  trocarContexto: async (novaBarbeariaId: string): Promise<AuthResponse> => {
+    const { data } = await api.post<AuthResponse>('/auth/barbeiro/trocar-contexto', {
+      novaBarbeariaId,
+    });
+    return data;
+  },
 };
