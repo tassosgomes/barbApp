@@ -24,9 +24,9 @@ Revisar autorização, filtros globais e isolamento por barbearia e barbeiro. Ga
 - Global Query Filter configurado para `Appointment`
 
 ## Subtarefas
-- [ ] 10.1 Revisar controllers e policies
-- [ ] 10.2 Verificar filtros e testes simples de isolamento
-- [ ] 10.3 Revisar logs e erros para não vazar dados
+- [x] 10.1 Revisar controllers e policies
+- [x] 10.2 Verificar filtros e testes simples de isolamento
+- [x] 10.3 Revisar logs e erros para não vazar dados
 
 ## Sequenciamento
 - Bloqueado por: 4.0
@@ -38,3 +38,12 @@ Revisar autorização, filtros globais e isolamento por barbearia e barbeiro. Ga
 
 ## Critérios de Sucesso
 - Auditoria rápida confirma ausência de vazamentos e que o isolamento está efetivo
+
+---
+
+- [x] 10.0 [Segurança e Multi-tenant - Role Barbeiro, TenantContext e Revisão de Acesso] ✅ CONCLUÍDA
+  - [x] 10.1 Implementação completada
+  - [x] 10.2 Definição da tarefa, PRD e tech spec validados
+  - [x] 10.3 Análise de regras e conformidade verificadas
+  - [x] 10.4 Revisão de código completada
+  - [x] 10.5 Pronto para deploy
