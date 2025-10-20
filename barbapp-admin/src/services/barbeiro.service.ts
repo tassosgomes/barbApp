@@ -191,6 +191,20 @@ export const barbeiroService = {
       await barbeiroService.deactivate(id);
     }
   },
+
+  /**
+   * Redefine a senha do barbeiro
+   * Gera uma nova senha segura e envia por email
+   * 
+   * @param id - UUID do barbeiro
+   * @throws {Error} 404 se barbeiro não encontrado, 403 se não pertence à barbearia
+   * 
+   * @example
+   * await barbeiroService.resetPassword('uuid');
+   */
+  resetPassword: async (id: string): Promise<void> => {
+    await api.post(`/barbers/${id}/reset-password`);
+  },
 };
 
 // Export default para compatibilidade

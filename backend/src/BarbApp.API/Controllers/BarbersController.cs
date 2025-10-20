@@ -1,4 +1,5 @@
 using BarbApp.Application.DTOs;
+using BarbApp.Application.Interfaces;
 using BarbApp.Application.Interfaces.UseCases;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -17,6 +18,7 @@ public class BarbersController : ControllerBase
     private readonly IListBarbersUseCase _listBarbersUseCase;
     private readonly IGetBarberByIdUseCase _getBarberByIdUseCase;
     private readonly IGetTeamScheduleUseCase _getTeamScheduleUseCase;
+    private readonly IResetBarberPasswordUseCase _resetBarberPasswordUseCase;
     private readonly ILogger<BarbersController> _logger;
 
     public BarbersController(
@@ -26,6 +28,7 @@ public class BarbersController : ControllerBase
         IListBarbersUseCase listBarbersUseCase,
         IGetBarberByIdUseCase getBarberByIdUseCase,
         IGetTeamScheduleUseCase getTeamScheduleUseCase,
+        IResetBarberPasswordUseCase resetBarberPasswordUseCase,
         ILogger<BarbersController> logger)
     {
         _createBarberUseCase = createBarberUseCase;
@@ -34,6 +37,7 @@ public class BarbersController : ControllerBase
         _listBarbersUseCase = listBarbersUseCase;
         _getBarberByIdUseCase = getBarberByIdUseCase;
         _getTeamScheduleUseCase = getTeamScheduleUseCase;
+        _resetBarberPasswordUseCase = resetBarberPasswordUseCase;
         _logger = logger;
     }
 
@@ -205,6 +209,33 @@ public class BarbersController : ControllerBase
         _logger.LogInformation("Barber removed successfully: {Id}", id);
 
         return NoContent();
+    }
+
+    /// <summary>
+    /// Redefinir senha de um barbeiro
+    /// </summary>
+    /// <param name="id">ID do barbeiro</param>
+    /// <returns>Mensagem de sucesso</returns>
+    /// <response code="200">Senha redefinida e enviada por email com sucesso</response>
+    /// <response code="401">Usuário não autenticado</response>
+    /// <response code="403">Usuário não tem permissão para redefinir a senha deste barbeiro</response>
+    /// <response code="404">Barbeiro não encontrado</response>
+    /// <response code="500">Falha ao enviar e-mail com nova senha</response>
+    [HttpPost("{id}/reset-password")]
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> ResetBarberPassword(Guid id)
+    {
+        _logger.LogInformation("Resetting password for barber with ID: {Id}", id);
+
+        await _resetBarberPasswordUseCase.ExecuteAsync(id, HttpContext.RequestAborted);
+
+        _logger.LogInformation("Password reset successfully for barber with ID: {Id}", id);
+
+        return Ok(new { message = "Senha redefinida com sucesso. O barbeiro receberá um e-mail com a nova senha." });
     }
 
     /// <summary>
