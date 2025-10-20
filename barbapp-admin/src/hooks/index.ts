@@ -9,3 +9,8 @@ export { useSchedule } from './useSchedule';
 export { useServiceMutations } from './useServiceMutations';
 export { useServices } from './useServices';
 export { useToast } from './use-toast';
+
+// Hooks para Sistema de Agendamentos (Barbeiro)
+export { useBarberSchedule } from './useBarberSchedule';
+export { useAppointmentDetails } from './useAppointmentDetails';
+export { useAppointmentActions } from './useAppointmentActions';
