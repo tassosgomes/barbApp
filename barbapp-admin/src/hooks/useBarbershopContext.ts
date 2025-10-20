@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { authService } from '@/services/auth.service';
 import { TokenManager, UserType } from '@/services/tokenManager';
-import { useBarbershops } from './useBarbershops';
-import type { Barbershop } from '@/types';
+import { barbershopService } from '@/services/barbershop.service';
 
 export interface BarbershopContext {
 	id: string;
@@ -16,11 +15,17 @@ export function useBarbershopContext() {
 		return stored ? JSON.parse(stored) : null;
 	});
 	const queryClient = useQueryClient();
-		const { data } = useBarbershops({ pageNumber: 1, pageSize: 50 });
+	
+	// Buscar barbearias do barbeiro usando a API correta
+	const { data: barbershopsData } = useQuery({
+		queryKey: ['my-barbershops'],
+		queryFn: barbershopService.getMyBarbershops,
+		staleTime: 1000 * 60 * 5, // 5 minutos
+	});
 
-	const availableBarbershops: BarbershopContext[] = (data?.items || []).map((b: Barbershop) => ({
+	const availableBarbershops: BarbershopContext[] = (barbershopsData || []).map((b) => ({
 		id: b.id,
-		name: b.name,
+		name: b.nome,
 	}));
 
 		const selectBarbershop = async (barbershop: BarbershopContext) => {
@@ -45,10 +50,9 @@ export function useBarbershopContext() {
 		// Caso não haja contexto e exista apenas 1 barbearia, selecionar automaticamente
 		useEffect(() => {
 			if (!context && availableBarbershops.length === 1) {
-				selectBarbershop(availableBarbershops[0]);
+				void selectBarbershop(availableBarbershops[0]);
 			}
-			// eslint-disable-next-line react-hooks/exhaustive-deps
-		}, [availableBarbershops]);
+		}, [context, availableBarbershops]);
 
 		return {
 			currentBarbershop: context,
