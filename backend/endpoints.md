@@ -37,7 +37,7 @@ Este documento detalha todos os endpoints da API BarbApp, incluindo descrições
 
 ### `POST /api/auth/barbeiro/login`
 
-- **Descrição**: Autentica um usuário com perfil de "Barbeiro". O sistema valida o e-mail e a senha do barbeiro. Se o barbeiro for encontrado e suas credenciais forem válidas, um token JWT é gerado com o contexto da barbearia à qual ele está associado.
+- **Descrição**: Autentica um usuário com perfil de "Barbeiro" usando e-mail e senha. Se o barbeiro for encontrado e suas credenciais forem válidas, um token JWT é gerado. Em cenários em que o barbeiro possui múltiplas barbearias vinculadas, o token inicial pode não conter `BarbeariaId`; utilize a listagem de barbearias e o endpoint de troca de contexto para obter um token contextualizado.
 - **Role Necessária**: Nenhuma (Público).
 - **Parâmetros de Entrada**:
   - `Email` (string): E-mail do barbeiro.
@@ -81,6 +81,19 @@ Este documento detalha todos os endpoints da API BarbApp, incluindo descrições
 - **Parâmetros de Entrada**:
   - `NovaBarbeariaId` (Guid): ID da nova barbearia para a qual o barbeiro deseja trocar.
 - **Parâmetros de Saída**: `AuthResponse` (similar ao login, com o contexto da nova barbearia).
+
+## Barbeiro (`/api/barbeiro`)
+
+### `GET /api/barbeiro/barbearias`
+
+- **Descrição**: Lista as barbearias às quais o barbeiro autenticado está vinculado. Usado para seleção de contexto quando o barbeiro trabalha em múltiplas barbearias.
+- **Role Necessária**: `Barbeiro`.
+- **Parâmetros de Entrada**: Nenhum.
+- **Parâmetros de Saída**: `IEnumerable<BarbershopLinkOutput>`
+  - `Id` (Guid): ID da barbearia.
+  - `Nome` (string): Nome da barbearia.
+  - `Codigo` (string): Código único da barbearia.
+  - `IsActive` (bool): Status da barbearia (somente ativas devem ser elegíveis para contexto).
 
 ---
 
