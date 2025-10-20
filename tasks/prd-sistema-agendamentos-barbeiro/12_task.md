@@ -1,7 +1,8 @@
 ---
-status: pending
+status: completed
 parallelizable: true
 blocked_by: ["8.0","11.0"]
+completed_date: 2025-10-20
 ---
 
 <task_context>
@@ -94,3 +95,16 @@ export const appointmentsService = {
 - Erros 403, 404, 409 são tratados com mensagens apropriadas
 - Tipos TypeScript corretos em todas as funções
 - Funciona com mock data (desenvolvimento)
+
+## ✅ CONCLUSÃO DA TAREFA - VALIDADO
+
+- [x] 12.0 [Serviços de API - Schedule e Appointments] ✅ CONCLUÍDA
+  - [x] 12.1 `schedule.service.ts` atualizado - Método `getMySchedule` implementado
+  - [x] 12.2 `appointments.service.ts` criado - 4 métodos implementados (getDetails, confirm, cancel, complete)
+  - [x] 12.3 Tratamento de erros implementado - Classe `AppointmentError` com mensagens específicas para 403, 404, 409
+  - [x] 12.4 Tipos TypeScript corretos - Compatível com tipos de `@/types/appointment`
+  - [x] 12.5 Testes implementados - 26 testes unitários (100% passando)
+  - [x] Exportações atualizadas em `services/index.ts`
+  - [x] Validação completa documentada em `12_task_validation.md`
+  - [x] Conformidade com padrões do projeto verificada (code-standard.md, tests-react.md, http.md)
+  - [x] Pronto para uso nas tarefas 13.0-16.0 - Services disponíveis para componentes e páginas

@@ -131,4 +131,77 @@ describe('Schedule Service', () => {
       });
     });
   });
+
+  describe('getMySchedule', () => {
+    it('should fetch barber schedule for a specific date', async () => {
+      const mockResponse = {
+        date: '2025-10-20',
+        barberId: '550e8400-e29b-41d4-a716-446655440000',
+        barberName: 'João Silva',
+        appointments: [
+          {
+            id: '550e8400-e29b-41d4-a716-446655440001',
+            customerName: 'Carlos Oliveira',
+            serviceTitle: 'Corte de Cabelo',
+            startTime: '2025-10-20T14:00:00Z',
+            endTime: '2025-10-20T14:30:00Z',
+            status: AppointmentStatus.Confirmed,
+          },
+          {
+            id: '550e8400-e29b-41d4-a716-446655440002',
+            customerName: 'Maria Santos',
+            serviceTitle: 'Barba',
+            startTime: '2025-10-20T15:00:00Z',
+            endTime: '2025-10-20T15:30:00Z',
+            status: AppointmentStatus.Pending,
+          },
+        ],
+      };
+
+      mockApiGet.mockResolvedValueOnce({ data: mockResponse });
+
+      const result = await scheduleService.getMySchedule('2025-10-20');
+
+      expect(api.get).toHaveBeenCalledWith('/schedule/my-schedule', {
+        params: { date: '2025-10-20' },
+      });
+      expect(result).toEqual(mockResponse);
+      expect(result.appointments).toHaveLength(2);
+    });
+
+    it('should fetch empty schedule when no appointments', async () => {
+      const mockResponse = {
+        date: '2025-10-20',
+        barberId: '550e8400-e29b-41d4-a716-446655440000',
+        barberName: 'João Silva',
+        appointments: [],
+      };
+
+      mockApiGet.mockResolvedValueOnce({ data: mockResponse });
+
+      const result = await scheduleService.getMySchedule('2025-10-20');
+
+      expect(api.get).toHaveBeenCalledWith('/schedule/my-schedule', {
+        params: { date: '2025-10-20' },
+      });
+      expect(result.appointments).toHaveLength(0);
+    });
+
+    it('should handle API errors', async () => {
+      const error = new Error('Network error');
+      mockApiGet.mockRejectedValueOnce(error);
+
+      await expect(scheduleService.getMySchedule('2025-10-20')).rejects.toThrow('Network error');
+      expect(api.get).toHaveBeenCalledWith('/schedule/my-schedule', {
+        params: { date: '2025-10-20' },
+      });
+    });
+
+    it('should handle 401 unauthorized errors', async () => {
+      const error = { response: { status: 401 } };
+      mockApiGet.mockRejectedValueOnce(error);
+
+      await expect(scheduleService.getMySchedule('2025-10-20')).rejects.toEqual(error);
+    });
+  });
 });
