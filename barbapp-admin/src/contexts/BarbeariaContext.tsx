@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { barbeariaInfoSchema } from '@/schemas/adminBarbearia.schema';
+import { TokenManager, UserType } from '@/services/tokenManager';
 
 /**
  * Data structure for barbershop information stored in context
@@ -22,12 +23,8 @@ export interface BarbeariaContextValue {
 }
 
 /**
- * Local storage key for persisting barbershop context
- */
-const STORAGE_KEY = 'admin_barbearia_context';
-
-/**
  * React Context for barbershop state management
+ * IMPORTANTE: Usa TokenManager para gerenciar contexto
  */
 const BarbeariaContext = createContext<BarbeariaContextValue | undefined>(undefined);
 
@@ -41,6 +38,7 @@ interface BarbeariaProviderProps {
 /**
  * Provider component that manages barbershop context state
  * Handles persistence to localStorage and cross-tab synchronization
+ * IMPORTANTE: Usa TokenManager para evitar conflitos
  */
 export function BarbeariaProvider({ children }: BarbeariaProviderProps) {
   const [barbearia, setBarbeariaState] = useState<BarbeariaContextData | null>(null);
@@ -49,14 +47,20 @@ export function BarbeariaProvider({ children }: BarbeariaProviderProps) {
   /**
    * Load barbershop data from localStorage on component mount
    * Validates data structure using Zod schema
+   * Usa TokenManager para obter contexto
    */
   useEffect(() => {
     try {
-      const stored = localStorage.getItem(STORAGE_KEY);
+      const stored = TokenManager.getContext<{
+        id: string;
+        nome: string;
+        codigo: string;
+        isActive: boolean;
+      }>(UserType.ADMIN_BARBEARIA);
+      
       if (stored) {
-        const parsed = JSON.parse(stored);
         // Validate structure with Zod
-        const validated = barbeariaInfoSchema.parse(parsed);
+        const validated = barbeariaInfoSchema.parse(stored);
         setBarbeariaState({
           barbeariaId: validated.id,
           nome: validated.nome,
@@ -66,7 +70,7 @@ export function BarbeariaProvider({ children }: BarbeariaProviderProps) {
       }
     } catch (error) {
       console.error('Erro ao carregar contexto da barbearia:', error);
-      localStorage.removeItem(STORAGE_KEY);
+      TokenManager.removeContext(UserType.ADMIN_BARBEARIA);
     } finally {
       setIsLoaded(true);
     }
@@ -75,8 +79,11 @@ export function BarbeariaProvider({ children }: BarbeariaProviderProps) {
   /**
    * Synchronize state changes across browser tabs
    * Listens for storage events and updates local state accordingly
+   * NOTA: TokenManager não expõe a chave diretamente, então mantemos referência local
    */
   useEffect(() => {
+    const STORAGE_KEY = 'admin_barbearia_context'; // Key used by TokenManager
+    
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === STORAGE_KEY) {
         if (e.newValue) {
@@ -104,27 +111,27 @@ export function BarbeariaProvider({ children }: BarbeariaProviderProps) {
 
   /**
    * Set barbershop data in context and persist to localStorage
+   * Usa TokenManager para gerenciar contexto
+   * 
    * @param data - Barbershop context data
    */
   const setBarbearia = (data: BarbeariaContextData) => {
     setBarbeariaState(data);
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify({
-        id: data.barbeariaId,
-        nome: data.nome,
-        codigo: data.codigo,
-        isActive: data.isActive,
-      })
-    );
+    TokenManager.setContext(UserType.ADMIN_BARBEARIA, {
+      id: data.barbeariaId,
+      nome: data.nome,
+      codigo: data.codigo,
+      isActive: data.isActive,
+    });
   };
 
   /**
    * Clear barbershop data from context and localStorage
+   * Usa TokenManager para limpeza completa
    */
   const clearBarbearia = () => {
     setBarbeariaState(null);
-    localStorage.removeItem(STORAGE_KEY);
+    TokenManager.removeContext(UserType.ADMIN_BARBEARIA);
   };
 
   return (

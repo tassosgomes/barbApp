@@ -1,5 +1,6 @@
 import api from './api';
 import type { LoginInput, AuthResponse, User } from '@/types/auth.types';
+import { TokenManager, UserType } from './tokenManager';
 
 /**
  * Serviço de autenticação para barbeiros
@@ -8,6 +9,8 @@ import type { LoginInput, AuthResponse, User } from '@/types/auth.types';
  * - Login de barbeiros usando e-mail e senha
  * - Validação de token JWT
  * - Logout (remoção de token)
+ * 
+ * IMPORTANTE: Usa TokenManager para evitar conflitos entre diferentes tipos de usuários
  */
 export const authService = {
   /**
@@ -54,11 +57,21 @@ export const authService = {
   
   /**
    * Realiza logout removendo token do localStorage
+   * Usa TokenManager para garantir limpeza completa
    * 
    * @example
    * authService.logout();
    */
   logout: () => {
-    localStorage.removeItem('barbapp-barber-token');
+    TokenManager.logout(UserType.BARBEIRO);
+  },
+
+  /**
+   * Obtém o token do barbeiro autenticado
+   * 
+   * @returns Token JWT ou null
+   */
+  getToken: (): string | null => {
+    return TokenManager.getToken(UserType.BARBEIRO);
   }
 };

@@ -1,4 +1,5 @@
 import api from './api';
+import { TokenManager, UserType } from './tokenManager';
 
 /**
  * Request payload for Admin Barbearia login
@@ -32,16 +33,14 @@ export interface LoginAdminBarbeariaResponse {
 }
 
 /**
- * Local storage key for Admin Barbearia token
- */
-const TOKEN_KEY = 'admin_barbearia_token';
-
-/**
  * Service for Admin Barbearia authentication operations
+ * IMPORTANTE: Usa TokenManager para evitar conflitos com outros tipos de usuários
  */
 export const adminBarbeariaAuthService = {
   /**
    * Authenticate Admin Barbearia with email, password and barbershop code
+   * IMPORTANTE: Limpa automaticamente tokens de outros tipos de usuários
+   * 
    * @param request - Login credentials and barbershop code
    * @returns Authentication response with token and barbershop info
    */
@@ -51,8 +50,8 @@ export const adminBarbeariaAuthService = {
       request
     );
 
-    // Store token in localStorage
-    localStorage.setItem(TOKEN_KEY, response.data.token);
+    // Store token using TokenManager (clears conflicting tokens automatically)
+    TokenManager.setToken(UserType.ADMIN_BARBEARIA, response.data.token);
 
     // Map backend response to frontend format
     return {
@@ -65,10 +64,11 @@ export const adminBarbeariaAuthService = {
   },
 
   /**
-   * Logout Admin Barbearia by clearing stored token
+   * Logout Admin Barbearia by clearing stored token and context
+   * Usa TokenManager para limpeza completa
    */
   logout: (): void => {
-    localStorage.removeItem(TOKEN_KEY);
+    TokenManager.logout(UserType.ADMIN_BARBEARIA);
   },
 
   /**
@@ -76,7 +76,7 @@ export const adminBarbeariaAuthService = {
    * @returns JWT token or null if not authenticated
    */
   getToken: (): string | null => {
-    return localStorage.getItem(TOKEN_KEY);
+    return TokenManager.getToken(UserType.ADMIN_BARBEARIA);
   },
 
   /**
@@ -84,6 +84,6 @@ export const adminBarbeariaAuthService = {
    * @returns true if token exists in localStorage
    */
   isAuthenticated: (): boolean => {
-    return !!localStorage.getItem(TOKEN_KEY);
+    return !!TokenManager.getToken(UserType.ADMIN_BARBEARIA);
   },
 };

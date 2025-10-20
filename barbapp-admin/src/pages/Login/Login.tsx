@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import api from '@/services/api';
+import { TokenManager, UserType } from '@/services/tokenManager';
 
 export function Login() {
   const navigate = useNavigate();
@@ -40,7 +41,9 @@ export function Login() {
     setIsLoading(true);
     try {
       const response = await api.post('/auth/admin-central/login', data);
-      localStorage.setItem('auth_token', response.data.token);
+      
+      // Use TokenManager to store token (clears conflicting tokens automatically)
+      TokenManager.setToken(UserType.ADMIN_CENTRAL, response.data.token);
 
       toast({
         title: 'Login realizado com sucesso!',

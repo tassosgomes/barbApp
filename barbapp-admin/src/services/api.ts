@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { TokenManager } from './tokenManager';
 
 /**
  * Axios instance configured with base URL, interceptors for authentication and error handling
@@ -13,19 +14,18 @@ const api = axios.create({
 
 /**
  * Request interceptor: Add JWT token to all requests and log requests
+ * IMPORTANTE: Usa TokenManager para obter o token correto baseado no tipo de usuário autenticado
  */
 api.interceptors.request.use(
   (config) => {
-    // Try to get tokens in order of priority
-    // Priority: barber token > admin barbearia token > central admin token
-    const barberToken = localStorage.getItem('barbapp-barber-token');
-    const adminBarbeariaToken = localStorage.getItem('admin_barbearia_token');
-    const centralToken = localStorage.getItem('auth_token');
+    // Detect current user type and get appropriate token
+    const currentUserType = TokenManager.getCurrentUserType();
     
-    const token = barberToken || adminBarbeariaToken || centralToken;
-    
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    if (currentUserType) {
+      const token = TokenManager.getToken(currentUserType);
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
     }
 
     // Log request
@@ -44,6 +44,8 @@ api.interceptors.request.use(
  * Response interceptor: Handle global errors and log responses
  * - 401: Clear token, set session expiry flag, and redirect to login
  * - Other errors: Pass through for component-level handling
+ * 
+ * IMPORTANTE: Usa TokenManager para limpeza de tokens
  */
 api.interceptors.response.use(
   (response) => {
@@ -62,33 +64,31 @@ api.interceptors.response.use(
     }
 
     if (error.response?.status === 401) {
-      // Clear all tokens and redirect to login
-      const barberToken = localStorage.getItem('barbapp-barber-token');
-      const adminBarbeariaToken = localStorage.getItem('admin_barbearia_token');
+      // Detect current user type and handle logout accordingly
+      const currentUserType = TokenManager.getCurrentUserType();
       
-      if (barberToken) {
-        // Barbeiro: clear barber token and redirect to barber login
-        localStorage.removeItem('barbapp-barber-token');
-        // Only redirect if not already on login page
+      if (currentUserType) {
+        // Clear tokens using TokenManager
+        TokenManager.logout(currentUserType);
+        sessionStorage.setItem('session_expired', 'true');
+        
+        // Redirect based on user type
         if (!window.location.pathname.includes('/login')) {
-          window.location.href = '/login';
+          // Extract codigo from path for Admin Barbearia
+          const path = window.location.pathname;
+          const codigoMatch = path.match(/^\/([A-Z0-9]+)\//);
+          
+          if (codigoMatch) {
+            // Admin Barbearia with codigo
+            window.location.href = `/${codigoMatch[1]}/login`;
+          } else if (path.startsWith('/barber')) {
+            // Barbeiro
+            window.location.href = '/login';
+          } else {
+            // Admin Central
+            window.location.href = '/admin/login';
+          }
         }
-      } else if (adminBarbeariaToken) {
-        // Admin Barbearia: extract codigo from path and redirect
-        const path = window.location.pathname;
-        const codigoMatch = path.match(/^\/([A-Z0-9]+)\//);
-        localStorage.removeItem('admin_barbearia_token');
-        sessionStorage.setItem('session_expired', 'true');
-        if (codigoMatch) {
-          window.location.href = `/${codigoMatch[1]}/login`;
-        } else {
-          window.location.href = '/';
-        }
-      } else {
-        // Admin Central: clear central token
-        localStorage.removeItem('auth_token');
-        sessionStorage.setItem('session_expired', 'true');
-        window.location.href = '/login';
       }
     }
 
