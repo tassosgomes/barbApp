@@ -3,10 +3,10 @@ import { test, expect } from '@playwright/test';
 test.describe('BarbApp Admin - E2E Tests', () => {
   test.describe('Authentication Flow', () => {
     test('should login successfully with valid credentials', async ({ page }) => {
-      await page.goto('/login');
+      await page.goto('/admin/login');
 
       // Fill login form
-      await page.fill('input[id="email"]', 'admin@barbapp.com');
+      await page.fill('input[id="email"]', 'admin@babapp.com');
       await page.fill('input[id="senha"]', '123456');
 
       // Submit form
@@ -18,21 +18,21 @@ test.describe('BarbApp Admin - E2E Tests', () => {
     });
 
     test('should show error with invalid credentials', async ({ page }) => {
-      await page.goto('/login');
+      await page.goto('/admin/login');
 
       // Fill with wrong credentials
-      await page.fill('input[id="email"]', 'admin@barbapp.com');
+      await page.fill('input[id="email"]', 'admin@babapp.com');
       await page.fill('input[id="senha"]', 'wrongpassword');
 
       // Submit form
       await page.click('button[type="submit"]');
 
       // Should stay on login page (error handling)
-      await expect(page).toHaveURL('/login');
+      await expect(page).toHaveURL('/admin/login');
     });
 
     test('should show validation errors for empty fields', async ({ page }) => {
-      await page.goto('/login');
+      await page.goto('/admin/login');
 
       // Try to submit without filling fields
       await page.click('button[type="submit"]');
@@ -46,8 +46,8 @@ test.describe('BarbApp Admin - E2E Tests', () => {
   test.describe('Barbershop CRUD Operations', () => {
     test.beforeEach(async ({ page }) => {
       // Login before each test
-      await page.goto('/login');
-      await page.fill('input[id="email"]', 'admin@barbapp.com');
+      await page.goto('/admin/login');
+      await page.fill('input[id="email"]', 'admin@babapp.com');
       await page.fill('input[id="senha"]', '123456');
       await page.click('button[type="submit"]');
       await expect(page).toHaveURL('/barbearias');
@@ -227,7 +227,7 @@ test.describe('BarbApp Admin - E2E Tests', () => {
     test.beforeEach(async ({ page }) => {
       // Login before each test
       await page.goto('/login');
-      await page.fill('input[id="email"]', 'admin@barbapp.com');
+      await page.fill('input[id="email"]', 'admin@babapp.com');
       await page.fill('input[id="senha"]', '123456');
       await page.click('button[type="submit"]');
       await expect(page).toHaveURL('/barbearias');

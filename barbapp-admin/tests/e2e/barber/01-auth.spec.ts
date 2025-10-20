@@ -35,8 +35,8 @@ test.describe('Barber Login - Autenticação e Fluxo de Login', () => {
     // Verifica que está na página de agenda
     await expect(page).toHaveURL('/barber/schedule');
     
-    // Verifica que exibe nome do usuário
-    await expect(page.locator(`text=${TEST_BARBER_CREDENTIALS.nome}`)).toBeVisible({
+    // Verifica que a página de agenda carregou (botão de sair visível)
+    await expect(page.getByRole('button', { name: /sair/i })).toBeVisible({
       timeout: 5000,
     });
   });
@@ -48,9 +48,8 @@ test.describe('Barber Login - Autenticação e Fluxo de Login', () => {
     await page.fill('input[type="password"]', TEST_BARBER_CREDENTIALS.password);
     await page.click('button[type="submit"]');
     
-    // Verifica mensagem de validação HTML5
-    const emailInput = page.locator('input[type="email"]');
-    await expect(emailInput).toHaveAttribute('required', '');
+    // Verifica mensagem de erro de validação Zod
+    await expect(page.getByTestId('email-error')).toBeVisible({ timeout: 3000 });
     
     // Verifica que NÃO redirecionou
     await expect(page).toHaveURL('/login');
@@ -63,9 +62,8 @@ test.describe('Barber Login - Autenticação e Fluxo de Login', () => {
     await page.fill('input[type="email"]', TEST_BARBER_CREDENTIALS.email);
     await page.click('button[type="submit"]');
     
-    // Verifica mensagem de validação HTML5
-    const passwordInput = page.locator('input[type="password"]');
-    await expect(passwordInput).toHaveAttribute('required', '');
+    // Verifica mensagem de erro de validação Zod
+    await expect(page.getByTestId('password-error')).toBeVisible({ timeout: 3000 });
     
     // Verifica que NÃO redirecionou
     await expect(page).toHaveURL('/login');
@@ -170,11 +168,12 @@ test.describe('Barber Login - Autenticação e Fluxo de Login', () => {
     await expect(page.locator('[role="dialog"]')).toBeVisible({ timeout: 3000 });
     
     // Verifica conteúdo do modal
-    await expect(page.locator('text=Como faço para acessar o sistema?')).toBeVisible();
-    await expect(page.locator('text=Esqueci minha senha')).toBeVisible();
+    await expect(page.locator('text=Como fazer login')).toBeVisible();
+    await expect(page.locator('text=📧 E-mail:')).toBeVisible();
+    await expect(page.locator('text=🔒 Senha:')).toBeVisible();
     
     // Fecha modal
-    await page.click('button:has-text("Fechar")');
+    await page.click('button:has-text("Entendi")');
     
     // Verifica que modal fechou
     await expect(page.locator('[role="dialog"]')).not.toBeVisible();

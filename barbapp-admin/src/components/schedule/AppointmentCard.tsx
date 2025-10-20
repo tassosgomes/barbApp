@@ -99,30 +99,34 @@ export function AppointmentCard({
         isLoading && 'opacity-50 pointer-events-none'
       )}
       onClick={handleCardClick}
+      data-testid="appointment-card"
+      data-status={appointment.status}
     >
       <CardContent className="p-4 space-y-3">
         {/* Header: Horário e Status */}
         <div className="flex items-start justify-between gap-2">
-          <div className="flex items-center gap-2 text-sm font-medium">
+          <div className="flex items-center gap-2 text-sm font-medium" data-testid="appointment-time">
             <Clock className="h-4 w-4 text-muted-foreground" />
             <span>
               {format(startTime, 'HH:mm', { locale: ptBR })} -{' '}
               {format(endTime, 'HH:mm', { locale: ptBR })}
             </span>
           </div>
-          <StatusBadge status={appointment.status} />
+          <div data-testid="appointment-status">
+            <StatusBadge status={appointment.status} />
+          </div>
         </div>
 
         {/* Cliente */}
         <div className="flex items-center gap-2">
           <User className="h-4 w-4 text-muted-foreground" />
-          <span className="font-medium text-base">{appointment.customerName}</span>
+          <span className="font-medium text-base" data-testid="customer-name">{appointment.customerName}</span>
         </div>
 
         {/* Serviço */}
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Scissors className="h-4 w-4" />
-          <span>{appointment.serviceTitle}</span>
+          <span data-testid="service-title">{appointment.serviceTitle}</span>
         </div>
 
         {/* Botões de Ação */}
@@ -135,6 +139,7 @@ export function AppointmentCard({
                 className="flex-1 min-h-[44px] gap-2"
                 onClick={handleConfirm}
                 disabled={isLoading}
+                data-testid="confirm-appointment-btn"
               >
                 <CheckCircle className="h-4 w-4" />
                 Confirmar
@@ -148,6 +153,7 @@ export function AppointmentCard({
                 className="flex-1 min-h-[44px] gap-2"
                 onClick={handleComplete}
                 disabled={isLoading}
+                data-testid="complete-appointment-btn"
               >
                 <Check className="h-4 w-4" />
                 Concluir
@@ -164,6 +170,7 @@ export function AppointmentCard({
                 )}
                 onClick={handleCancel}
                 disabled={isLoading}
+                data-testid="cancel-appointment-btn"
               >
                 <XCircle className="h-4 w-4" />
                 Cancelar

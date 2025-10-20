@@ -1,0 +1,71 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - banner [ref=e4]:
+      - generic [ref=e5]:
+        - generic [ref=e7]:
+          - heading "Barbearia da Neide" [level=1] [ref=e8]
+          - paragraph [ref=e9]: "Código: AMG7V8Y9"
+        - button "Sair" [ref=e10] [cursor=pointer]:
+          - img
+          - generic [ref=e11]: Sair
+    - generic [ref=e12]:
+      - complementary [ref=e13]:
+        - navigation [ref=e14]:
+          - link "Dashboard" [ref=e15] [cursor=pointer]:
+            - /url: /AMG7V8Y9/dashboard
+            - img [ref=e16]
+            - text: Dashboard
+          - link "Barbeiros" [ref=e21] [cursor=pointer]:
+            - /url: /AMG7V8Y9/barbeiros
+            - img [ref=e22]
+            - text: Barbeiros
+          - link "Serviços" [ref=e27] [cursor=pointer]:
+            - /url: /AMG7V8Y9/servicos
+            - img [ref=e28]
+            - text: Serviços
+          - link "Agenda" [ref=e34] [cursor=pointer]:
+            - /url: /AMG7V8Y9/agenda
+            - img [ref=e35]
+            - text: Agenda
+      - main [ref=e37]:
+        - generic [ref=e38]:
+          - generic [ref=e39]:
+            - heading "Bem-vindo ao painel!" [level=1] [ref=e40]
+            - paragraph [ref=e41]: Gerencie sua barbearia de forma simples e eficiente.
+          - generic [ref=e42]:
+            - generic [ref=e43]:
+              - generic [ref=e44]:
+                - heading "Total de Barbeiros" [level=3] [ref=e45]
+                - img [ref=e46]
+              - generic [ref=e51]:
+                - generic [ref=e52]: "3"
+                - paragraph [ref=e53]: Barbeiros cadastrados
+            - generic [ref=e54]:
+              - generic [ref=e55]:
+                - heading "Serviços Ativos" [level=3] [ref=e56]
+                - img [ref=e57]
+              - generic [ref=e63]:
+                - generic [ref=e64]: "12"
+                - paragraph [ref=e65]: Serviços disponíveis
+            - generic [ref=e66]:
+              - generic [ref=e67]:
+                - heading "Agendamentos Hoje" [level=3] [ref=e68]
+                - img [ref=e69]
+              - generic [ref=e71]:
+                - generic [ref=e72]: "0"
+                - paragraph [ref=e73]: Agendamentos para hoje
+          - generic [ref=e74]:
+            - heading "Próximos Agendamentos" [level=3] [ref=e76]
+            - paragraph [ref=e78]: Nenhum agendamento próximo para hoje.
+  - region "Notifications (F8)":
+    - list
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e79]:
+    - img [ref=e81]
+    - button "Open Tanstack query devtools" [ref=e129] [cursor=pointer]:
+      - img [ref=e130]
+```

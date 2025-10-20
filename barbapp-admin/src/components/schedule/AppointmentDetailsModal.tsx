@@ -87,7 +87,7 @@ export function AppointmentDetailsModal({
 
   return (
     <Dialog open={true} onOpenChange={onClose}>
-      <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto" data-testid="appointment-details-modal">
         <DialogHeader>
           <DialogTitle>Detalhes do Agendamento</DialogTitle>
           <DialogDescription>

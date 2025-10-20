@@ -62,7 +62,7 @@ export function AppointmentsList({
   });
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4" data-testid="appointments-list">
       {sortedAppointments.map((appointment) => (
         <AppointmentCard
           key={appointment.id}
