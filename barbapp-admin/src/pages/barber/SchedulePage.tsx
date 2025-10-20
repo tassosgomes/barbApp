@@ -21,6 +21,7 @@ import {
   AppointmentDetailsModal,
   CancelConfirmationDialog,
 } from '@/components/schedule';
+import { BarberHeader } from '@/components/barber';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle, WifiOff, RefreshCw } from 'lucide-react';
@@ -165,9 +166,13 @@ export function BarberSchedulePage() {
   const isActionLoading = appointmentActions.isLoading;
 
   return (
-    <div className="container mx-auto py-6 px-4 max-w-4xl">
-      {/* Header com navegação de data */}
-      <ScheduleHeader
+    <>
+      {/* Header do Barbeiro com botão de logout */}
+      <BarberHeader />
+      
+      <div className="container mx-auto py-6 px-4 max-w-4xl">
+        {/* Header com navegação de data */}
+        <ScheduleHeader
         date={selectedDate}
         appointmentsCount={schedule?.appointments.length ?? 0}
         onPrevious={goToPreviousDay}
@@ -248,7 +253,8 @@ export function BarberSchedulePage() {
         customerName={appointmentToCancel?.customerName}
         isLoading={appointmentActions.cancelState.isPending}
       />
-    </div>
+      </div>
+    </>
   );
 }
 
