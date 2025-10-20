@@ -4,7 +4,7 @@
 
 Implementaremos um app mobile (iOS/Android) para barbeiros, focado em visualizar e operar a própria agenda por barbearia (multi-tenant). A solução usará React Native com Expo (TS), TanStack Query para dados, Axios com interceptors para auth JWT, e Secure Storage para token. Fluxos principais: login (e-mail/senha), seleção de barbearia (quando multi‑vínculo), agenda do dia com polling (30s) e pull‑to‑refresh, detalhes + ações (confirmar, cancelar, concluir). Horários são UTC no backend; o app converte para timezone local.
 
-Principais decisões: RN + Expo para agilidade de MVP; TanStack Query para caching/reatividade; padrão de services com Axios e interceptors; adequação às regras do repositório (React/TS, Query) com justificativa para UI/estilo em RN (NativeWind em vez de Tailwind CSS, e lib de UI RN em vez de Shadcn).
+Principais decisões: RN + Expo para agilidade de MVP; TanStack Query para caching/reatividade; padrão de services com Axios e interceptors; UI com React Native Paper + StyleSheet (sem Tailwind/NativeWind) para simplificar; Sentry.io integrado no MVP.
 
 ## Arquitetura do Sistema
 
@@ -13,8 +13,8 @@ Principais decisões: RN + Expo para agilidade de MVP; TanStack Query para cachi
 - App Shell (Expo + Router): navegação stack/tab mínima e inicialização de providers (QueryClientProvider, AuthProvider).
 - Auth Module: telas de Login; serviço `authService` (login/logout), contexto `AuthContext` para token/usuário e troca de contexto.
 - Barbershop Context: listagem de barbearias do barbeiro e seleção de contexto (`barbershopsService`, `BarbershopContext`).
-- Schedule Module: telas Agenda do Dia e Detalhe; serviços `scheduleService` e `appointmentsService` (confirm/cancel/complete); hooks de dados com React Query.
-- UI/Design System: componentes RN (React Native Paper/Tamagui) + NativeWind para utilitários de estilo; toasts (sonner-rn/flash-message).
+- Schedule Module: telas Agenda do Dia e Detalhe; serviços `scheduleService` e `appointmentsService` (confirm/cancel/complete); hooks de dados com React Query. Refetch imediato ao voltar ao app (foreground) e ao focar a tela (useFocusEffect).
+- UI/Design System: componentes RN (React Native Paper) + StyleSheet para estilos; toasts (react-native-flash-message). Estratégia de atualização: server-first (sem optimistic updates); após ações, refetch e sincronização com backend.
 - Infra de Dados: `api.ts` (Axios instance + interceptors), `storage.ts` (SecureStore), `config.ts` (envs, baseURL).
 
 Fluxo de dados resumido:
@@ -108,14 +108,18 @@ Conversões de tempo: usar `date-fns` + `date-fns-tz` para formatar/exibir horá
 
 Observações:
 - Backend retorna UTC; app exibe no fuso local.
-- `GET /api/barbeiro/barbearias` está referenciado em documentação interna; caso não exista, implementar no backend ou ajustar o PRD/TechSpec com rota equivalente sob `/api/auth/...`.
+- `GET /api/barbeiro/barbearias` — REQUISITO DE BACKEND PARA O MVP (novo endpoint):
+  - Role: `Barbeiro` (Bearer JWT)
+  - Response 200: `[{ id: Guid, nome: string, codigo: string, isActive: bool }]`
+  - Regras: retornar apenas vínculos ativos; ordenado por `nome`
+  - Erros: 401/403/500
 
 ## Pontos de Integração
 
 - APIs internas do backend BarbApp (sem serviços de terceiros no MVP).
 - Autenticação Bearer JWT via Axios Interceptor.
 - Armazenamento de token em SecureStore (Expo) com fallback para AsyncStorage em dev.
-- Observabilidade (mínima): console logs estruturados para erros de rede e ações; integração Sentry RN pós‑MVP.
+- Observabilidade (MVP): Sentry.io integrado (Expo + sentry-expo) para capturar erros não tratados, breadcrumbs básicos (navegação/fetch), e associar `release`/`environment`.
 
 Tratamento de erros (padrões):
 - 401: limpar sessão e redirecionar para Login.
@@ -127,7 +131,7 @@ Tratamento de erros (padrões):
 | Componente Afetado                 | Tipo de Impacto             | Descrição & Nível de Risco                                                  | Ação Requerida                  |
 | ---------------------------------- | --------------------------- | ---------------------------------------------------------------------------- | ------------------------------- |
 | Backend `/api/auth/barbeiro/login` | Uso conforme contrato       | Troca para e‑mail/senha. Baixo risco.                                        | Confirmar contrato final.       |
-| Listagem de barbearias             | Nova dependência de API     | `GET /api/barbeiro/barbearias` pode precisar documentação formal em endpoints | Alinhar e padronizar rota.      |
+| Listagem de barbearias             | Nova API (Obrigatória)      | Implementar `GET /api/barbeiro/barbearias` no backend para seleção de contexto | Implementar + documentar rota.  |
 | Troca de contexto                  | Uso conforme contrato       | Gera novo token. Baixo risco.                                                | Sem ação além de documentação.  |
 | Schedule/Appointments              | Uso conforme contrato       | Polling (30s) aumenta requisições. Baixo risco.                              | Monitorar carga no backend.     |
 | Observabilidade Mobile             | Pós‑MVP                     | Sentry RN/Crashlytics.                                                       | Planejar integração futura.     |
@@ -152,12 +156,13 @@ Impacto de performance: polling a cada 30s na agenda visível; usar visibilidade
 
 ### Ordem de Construção
 
-1. Infra de dados: `api.ts` (Axios), `config.ts` (baseURL), `storage.ts` (SecureStore), interceptors (401 handler). 
-2. Auth: tela de Login, `authService`, `AuthContext` (+ testes unitários). 
-3. Barbershops: `listBarbershops()` + tela de Seleção + `switchContext()` (somente quando multi‑vínculo). 
-4. Schedule: tela Agenda do Dia, `scheduleService`, hooks de dados, polling/pull‑to‑refresh. 
-5. Appointment Details: modal/bottom sheet e ações (confirm/cancel/complete), handling de 409/400. 
-6. Refinos de UX e estados vazios/erros; testes de integração de fluxos principais. 
+1. Infra de dados: `api.ts` (Axios), `config.ts` (baseURL), `storage.ts` (SecureStore), interceptors (401 handler).
+2. Auth: tela de Login, `authService`, `AuthContext` (+ testes unitários).
+3. Barbershops: implementar `GET /api/barbeiro/barbearias` (backend) e integrar `listBarbershops()` + tela de Seleção + `switchContext()`.
+4. Schedule: tela Agenda do Dia, `scheduleService`, hooks de dados, polling/pull‑to‑refresh, refetch em foco/foreground.
+5. Appointment Details: modal/bottom sheet e ações (confirm/cancel/complete), handling de 409/400 (refetch e toasts).
+6. Observabilidade: integrar Sentry.io (sentry-expo) com DSN/env e captura de erros não tratados.
+7. Refinos de UX e estados vazios/erros; testes de integração de fluxos principais.
 
 ### Dependências Técnicas
 
@@ -167,22 +172,29 @@ Impacto de performance: polling a cada 30s na agenda visível; usar visibilidade
 
 ## Monitoramento e Observabilidade
 
-- Logs de falhas de rede (Axios interceptor `response.use`), incluindo status e rota.
-- Métricas futuras: taxa de erro por ação (confirm/cancel/complete), latência média das chamadas.
-- Integração futura com Sentry RN: DSN por ambiente, release e environment tags; scrubbing de PII.
+- Sentry.io (MVP):
+  - SDK: `sentry-expo` (Expo) ou `@sentry/react-native` se bare workflow.
+  - DSN via env: `EXPO_PUBLIC_SENTRY_DSN` (ou `SENTRY_DSN`).
+  - Tags: `environment` (development/staging/production), `release` (app-name@semver+commit), `platform` (ios/android).
+  - Ativar captura de erros não tratados e unhandled rejections; breadcrumbs de navegação/fetch.
+  - Scrubbing de PII ativado; não enviar telefones/emails em extras.
+  - Source maps: habilitar upload (EAS/CI) para stacks legíveis.
+- Logs de rede: Axios interceptor reportando status/rota em `warn` (4xx) e `error` (5xx/sem rede).
+- Métricas futuras: taxa de erro por ação (confirm/cancel/complete), latência média das chamadas (pós‑MVP se necessário).
 
 ## Considerações Técnicas
 
 ### Decisões Principais
 
 - React Native (Expo) + TypeScript: velocidade de entrega, comunidade, DX consistente com stack React do repositório.
-- TanStack Query: cache, invalidação e polling simplificados; padrão do repositório (rules/react.md).
+- TanStack Query: cache, invalidação e polling; padrão do repositório (rules/react.md).
 - Axios + interceptors: padronização de auth/erro; facilita logs e headers.
-- NativeWind para utilitários de estilo (alinhamento com Tailwind mindset em RN). UI lib RN (Paper/Tamagui) em vez de Shadcn (web-only).
+- UI lib: React Native Paper + StyleSheet (sem NativeWind) para reduzir dependências e simplificar MVP.
+- Observabilidade: Sentry.io no MVP via `sentry-expo`.
 
 Trade-offs:
 - RN vs Web responsivo (Capacitor): RN oferece UX nativa superior; custo de UI nativa maior que web.
-- NativeWind vs StyleSheet puro: produtividade vs dependência adicional; aceitável para MVP.
+- Paper+StyleSheet vs NativeWind: menos utilitários, porém menos dependências e menor curva de adoção; preferido pelo critério de simplicidade.
 
 Alternativas rejeitadas:
 - Flutter/Kotlin/Swift nativos: maior custo/time-to-market, menos alinhamento com stack existente.
@@ -204,8 +216,8 @@ Alternativas rejeitadas:
 - Regras React (rules/react.md):
   - TypeScript: OK; componentes RN em TSX.
   - React Query: OK (TanStack Query para RN).
-  - Tailwind: adotado via NativeWind (justificado por ambiente RN).
-  - Shadcn UI: substituído por RN UI lib (justificado; Shadcn é web).
+  - Tailwind: substituído por StyleSheet no RN para simplicidade (desvio justificado: ambiente nativo, evitar dependências extras). 
+  - Shadcn UI: não aplicável em RN; uso de React Native Paper.
 - Regras HTTP (rules/http.md): headers adequados, timeouts razoáveis, retries limitados (ex.: retry 1x para GET schedule).
 - Regras de Logging (rules/logging.md): logs desacoplados, níveis: warn (409), error (500/sem rede).
 - Regras de Testes (rules/tests-react.md): RN Testing Library para componentes/hooks; mocks de rede controlados.
@@ -273,6 +285,28 @@ export const scheduleService = {
 ```
 
 ```ts
+// src/screens/ScheduleScreen.tsx (trecho)
+import { useFocusEffect } from '@react-navigation/native';
+import { AppState } from 'react-native';
+import { useQueryClient } from '@tanstack/react-query';
+
+export function useScheduleAutoRefresh(queryKey: unknown[]) {
+  const qc = useQueryClient();
+  useFocusEffect(
+    React.useCallback(() => {
+      qc.invalidateQueries({ queryKey });
+      const sub = AppState.addEventListener('change', (state) => {
+        if (state === 'active') {
+          qc.invalidateQueries({ queryKey });
+        }
+      });
+      return () => sub.remove();
+    }, [qc])
+  );
+}
+```
+
+```ts
 // src/services/appointmentsService.ts
 import { api } from '../infra/api';
 
@@ -283,4 +317,3 @@ export const appointmentsService = {
   complete: async (id: string) => (await api.post(`/api/appointments/${id}/complete`)).data as AppointmentDetailsOutput,
 };
 ```
-

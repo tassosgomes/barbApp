@@ -169,13 +169,19 @@ Requisitos funcionais:
 - Autenticação: login por e-mail + senha; token com expiração (~24h); armazenamento seguro; interceptador nas chamadas.
 - Integrações (back-end atual):
   - `POST /api/auth/barbeiro/login` (input: `{ email, password }`) — autenticação do barbeiro.
-  - `GET /api/barbeiro/barbearias` — lista barbearias do barbeiro autenticado (para seleção de contexto, quando multi-vínculo).
   - `POST /api/auth/barbeiro/trocar-contexto` — troca de contexto para outra barbearia (gera novo token com `NovaBarbeariaId`).
   - `GET /api/schedule/my-schedule?date=YYYY-MM-DD` — agenda do barbeiro autenticado (por dia).
   - `GET /api/appointments/{id}` — detalhes do agendamento.
   - `POST /api/appointments/{id}/confirm` — confirmar agendamento pendente.
   - `POST /api/appointments/{id}/cancel` — cancelar agendamento pendente/confirmado.
   - `POST /api/appointments/{id}/complete` — concluir agendamento confirmado (após horário).
+- Novos endpoints necessários (MVP):
+  - `GET /api/barbeiro/barbearias` — lista as barbearias às quais o barbeiro autenticado está vinculado (seleção de contexto multi‑vínculo).
+    - Autorização: `Barbeiro` com Bearer JWT.
+    - Resposta sugerida (200): `[{ id: Guid, nome: string, codigo: string, isActive: bool }]`.
+    - Observações: retornar apenas ativas por padrão; ordenar alfabeticamente por `nome`.
+    - Erros: 401 (token inválido), 403 (sem permissão), 500.
+
 - Novos endpoints recomendados (pós-MVP para aprimorar UX/performance):
   - `GET /api/schedule/my-schedule-range?from=YYYY-MM-DD&to=YYYY-MM-DD` — retorna agenda do barbeiro no intervalo; otimiza visão semanal sem múltiplas chamadas/dia.
   - `GET /api/auth/me` — valida token e retorna perfil/claims básicos (role, userId, barbeariaId, nomeBarbearia).
