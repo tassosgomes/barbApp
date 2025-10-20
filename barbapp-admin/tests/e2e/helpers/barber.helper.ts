@@ -33,8 +33,18 @@ export async function loginAsBarber(page: Page) {
  * Verifica se está autenticado como barbeiro
  */
 export async function isBarberAuthenticated(page: Page): Promise<boolean> {
-  const token = await page.evaluate(() => localStorage.getItem('barber_token'));
-  return token !== null;
+  try {
+    const token = await page.evaluate(() => {
+      try {
+        return localStorage.getItem('barber_token');
+      } catch (e) {
+        return null;
+      }
+    });
+    return token !== null;
+  } catch (e) {
+    return false;
+  }
 }
 
 /**
@@ -47,9 +57,19 @@ export async function logoutBarber(page: Page) {
     await logoutButton.click();
   }
   
-  // Aguarda redirecionamento para login
+  // Aguardar redirecionamento para login
   await expect(page).toHaveURL('/login', {
     timeout: 5000,
+  });
+  
+  // Limpar localStorage após logout
+  await page.evaluate(() => {
+    try {
+      localStorage.removeItem('barber_token');
+      localStorage.removeItem('barber_user');
+    } catch (e) {
+      // Ignorar erros
+    }
   });
 }
 
@@ -57,9 +77,17 @@ export async function logoutBarber(page: Page) {
  * Limpa dados de autenticação do barbeiro
  */
 export async function clearBarberAuth(page: Page) {
+  // Aguardar página carregar completamente
+  await page.waitForLoadState('domcontentloaded');
+  
   await page.evaluate(() => {
-    localStorage.removeItem('barber_token');
-    localStorage.removeItem('barber_user');
+    try {
+      localStorage.removeItem('barber_token');
+      localStorage.removeItem('barber_user');
+    } catch (e) {
+      // Ignorar erros de localStorage (pode não estar disponível)
+      console.log('localStorage not available:', e);
+    }
   });
 }
 
