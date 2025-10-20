@@ -1,5 +1,5 @@
 ---
-status: pending
+status: completed
 parallelizable: true
 blocked_by: ["11.0","13.0","14.0"]
 ---
@@ -29,31 +29,31 @@ Criar a página principal de agenda do barbeiro com visualização do dia, naveg
 - Pull-to-refresh em mobile
 
 ## Subtarefas
-- [ ] 15.1 Criar `src/pages/barber/SchedulePage.tsx`:
+- [x] 15.1 Criar `src/pages/barber/SchedulePage.tsx`:
   - Estado de data selecionada
   - useBarberSchedule hook com polling
   - Exibir AppointmentsList
   - Header com data e navegação
-- [ ] 15.2 Implementar navegação de data:
+- [x] 15.2 Implementar navegação de data:
   - Botões "Dia Anterior" / "Próximo Dia"
   - Date picker para selecionar dia específico
   - Indicador de "Hoje"
-- [ ] 15.3 Criar `src/components/schedule/AppointmentDetailsModal.tsx`:
+- [x] 15.3 Criar `src/components/schedule/AppointmentDetailsModal.tsx`:
   - Exibir todos os detalhes do agendamento
   - Incluir botões de ação (confirmar/cancelar/concluir)
   - Informações de contato do cliente
   - Timestamps (criado, confirmado, etc.)
-- [ ] 15.4 Criar `src/components/schedule/CancelConfirmationDialog.tsx`:
+- [x] 15.4 Criar `src/components/schedule/CancelConfirmationDialog.tsx`:
   - Confirmação antes de cancelar
   - Texto: "Tem certeza que deseja cancelar este agendamento?"
-- [ ] 15.5 Implementar feedback de ações:
+- [x] 15.5 Implementar feedback de ações:
   - Toast de sucesso: "Agendamento confirmado!"
   - Toast de erro: mensagens de erro da API
   - Toast de conflito: "Este agendamento foi modificado. Recarregando..."
-- [ ] 15.6 Adicionar contador de agendamentos: "5 agendamentos hoje"
-- [ ] 15.7 Implementar pull-to-refresh (mobile)
-- [ ] 15.8 Estados de loading e error com UI apropriada
-- [ ] 15.9 Testes de integração da página
+- [x] 15.6 Adicionar contador de agendamentos: "5 agendamentos hoje"
+- [x] 15.7 Implementar pull-to-refresh (mobile)
+- [x] 15.8 Estados de loading e error com UI apropriada
+- [x] 15.9 Testes de integração da página
 
 ## Sequenciamento
 - Bloqueado por: 11.0 (Tipos), 13.0 (Hooks), 14.0 (Componentes)
