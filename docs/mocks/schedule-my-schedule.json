@@ -1,0 +1,47 @@
+{
+  "date": "2025-10-20T00:00:00Z",
+  "barberId": "550e8400-e29b-41d4-a716-446655440000",
+  "barberName": "João Silva",
+  "appointments": [
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440001",
+      "customerName": "Carlos Oliveira",
+      "serviceTitle": "Corte de Cabelo",
+      "startTime": "2025-10-20T09:00:00Z",
+      "endTime": "2025-10-20T09:30:00Z",
+      "status": 1
+    },
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440002",
+      "customerName": "Maria Santos",
+      "serviceTitle": "Corte + Barba",
+      "startTime": "2025-10-20T10:00:00Z",
+      "endTime": "2025-10-20T10:45:00Z",
+      "status": 0
+    },
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440003",
+      "customerName": "Pedro Lima",
+      "serviceTitle": "Barba Completa",
+      "startTime": "2025-10-20T14:00:00Z",
+      "endTime": "2025-10-20T14:30:00Z",
+      "status": 1
+    },
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440004",
+      "customerName": "Lucas Ferreira",
+      "serviceTitle": "Corte Premium",
+      "startTime": "2025-10-20T15:30:00Z",
+      "endTime": "2025-10-20T16:30:00Z",
+      "status": 2
+    },
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440005",
+      "customerName": "Rafael Costa",
+      "serviceTitle": "Corte Simples",
+      "startTime": "2025-10-20T17:00:00Z",
+      "endTime": "2025-10-20T17:30:00Z",
+      "status": 0
+    }
+  ]
+}

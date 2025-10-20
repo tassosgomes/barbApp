@@ -1,7 +1,8 @@
 ---
-status: pending
+status: completed
 parallelizable: true
 blocked_by: ["4.0","5.0"]
+completed_date: 2025-10-20
 ---
 
 <task_context>
@@ -24,9 +25,9 @@ Documentar contratos de API, disponibilizar exemplos e mock data para a agenda e
 - CORS configurado para o domínio do frontend
 
 ## Subtarefas
-- [ ] 8.1 Especificar contratos com exemplos
-- [ ] 8.2 Criar mock data para agenda e detalhes
-- [ ] 8.3 Validar CORS (dev)
+- [x] 8.1 Especificar contratos com exemplos
+- [x] 8.2 Criar mock data para agenda e detalhes
+- [x] 8.3 Validar CORS (dev)
 
 ## Sequenciamento
 - Bloqueado por: 4.0, 5.0
