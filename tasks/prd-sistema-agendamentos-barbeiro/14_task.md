@@ -1,5 +1,5 @@
 ---
-status: pending
+status: completed
 parallelizable: true
 blocked_by: ["11.0","13.0"]
 ---
@@ -27,23 +27,23 @@ Criar componentes reutilizáveis para exibir a lista de agendamentos do dia e ca
 - Utilizar Shadcn UI components
 
 ## Subtarefas
-- [ ] 14.1 Criar `src/components/schedule/AppointmentCard.tsx`:
+- [x] 14.1 Criar `src/components/schedule/AppointmentCard.tsx`:
   - Props: appointment, onConfirm, onCancel, onComplete, onClick
   - Exibir: nome cliente, serviço, horário, status
   - Código de cores por status (Pending: yellow, Confirmed: green, Completed: gray, Cancelled: red)
   - Botões de ação condicionais baseados em status
   - Área de toque mínima 44x44px
-- [ ] 14.2 Criar `src/components/schedule/AppointmentsList.tsx`:
+- [x] 14.2 Criar `src/components/schedule/AppointmentsList.tsx`:
   - Recebe array de appointments
   - Renderiza lista de AppointmentCard
   - Empty state: "Nenhum agendamento para este dia"
   - Loading state com skeletons
   - Ordenação cronológica
-- [ ] 14.3 Criar `src/components/schedule/StatusBadge.tsx`:
+- [x] 14.3 Criar `src/components/schedule/StatusBadge.tsx`:
   - Badge visual para status
   - Cores e ícones consistentes
-- [ ] 14.4 Implementar responsividade mobile-first
-- [ ] 14.5 Adicionar testes com React Testing Library
+- [x] 14.4 Implementar responsividade mobile-first
+- [x] 14.5 Adicionar testes com React Testing Library
 
 ## Sequenciamento
 - Bloqueado por: 11.0 (Tipos), 13.0 (Hooks)
