@@ -1,7 +1,8 @@
 ---
-status: pending
+status: completed
 parallelizable: true
 blocked_by: ["8.0"]
+completed_date: 2025-10-20
 ---
 
 <task_context>
@@ -25,14 +26,14 @@ Definir tipos de domínio para Appointment, AppointmentStatus, BarberSchedule e 
 - Alinhamento com DTOs do backend (BarberScheduleOutput, AppointmentDetailsOutput)
 
 ## Subtarefas
-- [ ] 11.1 Criar `src/types/appointment.ts` com tipos:
+- [x] 11.1 Criar `src/types/appointment.ts` com tipos:
   - `AppointmentStatus` enum (Pending, Confirmed, Completed, Cancelled)
   - `Appointment` interface
   - `AppointmentDetails` interface
   - `BarberSchedule` interface
-- [ ] 11.2 Criar `src/types/schedule-filters.ts` para navegação de data
-- [ ] 11.3 Exportar via `src/types/index.ts`
-- [ ] 11.4 Validar compatibilidade com contratos do backend
+- [x] 11.2 Criar `src/types/schedule-filters.ts` para navegação de data
+- [x] 11.3 Exportar via `src/types/index.ts`
+- [x] 11.4 Validar compatibilidade com contratos do backend
 
 ## Sequenciamento
 - Bloqueado por: 8.0 (Integração Frontend - Contratos)
@@ -82,3 +83,14 @@ export interface BarberSchedule {
 - Tipos compilam sem erros
 - Compatíveis com respostas do backend
 - Exportados corretamente para uso nos componentes
+
+## ✅ CONCLUSÃO DA TAREFA - VALIDADO
+
+- [x] 11.0 [Tipos TypeScript e Schemas - Sistema de Agendamentos (Barbeiro)] ✅ CONCLUÍDA
+  - [x] 11.1 Tipos criados em `src/types/appointment.ts` - AppointmentStatus enum, Appointment, AppointmentDetails, BarberSchedule
+  - [x] 11.2 Tipos de navegação criados em `src/types/schedule-filters.ts` - ScheduleFilters, DateNavigation, ScheduleViewMode
+  - [x] 11.3 Exportação configurada em `src/types/index.ts` - Todos os tipos exportados corretamente
+  - [x] 11.4 Compatibilidade validada - 100% compatível com DTOs do backend (BarberScheduleOutput, AppointmentDetailsOutput)
+  - [x] Validação completa documentada em `11_task_validation.md`
+  - [x] Conformidade com padrões do projeto verificada (code-standard.md)
+  - [x] Pronto para uso nas tarefas 12.0-16.0 - Tipos base prontos para implementação de API client, componentes e páginas
