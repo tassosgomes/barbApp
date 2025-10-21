@@ -25,6 +25,8 @@ public class BarbAppDbContext : DbContext
     public DbSet<BarbershopService> BarbershopServices => Set<BarbershopService>();
     public DbSet<Customer> Customers => Set<Customer>();
     public DbSet<Appointment> Appointments => Set<Appointment>();
+    public DbSet<LandingPageConfig> LandingPageConfigs => Set<LandingPageConfig>();
+    public DbSet<LandingPageService> LandingPageServices => Set<LandingPageService>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -48,5 +50,11 @@ public class BarbAppDbContext : DbContext
 
         modelBuilder.Entity<Appointment>().HasQueryFilter(a =>
             _tenantContext.IsAdminCentral || a.BarbeariaId == _tenantContext.BarbeariaId);
+
+        modelBuilder.Entity<LandingPageConfig>().HasQueryFilter(l =>
+            _tenantContext.IsAdminCentral || l.BarbershopId == _tenantContext.BarbeariaId);
+
+        modelBuilder.Entity<LandingPageService>().HasQueryFilter(l =>
+            _tenantContext.IsAdminCentral || l.LandingPageConfig.BarbershopId == _tenantContext.BarbeariaId);
     }
 }
