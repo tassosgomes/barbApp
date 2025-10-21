@@ -13,6 +13,6 @@ public class LoginBarbeiroInputValidator : AbstractValidator<DTOs.LoginBarbeiroI
 
         RuleFor(x => x.Password)
             .NotEmpty().WithMessage("Senha é obrigatória")
-            .MinimumLength(6).WithMessage("Senha deve ter no mínimo 6 caracteres");
+            .MinimumLength(6).WithMessage("A senha deve ter no mínimo 6 caracteres");
     }
 }
