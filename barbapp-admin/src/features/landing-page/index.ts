@@ -75,6 +75,20 @@ export type {
 // Constants
 // ============================================================================
 
+// Hooks
+export {
+  useLandingPage,
+  useTemplates,
+  useLogoUpload,
+  LANDING_PAGE_QUERY_KEYS,
+  TEMPLATES_QUERY_KEYS,
+  LOGO_UPLOAD_QUERY_KEYS,
+} from './hooks';
+
+// API Services
+// TODO: Descomentar quando API for criada (próximas tarefas)
+// export { landingPageApi } from '../../../services/api/landing-page.api';
+
 // Templates
 export {
   TEMPLATES,

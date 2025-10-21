@@ -1,330 +1,195 @@
-/**
- * useLandingPage Hook
- * 
- * Hook customizado para gerenciar estado e operações da landing page
- * no painel admin. Inclui integração com TanStack Query para cache,
- * invalidação automática, tratamento de erros e loading states.
- * 
- * @version 1.0
- * @date 2025-10-21
- */
-
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { toast } from '@/hooks/use-toast';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { landingPageApi } from '@/services/api/landing-page.api';
+import { showSuccessToast, showErrorToast } from '@/utils/toast';
 import type {
-  LandingPageConfigOutput,
-  UpdateLandingPageInput,
+  LandingPageConfig,
   CreateLandingPageInput,
+  UpdateLandingPageInput,
   UseLandingPageResult,
 } from '../types/landing-page.types';
 
-// ============================================================================
-// Query Keys
-// ============================================================================
-
-export const LANDING_PAGE_QUERY_KEYS = {
-  all: ['landingPage'] as const,
-  configs: () => [...LANDING_PAGE_QUERY_KEYS.all, 'config'] as const,
-  config: (barbershopId: string) => 
-    [...LANDING_PAGE_QUERY_KEYS.configs(), barbershopId] as const,
-  public: (code: string) =>
-    [...LANDING_PAGE_QUERY_KEYS.all, 'public', code] as const,
-  analytics: (barbershopId: string) =>
-    [...LANDING_PAGE_QUERY_KEYS.all, 'analytics', barbershopId] as const,
+const QUERY_KEYS = {
+  landingPage: (barbershopId: string) => ['landing-page', barbershopId] as const,
+  templates: ['landing-page-templates'] as const,
 } as const;
 
-// ============================================================================
-// Hook Implementation
-// ============================================================================
-
-export const useLandingPage = (barbershopId: string): UseLandingPageResult => {
+export function useLandingPage(barbershopId: string): UseLandingPageResult {
   const queryClient = useQueryClient();
 
-  // ============================================================================
-  // Queries
-  // ============================================================================
-
-  /**
-   * Buscar configuração da landing page
-   */
   const {
     data: config,
     isLoading,
-    isError,
     error,
     refetch,
   } = useQuery({
-    queryKey: LANDING_PAGE_QUERY_KEYS.config(barbershopId),
+    queryKey: QUERY_KEYS.landingPage(barbershopId),
     queryFn: () => landingPageApi.getConfig(barbershopId),
-    staleTime: 5 * 60 * 1000, // 5 minutos
-    gcTime: 10 * 60 * 1000, // 10 minutos (anteriormente cacheTime)
-    retry: 2,
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
     enabled: !!barbershopId,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    retry: (failureCount, error: unknown) => {
+      if ((error as { response?: { status?: number } })?.response?.status === 404) return false;
+      return failureCount < 2;
+    },
   });
 
-  // ============================================================================
-  // Mutations
-  // ============================================================================
-
-  /**
-   * Criar nova landing page
-   */
   const createMutation = useMutation({
-    mutationFn: (data: CreateLandingPageInput) => landingPageApi.createConfig(data),
-    onSuccess: (data) => {
-      // Invalidar queries relacionadas
+    mutationFn: (payload: CreateLandingPageInput) =>
+      landingPageApi.createConfig(barbershopId, payload),
+    onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: LANDING_PAGE_QUERY_KEYS.configs(),
+        queryKey: QUERY_KEYS.landingPage(barbershopId),
       });
-      
-      // Adicionar aos dados em cache
-      queryClient.setQueryData(
-        LANDING_PAGE_QUERY_KEYS.config(barbershopId),
-        data
+      showSuccessToast(
+        'Landing page criada',
+        'Sua landing page foi criada com sucesso!'
       );
-
-      toast({
-        title: 'Landing page criada!',
-        description: 'Sua landing page foi criada com sucesso.',
-        variant: 'default',
-      });
     },
-    onError: (error: Error) => {
-      toast({
-        title: 'Erro ao criar',
-        description: error.message || 'Erro ao criar landing page.',
-        variant: 'destructive',
-      });
+    onError: (error: unknown) => {
+      const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Erro ao criar landing page';
+      showErrorToast('Erro na criação', message);
     },
   });
 
-  /**
-   * Atualizar configuração da landing page
-   */
   const updateMutation = useMutation({
-    mutationFn: (data: UpdateLandingPageInput) => 
-      landingPageApi.updateConfig(barbershopId, data),
-    onMutate: async (newData) => {
-      // Cancelar queries em andamento
-      await queryClient.cancelQueries({
-        queryKey: LANDING_PAGE_QUERY_KEYS.config(barbershopId),
-      });
-
-      // Snapshot do valor anterior
-      const previousConfig = queryClient.getQueryData(
-        LANDING_PAGE_QUERY_KEYS.config(barbershopId)
-      );
-
-      // Atualização otimista
-      queryClient.setQueryData(
-        LANDING_PAGE_QUERY_KEYS.config(barbershopId),
-        (old: LandingPageConfigOutput | undefined) => {
-          if (!old) return old;
-          return {
-            ...old,
-            ...newData,
-            updatedAt: new Date().toISOString(),
-          };
-        }
-      );
-
-      return { previousConfig };
-    },
-    onSuccess: (data) => {
-      // Atualizar cache com dados reais do servidor
-      queryClient.setQueryData(
-        LANDING_PAGE_QUERY_KEYS.config(barbershopId),
-        data
-      );
-
-      toast({
-        title: 'Alterações salvas!',
-        description: 'Landing page atualizada com sucesso.',
-        variant: 'default',
-      });
-    },
-    onError: (error: Error, newData, context) => {
-      // Reverter para estado anterior em caso de erro
-      if (context?.previousConfig) {
-        queryClient.setQueryData(
-          LANDING_PAGE_QUERY_KEYS.config(barbershopId),
-          context.previousConfig
-        );
-      }
-
-      toast({
-        title: 'Erro ao salvar',
-        description: error.message || 'Erro ao atualizar landing page.',
-        variant: 'destructive',
-      });
-    },
-    onSettled: () => {
-      // Revalidar dados após mutação
+    mutationFn: (payload: UpdateLandingPageInput) =>
+      landingPageApi.updateConfig(barbershopId, payload),
+    onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: LANDING_PAGE_QUERY_KEYS.config(barbershopId),
+        queryKey: QUERY_KEYS.landingPage(barbershopId),
       });
+      showSuccessToast(
+        'Landing page atualizada',
+        'Suas alterações foram salvas com sucesso!'
+      );
+    },
+    onError: (error: unknown) => {
+      const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Erro ao atualizar landing page';
+      showErrorToast('Erro na atualização', message);
     },
   });
 
-  /**
-   * Publicar/despublicar landing page
-   */
-  const togglePublishMutation = useMutation({
-    mutationFn: (isPublished: boolean) => 
-      landingPageApi.togglePublish(barbershopId, isPublished),
-    onSuccess: (_, isPublished) => {
-      // Atualizar cache
+  const publishMutation = useMutation({
+    mutationFn: () => landingPageApi.publishConfig(barbershopId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.landingPage(barbershopId),
+      });
+      showSuccessToast(
+        'Landing page publicada',
+        'Sua landing page está agora disponível publicamente!'
+      );
+    },
+    onError: (error: unknown) => {
+      const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Erro ao publicar landing page';
+      showErrorToast('Erro na publicação', message);
+    },
+  });
+
+  const unpublishMutation = useMutation({
+    mutationFn: () => landingPageApi.unpublishConfig(barbershopId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.landingPage(barbershopId),
+      });
+      showSuccessToast(
+        'Landing page despublicada',
+        'Sua landing page não está mais pública'
+      );
+    },
+    onError: (error: unknown) => {
+      const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Erro ao despublicar landing page';
+      showErrorToast('Erro na despublicação', message);
+    },
+  });
+
+  const uploadLogoMutation = useMutation({
+    mutationFn: (file: File) => landingPageApi.uploadLogo(barbershopId, file),
+    onSuccess: (logoUrl: string) => {
       queryClient.setQueryData(
-        LANDING_PAGE_QUERY_KEYS.config(barbershopId),
-        (old: LandingPageConfigOutput | undefined) => {
-          if (!old) return old;
-          return { ...old, isPublished };
+        QUERY_KEYS.landingPage(barbershopId),
+        (oldData: LandingPageConfig | undefined) => {
+          if (!oldData) return oldData;
+          return { ...oldData, logoUrl };
         }
       );
-
-      toast({
-        title: isPublished ? 'Landing page publicada!' : 'Landing page despublicada!',
-        description: isPublished 
-          ? 'Sua landing page está agora online.' 
-          : 'Sua landing page foi despublicada.',
-        variant: 'default',
-      });
+      showSuccessToast(
+        'Logo atualizado',
+        'O logo da sua landing page foi atualizado com sucesso!'
+      );
     },
-    onError: (error: Error) => {
-      toast({
-        title: 'Erro',
-        description: error.message || 'Erro ao alterar status de publicação.',
-        variant: 'destructive',
-      });
+    onError: (error: unknown) => {
+      const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Erro ao fazer upload do logo';
+      showErrorToast('Erro no upload', message);
     },
   });
 
-  // ============================================================================
-  // Utility Functions
-  // ============================================================================
+  const deleteLogoMutation = useMutation({
+    mutationFn: () => landingPageApi.deleteLogo(barbershopId),
+    onSuccess: () => {
+      queryClient.setQueryData(
+        QUERY_KEYS.landingPage(barbershopId),
+        (oldData: LandingPageConfig | undefined) => {
+          if (!oldData) return oldData;
+          return { ...oldData, logoUrl: undefined };
+        }
+      );
+      showSuccessToast('Logo removido', 'O logo foi removido da sua landing page');
+    },
+    onError: (error: unknown) => {
+      const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Erro ao remover logo';
+      showErrorToast('Erro na remoção', message);
+    },
+  });
 
-  /**
-   * Invalidar cache manualmente
-   */
-  const invalidateCache = () => {
-    queryClient.invalidateQueries({
-      queryKey: LANDING_PAGE_QUERY_KEYS.config(barbershopId),
-    });
-  };
-
-  /**
-   * Limpar cache da landing page
-   */
-  const clearCache = () => {
-    queryClient.removeQueries({
-      queryKey: LANDING_PAGE_QUERY_KEYS.config(barbershopId),
-    });
-  };
-
-  /**
-   * Pré-carregar dados da landing page
-   */
-  const prefetchConfig = async () => {
-    await queryClient.prefetchQuery({
-      queryKey: LANDING_PAGE_QUERY_KEYS.config(barbershopId),
-      queryFn: () => landingPageApi.getConfig(barbershopId),
-      staleTime: 5 * 60 * 1000,
-    });
-  };
-
-  // ============================================================================
-  // Return Interface
-  // ============================================================================
+  const previewMutation = useMutation({
+    mutationFn: () => landingPageApi.generatePreview(barbershopId),
+    onError: (error: unknown) => {
+      const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Erro ao gerar preview';
+      showErrorToast('Erro no preview', message);
+    },
+  });
 
   return {
     // Data
     config,
+    
+    // Loading states
     isLoading,
-    isError,
+    isCreating: createMutation.isPending,
+    isUpdating: updateMutation.isPending,
+    isPublishing: publishMutation.isPending,
+    isUnpublishing: unpublishMutation.isPending,
+    isUploadingLogo: uploadLogoMutation.isPending,
+    isDeletingLogo: deleteLogoMutation.isPending,
+    isGeneratingPreview: previewMutation.isPending,
+    
+    // Error states
     error,
-
+    createError: createMutation.error,
+    updateError: updateMutation.error,
+    publishError: publishMutation.error,
+    unpublishError: unpublishMutation.error,
+    uploadLogoError: uploadLogoMutation.error,
+    deleteLogoError: deleteLogoMutation.error,
+    previewError: previewMutation.error,
+    
     // Actions
     createConfig: createMutation.mutate,
     updateConfig: updateMutation.mutate,
-    togglePublish: togglePublishMutation.mutate,
+    publishConfig: publishMutation.mutate,
+    unpublishConfig: unpublishMutation.mutate,
+    uploadLogo: uploadLogoMutation.mutate,
+    deleteLogo: deleteLogoMutation.mutate,
+    generatePreview: previewMutation.mutate,
     refetch,
-
-    // States
-    isCreating: createMutation.isPending,
-    isUpdating: updateMutation.isPending,
-    isToggling: togglePublishMutation.isPending,
-
-    // Utilities
-    invalidateCache,
-    clearCache,
-    prefetchConfig,
-
-    // Computed values
-    isReady: !isLoading && !isError && !!config,
-    hasConfig: !!config,
-    isPublished: config?.isPublished ?? false,
-  };
-};
-
-// ============================================================================
-// Helper Hooks
-// ============================================================================
-
-/**
- * Hook para buscar landing page pública (para preview)
- */
-export const usePublicLandingPage = (barbershopCode: string) => {
-  return useQuery({
-    queryKey: LANDING_PAGE_QUERY_KEYS.public(barbershopCode),
-    queryFn: () => landingPageApi.getPublicData(barbershopCode),
-    staleTime: 2 * 60 * 1000, // 2 minutos
-    gcTime: 5 * 60 * 1000, // 5 minutos
-    enabled: !!barbershopCode,
-    retry: 1,
-  });
-};
-
-/**
- * Hook para duplicar template
- */
-export const useDuplicateTemplate = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: ({ 
-      sourceBarbershopId, 
-      targetBarbershopId 
-    }: {
-      sourceBarbershopId: string;
-      targetBarbershopId: string;
-    }) => landingPageApi.duplicateTemplate(sourceBarbershopId, targetBarbershopId),
-    onSuccess: (data, variables) => {
-      // Invalidar cache do target
+    
+    // Utils
+    invalidateQueries: () => {
       queryClient.invalidateQueries({
-        queryKey: LANDING_PAGE_QUERY_KEYS.config(variables.targetBarbershopId),
-      });
-
-      toast({
-        title: 'Template duplicado!',
-        description: 'Template copiado com sucesso.',
-        variant: 'default',
+        queryKey: QUERY_KEYS.landingPage(barbershopId),
       });
     },
-    onError: (error: Error) => {
-      toast({
-        title: 'Erro ao duplicar',
-        description: error.message || 'Erro ao duplicar template.',
-        variant: 'destructive',
-      });
-    },
-  });
-};
+  };
+}
 
-// ============================================================================
-// Export
-// ============================================================================
-
-export type { UseLandingPageResult };
-export default useLandingPage;
+export { QUERY_KEYS };

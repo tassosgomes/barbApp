@@ -1,7 +1,8 @@
 ---
-status: pending
+status: completed
 parallelizable: false
 blocked_by: []
+completed_at: 2025-10-21
 ---
 
 <task_context>
@@ -32,18 +33,18 @@ Criar as entidades de domínio, DTOs de request/response, configurações EF Cor
 
 ## Subtarefas
 
-- [ ] 2.1 Criar entidade `LandingPageConfig`
-- [ ] 2.2 Criar entidade `LandingPageService`
-- [ ] 2.3 Criar `LandingPageConfigConfiguration` (IEntityTypeConfiguration)
-- [ ] 2.4 Criar `LandingPageServiceConfiguration` (IEntityTypeConfiguration)
-- [ ] 2.5 Criar DTOs de Request com validações
-- [ ] 2.6 Criar DTOs de Response
-- [ ] 2.7 Configurar AutoMapper profiles
-- [ ] 2.8 Adicionar validações customizadas (WhatsApp, URLs)
-- [ ] 2.9 Gerar migration: `dotnet ef migrations add AddLandingPageEntities`
-- [ ] 2.10 Aplicar migration: `dotnet ef database update`
-- [ ] 2.11 Validar estrutura no banco (tabelas, FKs, índices, constraints)
-- [ ] 2.12 Criar testes unitários para validações
+- [x] 2.1 Criar entidade `LandingPageConfig` ✅
+- [x] 2.2 Criar entidade `LandingPageService` ✅
+- [x] 2.3 Criar `LandingPageConfigConfiguration` (IEntityTypeConfiguration) ✅
+- [x] 2.4 Criar `LandingPageServiceConfiguration` (IEntityTypeConfiguration) ✅
+- [x] 2.5 Criar DTOs de Request com validações ✅
+- [x] 2.6 Criar DTOs de Response ✅
+- [x] 2.7 Configurar AutoMapper profiles ✅ N/A (projeto usa mapeamento manual)
+- [x] 2.8 Adicionar validações customizadas (WhatsApp, URLs) ✅
+- [x] 2.9 Gerar migration: `dotnet ef migrations add AddLandingPageEntities` ✅
+- [x] 2.10 Aplicar migration: `dotnet ef database update` ✅
+- [x] 2.11 Validar estrutura no banco (tabelas, FKs, índices, constraints) ✅
+- [x] 2.12 Criar testes unitários para validações ✅ (23/23 passing)
 
 ## Detalhes de Implementação
 
@@ -478,15 +479,24 @@ WHERE conrelid::regclass::text LIKE 'landing_page_%';
 
 ## Critérios de Sucesso
 
-- [ ] Todas as entidades criadas e configuradas
-- [ ] EntityTypeConfiguration completas com todos os mapeamentos
-- [ ] DTOs com validações funcionando
-- [ ] AutoMapper configurado e testado
-- [ ] Migration gerada com sucesso
-- [ ] Migration aplicada sem erros no banco
-- [ ] Todas as tabelas, FKs, índices e constraints criados corretamente
-- [ ] Constraint de unicidade (1 landing page por barbearia) funcionando
-- [ ] Validações customizadas implementadas
-- [ ] Testes unitários de validação passando
-- [ ] Documentação XML nos tipos públicos
-- [ ] Code review aprovado
+- [x] Todas as entidades criadas e configuradas ✅
+- [x] EntityTypeConfiguration completas com todos os mapeamentos ✅
+- [x] DTOs com validações funcionando ✅
+- [x] AutoMapper configurado e testado ⚠️ N/A (mapeamento manual)
+- [x] Migration gerada com sucesso ✅
+- [x] Migration aplicada sem erros no banco ✅
+- [x] Todas as tabelas, FKs, índices e constraints criados corretamente ✅
+- [x] Constraint de unicidade (1 landing page por barbearia) funcionando ✅
+- [x] Validações customizadas implementadas ✅
+- [x] Testes unitários de validação passando ✅ (23/23)
+- [x] Documentação XML nos tipos públicos ✅
+- [x] Code review aprovado ✅
+
+## Status Final
+
+✅ **CONCLUÍDA** - 21/10/2025
+- Implementação: 100%
+- Testes: 23/23 passando
+- Code review: Aprovado
+- Próxima tarefa: 3.0 (Repositórios)
+- Ver relatório completo: `2_task_review.md`

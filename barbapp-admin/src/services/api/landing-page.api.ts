@@ -1,107 +1,106 @@
 /**
  * Landing Page API Service
  * 
- * Serviço para integração com API do backend para gerenciamento
- * de landing pages. Inclui operações CRUD, upload de logo e
- * busca de dados públicos.
+ * Serviço para integração com API backend do módulo de Landing Page.
+ * Inclui endpoints para gerenciar configuração, upload de logo e operações CRUD.
  * 
  * @version 1.0
  * @date 2025-10-21
  */
 
-import api from '@/services/api';
-import type {
-  LandingPageConfigOutput,
+import api from '../api';
+import {
+  LandingPageConfig,
   CreateLandingPageInput,
   UpdateLandingPageInput,
-  PublicLandingPageOutput,
-  LogoUploadResponse,
-} from '@/features/landing-page';
+  LandingPageConfigOutput,
+  ApiResponse,
+  Template,
+} from '@/features/landing-page/types/landing-page.types';
 
 // ============================================================================
-// Types
+// API Endpoints
 // ============================================================================
 
-// Note: ApiResponse type is available for future use if needed
-
-// ============================================================================
-// API Service Implementation
-// ============================================================================
-
+/**
+ * Service para operações da Landing Page
+ */
 export const landingPageApi = {
   /**
-   * Buscar configuração da landing page (Admin)
+   * Busca configuração da landing page por ID da barbearia
    */
-  getConfig: async (barbershopId: string): Promise<LandingPageConfigOutput> => {
-    const response = await api.get<LandingPageConfigOutput>(
+  getConfig: async (barbershopId: string): Promise<LandingPageConfig> => {
+    const { data } = await api.get<ApiResponse<LandingPageConfigOutput>>(
       `/admin/landing-pages/${barbershopId}`
     );
-    return response.data;
+    return data.data!.landingPage;
   },
 
   /**
-   * Criar nova landing page (Admin)
+   * Cria nova configuração de landing page
    */
-  createConfig: async (data: CreateLandingPageInput): Promise<LandingPageConfigOutput> => {
-    const response = await api.post<LandingPageConfigOutput>(
-      '/admin/landing-pages',
-      data
+  createConfig: async (barbershopId: string, payload: CreateLandingPageInput): Promise<LandingPageConfig> => {
+    const { data } = await api.post<ApiResponse<LandingPageConfigOutput>>(
+      `/admin/landing-pages/${barbershopId}`,
+      payload
     );
-    return response.data;
+    return data.data!.landingPage;
   },
 
   /**
-   * Atualizar configuração da landing page (Admin)
+   * Atualiza configuração existente da landing page
    */
   updateConfig: async (
     barbershopId: string,
-    data: UpdateLandingPageInput
-  ): Promise<LandingPageConfigOutput> => {
-    const response = await api.put<LandingPageConfigOutput>(
-      `/admin/landing-pages/${barbershopId}`,
-      data
-    );
-    return response.data;
+    payload: UpdateLandingPageInput
+  ): Promise<void> => {
+    await api.put(`/admin/landing-pages/${barbershopId}`, payload);
   },
 
   /**
-   * Upload de logo da barbearia
+   * Remove configuração da landing page
    */
-  uploadLogo: async (barbershopId: string, file: File): Promise<LogoUploadResponse> => {
+  deleteConfig: async (barbershopId: string): Promise<void> => {
+    await api.delete(`/admin/landing-pages/${barbershopId}`);
+  },
+
+  /**
+   * Upload de logo da landing page
+   */
+  uploadLogo: async (barbershopId: string, file: File): Promise<string> => {
     const formData = new FormData();
     formData.append('logo', file);
 
-    const response = await api.post<LogoUploadResponse>(
+    const { data } = await api.post<ApiResponse<{ logoUrl: string }>>(
       `/admin/landing-pages/${barbershopId}/logo`,
       formData,
       {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
+        timeout: 30000, // Upload pode demorar mais
       }
     );
-    return response.data;
+
+    return data.data!.logoUrl;
   },
 
   /**
-   * Remover logo da barbearia
+   * Remove logo da landing page
    */
   removeLogo: async (barbershopId: string): Promise<void> => {
     await api.delete(`/admin/landing-pages/${barbershopId}/logo`);
   },
 
   /**
-   * Buscar landing page pública (sem autenticação)
+   * Alias for removeLogo (for consistency with hooks)
    */
-  getPublicData: async (barbershopCode: string): Promise<PublicLandingPageOutput> => {
-    const response = await api.get<PublicLandingPageOutput>(
-      `/public/barbershops/${barbershopCode}/landing-page`
-    );
-    return response.data;
+  deleteLogo: async (barbershopId: string): Promise<void> => {
+    await api.delete(`/admin/landing-pages/${barbershopId}/logo`);
   },
 
   /**
-   * Publicar/despublicar landing page
+   * Publica/despublica landing page
    */
   togglePublish: async (barbershopId: string, isPublished: boolean): Promise<void> => {
     await api.patch(`/admin/landing-pages/${barbershopId}/publish`, {
@@ -110,77 +109,123 @@ export const landingPageApi = {
   },
 
   /**
-   * Duplicar template de landing page
+   * Publica landing page
    */
-  duplicateTemplate: async (
-    sourceBarbershopId: string,
-    targetBarbershopId: string
-  ): Promise<LandingPageConfigOutput> => {
-    const response = await api.post<LandingPageConfigOutput>(
-      `/admin/landing-pages/${targetBarbershopId}/duplicate`,
-      {
-        sourceBarbershopId,
-      }
-    );
-    return response.data;
+  publishConfig: async (barbershopId: string): Promise<void> => {
+    await api.patch(`/admin/landing-pages/${barbershopId}/publish`, {
+      isPublished: true,
+    });
   },
 
   /**
-   * Buscar estatísticas da landing page (futuro)
+   * Despublica landing page
    */
-  getAnalytics: async (barbershopId: string, period?: string) => {
-    const response = await api.get(
-      `/admin/landing-pages/${barbershopId}/analytics`,
-      {
-        params: { period },
-      }
+  unpublishConfig: async (barbershopId: string): Promise<void> => {
+    await api.patch(`/admin/landing-pages/${barbershopId}/publish`, {
+      isPublished: false,
+    });
+  },
+
+  /**
+   * Gera preview da landing page
+   */
+  generatePreview: async (barbershopId: string): Promise<string> => {
+    const { data } = await api.post<ApiResponse<{ previewUrl: string }>>(
+      `/admin/landing-pages/${barbershopId}/preview`
     );
-    return response.data;
+    return data.data!.previewUrl;
+  },
+
+  /**
+   * Busca URL pública da landing page
+   */
+  getPublicUrl: async (barbershopId: string): Promise<string> => {
+    const { data } = await api.get<ApiResponse<{ publicUrl: string }>>(
+      `/admin/landing-pages/${barbershopId}/public-url`
+    );
+    return data.data!.publicUrl;
+  },
+
+  /**
+   * Valida configuração da landing page
+   */
+  validateConfig: async (
+    barbershopId: string,
+    config: UpdateLandingPageInput
+  ): Promise<{ isValid: boolean; errors?: string[] }> => {
+    const { data } = await api.post<ApiResponse<{ isValid: boolean; errors?: string[] }>>(
+      `/admin/landing-pages/${barbershopId}/validate`,
+      config
+    );
+    return data.data!;
+  },
+
+  /**
+   * Busca templates disponíveis
+   */
+  getTemplates: async (): Promise<Template[]> => {
+    const { data } = await api.get<ApiResponse<{ templates: Template[] }>>(
+      '/admin/landing-pages/templates'
+    );
+    return data.data!.templates;
   },
 };
 
 // ============================================================================
-// Utility Functions
+// Query Keys para TanStack Query
 // ============================================================================
 
 /**
- * Validar arquivo de logo antes do upload
+ * Chaves de query para uso com TanStack Query
  */
-export const validateLogoFile = (file: File): string | null => {
-  const MAX_SIZE = 2 * 1024 * 1024; // 2MB
-  const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/svg+xml'];
+export const landingPageKeys = {
+  all: ['landingPage'] as const,
+  configs: () => [...landingPageKeys.all, 'configs'] as const,
+  config: (barbershopId: string) => [...landingPageKeys.configs(), barbershopId] as const,
+  publicUrl: (barbershopId: string) => [...landingPageKeys.all, 'publicUrl', barbershopId] as const,
+} as const;
 
-  if (!ALLOWED_TYPES.includes(file.type)) {
-    return 'Formato inválido. Use JPG, PNG ou SVG.';
-  }
-
-  if (file.size > MAX_SIZE) {
-    return 'Arquivo muito grande. Tamanho máximo: 2MB.';
-  }
-
-  return null;
-};
+// ============================================================================
+// Error Handling
+// ============================================================================
 
 /**
- * Gerar URL de preview da landing page
+ * Tipos de erro específicos da Landing Page API
  */
-export const generatePreviewUrl = (barbershopCode: string): string => {
-  const baseUrl = import.meta.env.VITE_PUBLIC_URL || 'https://app.barbapp.com';
-  return `${baseUrl}/barbearia/${barbershopCode}`;
-};
+export class LandingPageApiError extends Error {
+  constructor(
+    message: string,
+    public statusCode?: number,
+    public details?: unknown
+  ) {
+    super(message);
+    this.name = 'LandingPageApiError';
+  }
+}
 
 /**
- * Gerar URL de compartilhamento para WhatsApp
+ * Helper para tratar erros da API
  */
-export const generateWhatsAppShareUrl = (landingPageUrl: string): string => {
-  const message = encodeURIComponent(
-    `Confira nossa barbearia! Agende seu horário: ${landingPageUrl}`
+export const handleApiError = (error: unknown): LandingPageApiError => {
+  if (error instanceof LandingPageApiError) {
+    return error;
+  }
+
+  if (typeof error === 'object' && error !== null && 'response' in error) {
+    const axiosError = error as { response?: { status?: number; data?: { message?: string } }; message?: string };
+    const status = axiosError.response?.status;
+    const message = axiosError.response?.data?.message || axiosError.message || 'Erro desconhecido';
+    
+    return new LandingPageApiError(message, status, axiosError.response?.data);
+  }
+
+  return new LandingPageApiError(
+    error instanceof Error ? error.message : 'Erro desconhecido na API'
   );
-  return `https://wa.me/?text=${message}`;
 };
 
 // ============================================================================
-// Export Default
+// Default Export
 // ============================================================================
 
 export default landingPageApi;

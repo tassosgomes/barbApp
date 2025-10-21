@@ -1,504 +1,149 @@
-/**
- * useLogoUpload Hook
- * 
- * Hook especializado para gerenciar upload de logo da barbearia.
- * Inclui validação de arquivo, preview local, upload progressivo
- * e integração com cache da landing page.
- * 
- * @version 1.0
- * @date 2025-10-21
- */
-
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { toast } from '@/hooks/use-toast';
-import { landingPageApi, validateLogoFile } from '@/services/api/landing-page.api';
-import { LANDING_PAGE_QUERY_KEYS } from './useLandingPage';
-import type {
-  LogoUploadResponse,
-  LogoUploadState,
-  LandingPageConfigOutput,
+import { landingPageApi } from '@/services/api/landing-page.api';
+import { showSuccessToast, showErrorToast } from '@/utils/toast';
+import { LOGO_UPLOAD_CONFIG } from '../constants/validation';
+import type { 
+  LandingPageConfig, 
+  UseLogoUploadResult,
+  LogoUploadValidationError,
 } from '../types/landing-page.types';
 
-// ============================================================================
-// Constants
-// ============================================================================
-
-const UPLOAD_CONFIG = {
-  MAX_FILE_SIZE: 2 * 1024 * 1024, // 2MB
-  ALLOWED_TYPES: ['image/jpeg', 'image/png', 'image/svg+xml'],
-  RECOMMENDED_SIZE: '300x300px',
-  PREVIEW_MAX_WIDTH: 400,
-  PREVIEW_MAX_HEIGHT: 400,
+const QUERY_KEYS = {
+  landingPage: (barbershopId: string) => ['landing-page', barbershopId] as const,
 } as const;
 
-// ============================================================================
-// Types
-// ============================================================================
-
-interface UseLogoUploadOptions {
-  onSuccess?: (url: string) => void;
-  onError?: (error: string) => void;
-  autoUpload?: boolean;
-}
-
-interface UseLogoUploadResult {
-  // State
-  uploadState: LogoUploadState;
-  preview: string | null;
-  originalFile: File | null;
-  
-  // Actions
-  selectFile: (file: File) => void;
-  uploadFile: () => Promise<void>;
-  removeFile: () => void;
-  removeLogo: () => Promise<void>;
-  resetState: () => void;
-  
-  // Status
-  isUploading: boolean;
-  canUpload: boolean;
-  hasPreview: boolean;
-  
-  // Validation
-  validationError: string | null;
-}
-
-// ============================================================================
-// Hook Implementation
-// ============================================================================
-
-export const useLogoUpload = (
-  barbershopId: string,
-  options: UseLogoUploadOptions = {}
-): UseLogoUploadResult => {
-  const { onSuccess, onError, autoUpload = true } = options;
+export function useLogoUpload(barbershopId: string): UseLogoUploadResult {
   const queryClient = useQueryClient();
+  const [validationError, setValidationError] = useState<LogoUploadValidationError | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
-  // ============================================================================
-  // State
-  // ============================================================================
-
-  const [uploadState, setUploadState] = useState<LogoUploadState>({
-    status: 'idle',
-    progress: 0,
-    url: null,
-    error: null,
-  });
-
-  const [preview, setPreview] = useState<string | null>(null);
-  const [originalFile, setOriginalFile] = useState<File | null>(null);
-  const [validationError, setValidationError] = useState<string | null>(null);
-
-  // ============================================================================
-  // Effects
-  // ============================================================================
-
-  // Limpar preview e arquivo quando upload for bem-sucedido
-  useEffect(() => {
-    if (uploadState.status === 'success') {
-      setPreview(null);
-      setOriginalFile(null);
+  const validateFile = useCallback((file: File): LogoUploadValidationError | null => {
+    // Check file size
+    if (file.size > LOGO_UPLOAD_CONFIG.maxSize) {
+      return {
+        type: 'size',
+        message: `Arquivo muito grande. Tamanho máximo: ${LOGO_UPLOAD_CONFIG.maxSize / 1024 / 1024}MB`,
+      };
     }
-  }, [uploadState.status]);
 
-  // ============================================================================
-  // Mutations
-  // ============================================================================
+    // Check file type
+    if (!LOGO_UPLOAD_CONFIG.allowedTypes.includes(file.type)) {
+      return {
+        type: 'type',
+        message: `Tipo de arquivo não suportado. Use: ${LOGO_UPLOAD_CONFIG.allowedTypes.join(', ')}`,
+      };
+    }
 
-  /**
-   * Upload do logo
-   */
+    return null;
+  }, []);
+
   const uploadMutation = useMutation({
     mutationFn: (file: File) => landingPageApi.uploadLogo(barbershopId, file),
-    onMutate: () => {
-      setUploadState(prev => ({
-        ...prev,
-        status: 'uploading',
-        progress: 0,
-        error: null,
-      }));
-    },
-    onSuccess: (response: LogoUploadResponse) => {
-      setUploadState(prev => ({
-        ...prev,
-        status: 'success',
-        progress: 100,
-        url: response.logoUrl,
-      }));
-
-      // Atualizar cache da landing page
+    onSuccess: (logoUrl: string) => {
       queryClient.setQueryData(
-        LANDING_PAGE_QUERY_KEYS.config(barbershopId),
-        (old: LandingPageConfigOutput | undefined) => {
-          if (!old) return old;
-          return {
-            ...old,
-            logoUrl: response.logoUrl,
-            updatedAt: new Date().toISOString(),
-          };
+        QUERY_KEYS.landingPage(barbershopId),
+        (oldData: LandingPageConfig | undefined) => {
+          if (!oldData) return oldData;
+          return { ...oldData, logoUrl };
         }
       );
-
-      toast({
-        title: 'Logo atualizado!',
-        description: 'Seu logo foi enviado com sucesso.',
-        variant: 'default',
-      });
-
-      onSuccess?.(response.logoUrl);
+      setValidationError(null);
+      setPreviewUrl(null);
+      showSuccessToast(
+        'Logo atualizado',
+        'O logo da sua landing page foi atualizado com sucesso!'
+      );
     },
-    onError: (error: Error) => {
-      const errorMessage = error.message || 'Erro ao enviar logo.';
-      
-      setUploadState(prev => ({
-        ...prev,
-        status: 'error',
-        error: errorMessage,
-      }));
-
-      toast({
-        title: 'Erro no upload',
-        description: errorMessage,
-        variant: 'destructive',
-      });
-
-      onError?.(errorMessage);
+    onError: (error: unknown) => {
+      const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Erro ao fazer upload do logo';
+      showErrorToast('Erro no upload', message);
     },
   });
 
-  /**
-   * Remoção do logo
-   */
-  const removeMutation = useMutation({
-    mutationFn: () => landingPageApi.removeLogo(barbershopId),
+  const deleteMutation = useMutation({
+    mutationFn: () => landingPageApi.deleteLogo(barbershopId),
     onSuccess: () => {
-      // Atualizar cache
       queryClient.setQueryData(
-        LANDING_PAGE_QUERY_KEYS.config(barbershopId),
-        (old: LandingPageConfigOutput | undefined) => {
-          if (!old) return old;
-          return {
-            ...old,
-            logoUrl: undefined,
-            updatedAt: new Date().toISOString(),
-          };
+        QUERY_KEYS.landingPage(barbershopId),
+        (oldData: LandingPageConfig | undefined) => {
+          if (!oldData) return oldData;
+          return { ...oldData, logoUrl: undefined };
         }
       );
-
-      // Limpar estado local
-      resetState();
-
-      toast({
-        title: 'Logo removido',
-        description: 'Logo removido com sucesso.',
-        variant: 'default',
-      });
+      setPreviewUrl(null);
+      showSuccessToast('Logo removido', 'O logo foi removido da sua landing page');
     },
-    onError: (error: Error) => {
-      toast({
-        title: 'Erro ao remover',
-        description: error.message || 'Erro ao remover logo.',
-        variant: 'destructive',
-      });
+    onError: (error: unknown) => {
+      const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Erro ao remover logo';
+      showErrorToast('Erro na remoção', message);
     },
   });
 
-  // ============================================================================
-  // Functions
-  // ============================================================================
-
-  /**
-   * Criar preview do arquivo
-   */
-  const createPreview = useCallback((file: File) => {
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setPreview(reader.result as string);
-    };
-    reader.readAsDataURL(file);
-  }, []);
-
-  /**
-   * Validar e selecionar arquivo
-   */
-  const selectFile = useCallback((file: File) => {
-    // Limpar estado anterior
-    setValidationError(null);
-    setUploadState(prev => ({ ...prev, error: null }));
-
-    // Validar arquivo
-    const error = validateLogoFile(file);
+  const uploadLogo = useCallback((file: File) => {
+    const error = validateFile(file);
     if (error) {
       setValidationError(error);
-      toast({
-        title: 'Arquivo inválido',
-        description: error,
-        variant: 'destructive',
-      });
+      showErrorToast('Arquivo inválido', error.message);
       return;
     }
 
-    // Armazenar arquivo e criar preview
-    setOriginalFile(file);
-    createPreview(file);
+    setValidationError(null);
+    uploadMutation.mutate(file);
+  }, [validateFile, uploadMutation]);
 
-    setUploadState(prev => ({
-      ...prev,
-      status: 'selected',
-      progress: 0,
-    }));
+  const deleteLogo = useCallback(() => {
+    deleteMutation.mutate();
+  }, [deleteMutation]);
 
-    // Auto upload se habilitado
-    if (autoUpload) {
-      uploadMutation.mutate(file);
-    }
-  }, [autoUpload, uploadMutation, createPreview]);
-
-  /**
-   * Upload manual (quando autoUpload = false)
-   */
-  const uploadFile = useCallback(async () => {
-    if (!originalFile) {
-      toast({
-        title: 'Nenhum arquivo',
-        description: 'Selecione um arquivo primeiro.',
-        variant: 'destructive',
-      });
+  const createPreview = useCallback((file: File) => {
+    const error = validateFile(file);
+    if (error) {
+      setValidationError(error);
+      setPreviewUrl(null);
       return;
     }
 
-    uploadMutation.mutate(originalFile);
-  }, [originalFile, uploadMutation]);
-
-  /**
-   * Remover arquivo local (cancelar upload)
-   */
-  const removeFile = useCallback(() => {
-    setOriginalFile(null);
-    setPreview(null);
     setValidationError(null);
-    setUploadState({
-      status: 'idle',
-      progress: 0,
-      url: null,
-      error: null,
-    });
-  }, []);
+    const url = URL.createObjectURL(file);
+    setPreviewUrl(url);
 
-  /**
-   * Remover logo do servidor
-   */
-  const removeLogo = useCallback(async () => {
-    removeMutation.mutate();
-  }, [removeMutation]);
+    // Cleanup previous preview URL
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [validateFile, previewUrl]);
 
-  /**
-   * Reset completo do estado
-   */
-  const resetState = useCallback(() => {
-    setOriginalFile(null);
-    setPreview(null);
+  const clearPreview = useCallback(() => {
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+      setPreviewUrl(null);
+    }
     setValidationError(null);
-    setUploadState({
-      status: 'idle',
-      progress: 0,
-      url: null,
-      error: null,
-    });
-  }, []);
-
-  // ============================================================================
-  // Computed Values
-  // ============================================================================
-
-  const isUploading = uploadMutation.isPending;
-  const canUpload = !!originalFile && !validationError && !isUploading;
-  const hasPreview = !!preview;
-
-  // ============================================================================
-  // Return Interface
-  // ============================================================================
+  }, [previewUrl]);
 
   return {
-    // State
-    uploadState,
-    preview,
-    originalFile,
+    // Loading states
+    isUploading: uploadMutation.isPending,
+    isDeleting: deleteMutation.isPending,
+    
+    // Error states
+    uploadError: uploadMutation.error,
+    deleteError: deleteMutation.error,
+    validationError,
+    
+    // Preview state
+    previewUrl,
     
     // Actions
-    selectFile,
-    uploadFile,
-    removeFile,
-    removeLogo,
-    resetState,
-    
-    // Status
-    isUploading,
-    canUpload,
-    hasPreview,
-    
-    // Validation
-    validationError,
+    uploadLogo,
+    deleteLogo,
+    createPreview,
+    clearPreview,
+    validateFile,
   };
-};
+}
 
-// ============================================================================
-// Utility Hooks
-// ============================================================================
-
-/**
- * Hook simplificado para upload com drag & drop
- */
-export const useLogoDropzone = (
-  barbershopId: string,
-  options: UseLogoUploadOptions = {}
-) => {
-  const logoUpload = useLogoUpload(barbershopId, options);
-  const [isDragOver, setIsDragOver] = useState(false);
-
-  const handleDragEnter = useCallback((e: DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragOver(true);
-  }, []);
-
-  const handleDragLeave = useCallback((e: DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragOver(false);
-  }, []);
-
-  const handleDragOver = useCallback((e: DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-  }, []);
-
-  const handleDrop = useCallback((e: DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragOver(false);
-
-    const files = Array.from(e.dataTransfer?.files || []);
-    const file = files[0];
-
-    if (file) {
-      logoUpload.selectFile(file);
-    }
-  }, [logoUpload]);
-
-  const handleFileInput = useCallback((e: Event) => {
-    const target = e.target as HTMLInputElement;
-    const file = target.files?.[0];
-
-    if (file) {
-      logoUpload.selectFile(file);
-    }
-  }, [logoUpload]);
-
-  return {
-    ...logoUpload,
-    isDragOver,
-    dragHandlers: {
-      onDragEnter: handleDragEnter,
-      onDragLeave: handleDragLeave,
-      onDragOver: handleDragOver,
-      onDrop: handleDrop,
-    },
-    handleFileInput,
-  };
-};
-
-// ============================================================================
-// Validation Utilities
-// ============================================================================
-
-/**
- * Validar dimensões da imagem
- */
-export const validateImageDimensions = (
-  file: File,
-  maxWidth: number = 1000,
-  maxHeight: number = 1000
-): Promise<boolean> => {
-  return new Promise((resolve) => {
-    const img = new Image();
-    const url = URL.createObjectURL(file);
-
-    img.onload = () => {
-      URL.revokeObjectURL(url);
-      resolve(img.width <= maxWidth && img.height <= maxHeight);
-    };
-
-    img.onerror = () => {
-      URL.revokeObjectURL(url);
-      resolve(false);
-    };
-
-    img.src = url;
-  });
-};
-
-/**
- * Redimensionar imagem no client-side
- */
-export const resizeImage = (
-  file: File,
-  maxWidth: number = 300,
-  maxHeight: number = 300,
-  quality: number = 0.8
-): Promise<Blob> => {
-  return new Promise((resolve, reject) => {
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    const img = new Image();
-
-    img.onload = () => {
-      const { width, height } = img;
-      
-      // Calcular novas dimensões mantendo proporção
-      let newWidth = width;
-      let newHeight = height;
-
-      if (width > height) {
-        if (width > maxWidth) {
-          newHeight = (height * maxWidth) / width;
-          newWidth = maxWidth;
-        }
-      } else {
-        if (height > maxHeight) {
-          newWidth = (width * maxHeight) / height;
-          newHeight = maxHeight;
-        }
-      }
-
-      canvas.width = newWidth;
-      canvas.height = newHeight;
-
-      ctx?.drawImage(img, 0, 0, newWidth, newHeight);
-
-      canvas.toBlob(
-        (blob) => {
-          if (blob) {
-            resolve(blob);
-          } else {
-            reject(new Error('Erro ao redimensionar imagem'));
-          }
-        },
-        file.type,
-        quality
-      );
-    };
-
-    img.onerror = () => reject(new Error('Erro ao carregar imagem'));
-    img.src = URL.createObjectURL(file);
-  });
-};
-
-// ============================================================================
-// Export
-// ============================================================================
-
-export type { UseLogoUploadResult, UseLogoUploadOptions };
-export { UPLOAD_CONFIG };
-export default useLogoUpload;
+export { QUERY_KEYS };

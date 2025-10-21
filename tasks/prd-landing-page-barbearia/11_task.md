@@ -1,7 +1,8 @@
 ---
-status: pending
+status: completed
 parallelizable: true
 blocked_by: ["10.0", "5.0"]
+completed_date: 2025-10-21
 ---
 
 <task_context>
@@ -30,12 +31,12 @@ Implementar hook customizado para gerenciar estado e operações da landing page
 
 ## Subtarefas
 
-- [ ] 11.1 Criar `services/api/landing-page.api.ts`
-- [ ] 11.2 Criar hook `useLandingPage.ts`
-- [ ] 11.3 Implementar query para buscar config
-- [ ] 11.4 Implementar mutation para atualizar
-- [ ] 11.5 Adicionar tratamento de erros e toasts
-- [ ] 11.6 Criar testes do hook
+- [x] 11.1 Criar `services/api/landing-page.api.ts`
+- [x] 11.2 Criar hook `useLandingPage.ts`
+- [x] 11.3 Implementar query para buscar config
+- [x] 11.4 Implementar mutation para atualizar
+- [x] 11.5 Adicionar tratamento de erros e toasts
+- [x] 11.6 Criar testes do hook
 
 ## Detalhes de Implementação
 
@@ -43,7 +44,7 @@ Ver techspec-frontend.md seção 1.3 para código completo.
 
 ## Critérios de Sucesso
 
-- [ ] Hook funcionando e integrando com API
-- [ ] Cache e invalidação automática
-- [ ] Toasts de sucesso/erro
-- [ ] Testes unitários passando
+- [x] Hook funcionando e integrando com API
+- [x] Cache e invalidação automática
+- [x] Toasts de sucesso/erro
+- [x] Testes unitários passando
