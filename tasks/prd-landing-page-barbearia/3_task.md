@@ -1,5 +1,5 @@
 ---
-status: pending
+status: completed
 parallelizable: false
 blocked_by: ["2.0"]
 ---
@@ -31,13 +31,13 @@ Implementar os repositórios de acesso a dados para Landing Page seguindo o padr
 
 ## Subtarefas
 
-- [ ] 3.1 Criar interface `ILandingPageConfigRepository`
-- [ ] 3.2 Implementar `LandingPageConfigRepository`
-- [ ] 3.3 Criar interface `ILandingPageServiceRepository`
-- [ ] 3.4 Implementar `LandingPageServiceRepository`
-- [ ] 3.5 Adicionar repositórios ao `IUnitOfWork`
-- [ ] 3.6 Criar queries otimizadas com navegação
-- [ ] 3.7 Implementar testes de repositório
+- [x] 3.1 Criar interface `ILandingPageConfigRepository` ✅ CONCLUÍDA
+- [x] 3.2 Implementar `LandingPageConfigRepository` ✅ CONCLUÍDA
+- [x] 3.3 Criar interface `ILandingPageServiceRepository` ✅ CONCLUÍDA
+- [x] 3.4 Implementar `LandingPageServiceRepository` ✅ CONCLUÍDA
+- [x] 3.5 Adicionar repositórios ao `IUnitOfWork` ✅ CONCLUÍDA
+- [x] 3.6 Criar queries otimizadas com navegação ✅ CONCLUÍDA
+- [x] 3.7 Implementar testes de repositório ✅ CONCLUÍDA
 
 ## Detalhes de Implementação
 
@@ -259,10 +259,20 @@ namespace BarbApp.Infrastructure.Data
 
 ## Critérios de Sucesso
 
-- [ ] Todos os repositórios implementados
-- [ ] Queries otimizadas com Include funcionando
-- [ ] Unit of Work integrado
-- [ ] Testes de repositório passando
-- [ ] Nenhum N+1 query problem
-- [ ] Performance adequada em consultas
-- [ ] Code coverage > 80%
+- [x] Todos os repositórios implementados ✅
+- [x] Queries otimizadas com Include funcionando ✅
+- [x] Unit of Work integrado ✅
+- [x] Testes de repositório passando ✅
+- [x] Nenhum N+1 query problem ✅
+- [x] Performance adequada em consultas ✅
+- [x] Code coverage > 80% ✅
+
+## Status Final
+
+**✅ TAREFA CONCLUÍDA EM 2025-10-21**
+
+- 23 testes criados (13 LandingPageConfig + 10 LandingPageService)
+- 110/110 testes passando no projeto
+- Cobertura > 80% alcançada
+- Implementação segue todos os padrões do projeto
+- Relatório completo de revisão em `3_task_review.md`
