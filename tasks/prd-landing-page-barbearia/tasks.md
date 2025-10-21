@@ -31,7 +31,7 @@ Integração completa entre sistemas e otimizações finais.
 - [ ] 5.0 API Endpoints - Gestão Admin
 - [ ] 6.0 API Endpoint - Landing Page Pública
 - [ ] 7.0 Serviço de Upload e Processamento de Logos
-- [ ] 8.0 Criação Automática no Cadastro da Barbearia
+- [x] 8.0 Criação Automática no Cadastro da Barbearia ✅
 - [ ] 9.0 Testes Backend (Unit + Integration)
 
 ### Fase 2: Admin Frontend - Gestão (Parcialmente Paralelo)
