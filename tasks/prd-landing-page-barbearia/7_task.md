@@ -1,5 +1,5 @@
 ---
-status: pending
+status: completed
 parallelizable: true
 blocked_by: ["4.0"]
 ---
@@ -31,13 +31,13 @@ Implementar serviço para upload, validação, redimensionamento e armazenamento
 
 ## Subtarefas
 
-- [ ] 7.1 Criar interface `ILogoUploadService`
-- [ ] 7.2 Implementar `LocalLogoUploadService` (filesystem)
-- [ ] 7.3 Adicionar validação de arquivo
-- [ ] 7.4 Implementar redimensionamento com ImageSharp
-- [ ] 7.5 Gerar nomes únicos de arquivo
-- [ ] 7.6 Implementar endpoint POST de upload
-- [ ] 7.7 Adicionar testes unitários e integração
+- [x] 7.1 Criar interface `ILogoUploadService`
+- [x] 7.2 Implementar `LocalLogoUploadService` (filesystem)
+- [x] 7.3 Adicionar validação de arquivo
+- [x] 7.4 Implementar redimensionamento com ImageSharp
+- [x] 7.5 Gerar nomes únicos de arquivo
+- [x] 7.6 Implementar endpoint POST de upload
+- [x] 7.7 Adicionar testes unitários e integração
 
 ## Detalhes de Implementação
 
