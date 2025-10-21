@@ -355,14 +355,54 @@ export interface UseLandingPageResult {
   config?: LandingPageConfig;
   /** Estado de carregamento */
   isLoading: boolean;
-  /** Erro */
-  error?: Error;
-  /** Função para atualizar configuração */
-  updateConfig: (data: UpdateLandingPageInput) => Promise<void>;
-  /** Se está atualizando */
+  /** Estado de criação */
+  isCreating: boolean;
+  /** Estado de atualização */
   isUpdating: boolean;
+  /** Estado de publicação */
+  isPublishing: boolean;
+  /** Estado de despublicação */
+  isUnpublishing: boolean;
+  /** Estado de upload de logo */
+  isUploadingLogo: boolean;
+  /** Estado de deleção de logo */
+  isDeletingLogo: boolean;
+  /** Estado de geração de preview */
+  isGeneratingPreview: boolean;
+  /** Erro geral */
+  error: unknown;
+  /** Erro de criação */
+  createError: unknown;
+  /** Erro de atualização */
+  updateError: unknown;
+  /** Erro de publicação */
+  publishError: unknown;
+  /** Erro de despublicação */
+  unpublishError: unknown;
+  /** Erro de upload de logo */
+  uploadLogoError: unknown;
+  /** Erro de deleção de logo */
+  deleteLogoError: unknown;
+  /** Erro de preview */
+  previewError: unknown;
+  /** Função para criar configuração */
+  createConfig: (data: CreateLandingPageInput) => void;
+  /** Função para atualizar configuração */
+  updateConfig: (data: UpdateLandingPageInput) => void;
+  /** Função para publicar landing page */
+  publishConfig: () => void;
+  /** Função para despublicar landing page */
+  unpublishConfig: () => void;
+  /** Função para fazer upload de logo */
+  uploadLogo: (file: File) => void;
+  /** Função para deletar logo */
+  deleteLogo: () => void;
+  /** Função para gerar preview */
+  generatePreview: () => void;
   /** Função para refazer query */
-  refetch: () => Promise<void>;
+  refetch: () => void;
+  /** Função para invalidar queries */
+  invalidateQueries: () => void;
 }
 
 /**
@@ -371,12 +411,56 @@ export interface UseLandingPageResult {
 export interface UseTemplatesResult {
   /** Lista de templates */
   templates: Template[];
-  /** Template selecionado */
-  selectedTemplate?: Template;
-  /** Função para selecionar template */
-  selectTemplate: (templateId: number) => void;
   /** Estado de carregamento */
   isLoading: boolean;
+  /** Erro */
+  error: unknown;
+  /** Função para refazer query */
+  refetch: () => void;
+  /** Função para buscar template por ID */
+  getTemplateById: (id: number) => Template | undefined;
+  /** Função para buscar templates por tema */
+  getTemplatesByTheme: (theme: string) => Template[];
+  /** Função para obter temas disponíveis */
+  getAvailableThemes: () => string[];
+}
+
+/**
+ * Resultado do hook useLogoUpload
+ */
+export interface UseLogoUploadResult {
+  /** Se está fazendo upload */
+  isUploading: boolean;
+  /** Se está deletando logo */
+  isDeleting: boolean;
+  /** Erro de upload */
+  uploadError: unknown;
+  /** Erro de deleção */
+  deleteError: unknown;
+  /** Erro de validação */
+  validationError: LogoUploadValidationError | null;
+  /** URL de preview do logo */
+  previewUrl: string | null;
+  /** Função para fazer upload de logo */
+  uploadLogo: (file: File) => void;
+  /** Função para deletar logo */
+  deleteLogo: () => void;
+  /** Função para criar preview */
+  createPreview: (file: File) => void;
+  /** Função para limpar preview */
+  clearPreview: () => void;
+  /** Função para validar arquivo */
+  validateFile: (file: File) => LogoUploadValidationError | null;
+}
+
+/**
+ * Erro de validação de upload de logo
+ */
+export interface LogoUploadValidationError {
+  /** Tipo de erro */
+  type: 'size' | 'type' | 'network';
+  /** Mensagem de erro */
+  message: string;
 }
 
 /**
