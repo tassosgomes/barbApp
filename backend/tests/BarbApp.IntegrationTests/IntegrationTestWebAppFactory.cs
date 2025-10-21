@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Testcontainers.PostgreSql;
@@ -61,20 +62,30 @@ public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>
 
         builder.ConfigureTestServices(services =>
         {
-            // Remove existing DbContext registration
-            var dbContextDescriptor = services.SingleOrDefault(
-                d => d.ServiceType == typeof(DbContextOptions<BarbAppDbContext>));
-            if (dbContextDescriptor != null)
+            // Replace IWebHostEnvironment with test implementation
+            var webHostEnvironmentDescriptors = services.Where(
+                d => d.ServiceType == typeof(IWebHostEnvironment)).ToList();
+            foreach (var descriptor in webHostEnvironmentDescriptors)
             {
-                services.Remove(dbContextDescriptor);
+                services.Remove(descriptor);
+            }
+            
+            services.AddSingleton<IWebHostEnvironment>(new TestWebHostEnvironment());
+
+            // Remove existing DbContext registration
+            var dbContextDescriptors = services.Where(
+                d => d.ServiceType == typeof(DbContextOptions<BarbAppDbContext>)).ToList();
+            foreach (var descriptor in dbContextDescriptors)
+            {
+                services.Remove(descriptor);
             }
 
             // Remove any existing DbContext registration by implementation type
-            var dbContextServiceDescriptor = services.SingleOrDefault(
-                d => d.ServiceType == typeof(BarbAppDbContext));
-            if (dbContextServiceDescriptor != null)
+            var dbContextServiceDescriptors = services.Where(
+                d => d.ServiceType == typeof(BarbAppDbContext)).ToList();
+            foreach (var descriptor in dbContextServiceDescriptors)
             {
-                services.Remove(dbContextServiceDescriptor);
+                services.Remove(descriptor);
             }
 
             // Add test DbContext with PostgreSQL
@@ -198,5 +209,25 @@ public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>
             _containerStarted = false;
         }
         base.Dispose(disposing);
+    }
+}
+
+class TestWebHostEnvironment : IWebHostEnvironment
+{
+    public string ApplicationName { get; set; } = "BarbApp.IntegrationTests";
+    public IFileProvider ContentRootFileProvider { get; set; }
+    public string ContentRootPath { get; set; }
+    public string EnvironmentName { get; set; } = "Testing";
+    public IFileProvider WebRootFileProvider { get; set; }
+    public string WebRootPath { get; set; }
+
+    public TestWebHostEnvironment()
+    {
+        ContentRootPath = Directory.GetCurrentDirectory();
+        ContentRootFileProvider = new PhysicalFileProvider(ContentRootPath);
+        
+        WebRootPath = Path.Combine(ContentRootPath, "wwwroot");
+        Directory.CreateDirectory(WebRootPath);
+        WebRootFileProvider = new PhysicalFileProvider(WebRootPath);
     }
 }

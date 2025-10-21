@@ -47,7 +47,7 @@ public class LocalLogoUploadService : ILogoUploadService
                 return Result<string>.Failure("Arquivo inválido. Use JPG, PNG ou SVG com no máximo 2MB");
             }
 
-            var uploadsPath = Path.Combine(_environment.WebRootPath, "uploads", "logos");
+            var uploadsPath = Path.Combine(_environment.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot"), "uploads", "logos");
             Directory.CreateDirectory(uploadsPath);
 
             var fileExtension = Path.GetExtension(file.FileName).ToLowerInvariant();
@@ -97,7 +97,7 @@ public class LocalLogoUploadService : ILogoUploadService
                 return Result.Success();
             }
 
-            var filePath = Path.Combine(_environment.WebRootPath, logoUrl.TrimStart('/'));
+            var filePath = Path.Combine(_environment.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot"), logoUrl.TrimStart('/'));
 
             if (File.Exists(filePath))
             {

@@ -254,7 +254,7 @@ public class LandingPagesControllerIntegrationTests
         var client = CreateAuthorizedClient(barbershopId);
 
         var content = new MultipartFormDataContent();
-        var fileContent = new ByteArrayContent(new byte[100]);
+        var fileContent = new ByteArrayContent(CreateMinimalValidPng());
         fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/png");
         content.Add(fileContent, "file", "logo.png");
 
@@ -370,6 +370,15 @@ public class LandingPagesControllerIntegrationTests
         client.DefaultRequestHeaders.Authorization =
             new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
         return client;
+    }
+
+    private static byte[] CreateMinimalValidPng()
+    {
+        // Minimal valid 1x1 PNG image (transparent)
+        // This is a known valid minimal PNG file
+        return Convert.FromBase64String(
+            "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=="
+        );
     }
 
     private static string GenerateRandomUniqueCode()
