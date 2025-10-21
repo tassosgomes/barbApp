@@ -115,7 +115,15 @@ builder.Services.AddScoped<IUniqueCodeGenerator, UniqueCodeGenerator>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 // Email Service
-builder.Services.AddScoped<IEmailService, SmtpEmailService>();
+// Usar FakeEmailService em desenvolvimento para não precisar de SMTP configurado
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddScoped<IEmailService, FakeEmailService>();
+}
+else
+{
+    builder.Services.AddScoped<IEmailService, SmtpEmailService>();
+}
 
 // JWT Settings
 builder.Services.Configure<JwtSettings>(
