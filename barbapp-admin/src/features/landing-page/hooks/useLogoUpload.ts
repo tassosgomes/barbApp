@@ -9,7 +9,7 @@
  * @date 2025-10-21
  */
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from '@/hooks/use-toast';
 import { landingPageApi, validateLogoFile } from '@/services/api/landing-page.api';
@@ -91,6 +91,18 @@ export const useLogoUpload = (
   const [validationError, setValidationError] = useState<string | null>(null);
 
   // ============================================================================
+  // Effects
+  // ============================================================================
+
+  // Limpar preview e arquivo quando upload for bem-sucedido
+  useEffect(() => {
+    if (uploadState.status === 'success') {
+      setPreview(null);
+      setOriginalFile(null);
+    }
+  }, [uploadState.status]);
+
+  // ============================================================================
   // Mutations
   // ============================================================================
 
@@ -127,10 +139,6 @@ export const useLogoUpload = (
           };
         }
       );
-
-      // Limpar preview local após sucesso
-      setPreview(null);
-      setOriginalFile(null);
 
       toast({
         title: 'Logo atualizado!',

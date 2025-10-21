@@ -280,14 +280,14 @@ export interface ServiceFormState {
  * Estado do upload de logo
  */
 export interface LogoUploadState {
-  /** URL de preview local */
-  preview?: string;
-  /** Se está fazendo upload */
-  isUploading: boolean;
+  /** Status do upload */
+  status: 'idle' | 'selected' | 'uploading' | 'success' | 'error';
   /** Progresso do upload (0-100) */
   progress: number;
+  /** URL final após upload bem-sucedido */
+  url: string | null;
   /** Erro do upload */
-  error?: string;
+  error: string | null;
 }
 
 /**

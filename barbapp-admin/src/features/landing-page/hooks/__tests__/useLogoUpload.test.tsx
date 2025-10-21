@@ -294,10 +294,15 @@ describe('useLogoUpload', () => {
         expect(result.current.uploadState.status).toBe('success');
       });
 
+      // Aguardar a limpeza do preview pelo useEffect
+      await waitFor(() => {
+        expect(result.current.preview).toBeNull();
+        expect(result.current.originalFile).toBeNull();
+      });
+
+      // Verificar se o estado final está correto
       expect(result.current.uploadState.url).toBe(mockUploadResponse.logoUrl);
       expect(result.current.uploadState.progress).toBe(100);
-      expect(result.current.preview).toBeNull(); // Should clear after success
-      expect(result.current.originalFile).toBeNull();
       expect(onSuccess).toHaveBeenCalledWith(mockUploadResponse.logoUrl);
     });
 
@@ -344,9 +349,14 @@ describe('useLogoUpload', () => {
         result.current.selectFile(mockFile);
       });
 
-      // Should be uploading initially
-      expect(result.current.isUploading).toBe(true);
-      expect(result.current.uploadState.status).toBe('uploading');
+      // Wait for uploading state
+      await waitFor(() => {
+        expect(result.current.isUploading).toBe(true);
+      });
+      
+      await waitFor(() => {
+        expect(result.current.uploadState.status).toBe('uploading');
+      });
 
       await waitFor(() => {
         expect(result.current.isUploading).toBe(false);
