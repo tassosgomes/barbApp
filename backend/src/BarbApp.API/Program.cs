@@ -141,6 +141,12 @@ builder.Services.Configure<AppSettings>(
 // ══════════════════════════════════════════════════════════
 // DEPENDENCY INJECTION - Use Cases
 // ══════════════════════════════════════════════════════════
+builder.Services.AddMediatR(cfg => 
+{
+    cfg.RegisterServicesFromAssembly(typeof(Program).Assembly);
+    cfg.RegisterServicesFromAssembly(typeof(CreateBarbershopUseCase).Assembly);
+});
+
 builder.Services.AddScoped<IAuthenticateAdminCentralUseCase, AuthenticateAdminCentralUseCase>();
 builder.Services.AddScoped<IAuthenticateAdminBarbeariaUseCase, AuthenticateAdminBarbeariaUseCase>();
 builder.Services.AddScoped<IAuthenticateBarbeiroUseCase, AuthenticateBarbeiroUseCase>();

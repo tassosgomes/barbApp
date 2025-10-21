@@ -859,5 +859,47 @@ public class BarbershopsControllerIntegrationTests
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
 
+    [Fact]
+    public async Task CreateBarbershop_ShouldAutomaticallyCreateLandingPage()
+    {
+        // Arrange
+        var request = new
+        {
+            name = "Barbearia Teste Auto LP",
+            document = "12.345.678/0001-90",
+            phone = "(11) 99999-9999",
+            ownerName = "João Silva",
+            email = "joao.teste.autolp@barbearia.com",
+            zipCode = "01234-567",
+            street = "Rua Teste",
+            number = "123",
+            complement = "Sala 1",
+            neighborhood = "Centro",
+            city = "São Paulo",
+            state = "SP"
+        };
+
+        // Act - Create barbershop
+        var createResponse = await _client.PostAsJsonAsync("/api/barbearias", request);
+        createResponse.StatusCode.Should().Be(HttpStatusCode.Created);
+
+        var createResult = await createResponse.Content.ReadFromJsonAsync<BarbershopOutput>();
+        createResult.Should().NotBeNull();
+
+        // Wait a bit for the async event to complete
+        await Task.Delay(2000);
+
+        // Assert - Check if landing page was created
+        var landingPageResponse = await _client.GetAsync($"/api/admin/landing-pages/{createResult!.Id}");
+        landingPageResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var landingPage = await landingPageResponse.Content.ReadFromJsonAsync<LandingPageConfigOutput>();
+        landingPage.Should().NotBeNull();
+        landingPage!.BarbershopId.Should().Be(createResult.Id);
+        landingPage.TemplateId.Should().Be(1); // Default template
+        landingPage.IsPublished.Should().BeTrue();
+        landingPage.WhatsappNumber.Should().Be("+5511999999999"); // Formatted phone
+    }
+
     #endregion
 }

@@ -3,12 +3,13 @@ using BarbApp.Application.Interfaces.UseCases;
 using BarbApp.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace BarbApp.API.Controllers;
 
 [ApiController]
 [Route("api/admin/landing-pages")]
-[Authorize(Roles = "AdminBarbearia")]
+[Authorize(Roles = "AdminBarbearia,AdminCentral")]
 [Produces("application/json")]
 public class LandingPagesController : ControllerBase
 {
@@ -214,8 +215,16 @@ public class LandingPagesController : ControllerBase
 
     private bool IsAuthorizedForBarbershop(Guid barbershopId)
     {
+        var userType = User.FindFirst(ClaimTypes.Role)?.Value;
+        
+        // AdminCentral can access any barbershop
+        if (userType == "AdminCentral")
+        {
+            return true;
+        }
+        
+        // AdminBarbearia can only access their own barbershop
         var userBarbershopId = User.FindFirst("barbeariaId")?.Value;
-
         if (string.IsNullOrEmpty(userBarbershopId))
         {
             return false;

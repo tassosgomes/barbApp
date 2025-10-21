@@ -8,6 +8,7 @@ using BarbApp.Domain.Exceptions;
 using BarbApp.Domain.Interfaces.Repositories;
 using BarbApp.Domain.ValueObjects;
 using FluentAssertions;
+using MediatR;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -27,6 +28,7 @@ public class CreateBarbershopUseCaseTests
     private readonly Mock<IUnitOfWork> _unitOfWorkMock;
     private readonly Mock<ILogger<CreateBarbershopUseCase>> _loggerMock;
     private readonly Mock<IOptions<AppSettings>> _appSettingsMock;
+    private readonly Mock<IMediator> _mediatorMock;
     private readonly CreateBarbershopUseCase _useCase;
 
     public CreateBarbershopUseCaseTests()
@@ -41,6 +43,7 @@ public class CreateBarbershopUseCaseTests
         _unitOfWorkMock = new Mock<IUnitOfWork>();
         _loggerMock = new Mock<ILogger<CreateBarbershopUseCase>>();
         _appSettingsMock = new Mock<IOptions<AppSettings>>();
+        _mediatorMock = new Mock<IMediator>();
 
         _appSettingsMock.Setup(x => x.Value).Returns(new AppSettings { FrontendUrl = "http://app.barbapp.com" });
 
@@ -54,7 +57,8 @@ public class CreateBarbershopUseCaseTests
             _codeGeneratorMock.Object,
             _unitOfWorkMock.Object,
             _appSettingsMock.Object,
-            _loggerMock.Object);
+            _loggerMock.Object,
+            _mediatorMock.Object);
     }
 
     [Fact]

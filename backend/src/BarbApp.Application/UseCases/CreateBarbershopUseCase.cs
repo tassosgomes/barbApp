@@ -8,6 +8,7 @@ using BarbApp.Domain.ValueObjects;
 using Microsoft.Extensions.Logging;
 using BarbApp.Application.Configuration;
 using Microsoft.Extensions.Options;
+using MediatR;
 
 namespace BarbApp.Application.UseCases;
 
@@ -23,6 +24,7 @@ public class CreateBarbershopUseCase : ICreateBarbershopUseCase
     private readonly IUnitOfWork _unitOfWork;
     private readonly IOptions<AppSettings> _appSettings;
     private readonly ILogger<CreateBarbershopUseCase> _logger;
+    private readonly IMediator _mediator;
 
     public CreateBarbershopUseCase(
         IBarbershopRepository barbershopRepository,
@@ -34,7 +36,8 @@ public class CreateBarbershopUseCase : ICreateBarbershopUseCase
         IUniqueCodeGenerator codeGenerator,
         IUnitOfWork unitOfWork,
         IOptions<AppSettings> appSettings,
-        ILogger<CreateBarbershopUseCase> logger)
+        ILogger<CreateBarbershopUseCase> logger,
+        IMediator mediator)
     {
         _barbershopRepository = barbershopRepository;
         _addressRepository = addressRepository;
@@ -46,6 +49,7 @@ public class CreateBarbershopUseCase : ICreateBarbershopUseCase
         _unitOfWork = unitOfWork;
         _appSettings = appSettings;
         _logger = logger;
+        _mediator = mediator;
     }
 
     public async Task<BarbershopOutput> ExecuteAsync(CreateBarbershopInput input, CancellationToken cancellationToken)
@@ -143,6 +147,24 @@ public class CreateBarbershopUseCase : ICreateBarbershopUseCase
         // Commit transaction only after email is sent successfully
         await _unitOfWork.Commit(cancellationToken);
         _logger.LogInformation("Barbershop created successfully with ID {BarbershopId} and code {BarbershopCode}", barbershop.Id, barbershop.Code.Value);
+
+        // Publish event for automatic landing page creation (fire-and-forget)
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                await _mediator.Publish(new Domain.Events.BarbershopCreatedEvent
+                {
+                    BarbershopId = barbershop.Id,
+                    BarbershopName = barbershop.Name,
+                    CreatedAt = DateTime.UtcNow
+                }, CancellationToken.None);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to publish BarbershopCreatedEvent for barbershop {BarbershopId}", barbershop.Id);
+            }
+        });
 
         return new BarbershopOutput(
             barbershop.Id,

@@ -46,7 +46,7 @@ public class LandingPageService : ILandingPageService
         var config = LandingPageConfig.Create(
             barbershopId: barbershopId,
             templateId: 1,
-            whatsappNumber: barbershop.Phone ?? string.Empty,
+            whatsappNumber: FormatPhoneForWhatsapp(barbershop.Phone ?? string.Empty),
             openingHours: "Segunda a Sábado: 09:00 - 19:00");
 
         await _unitOfWork.LandingPageConfigs.InsertAsync(config, cancellationToken);
@@ -246,6 +246,32 @@ public class LandingPageService : ILandingPageService
             config.UpdatedAt,
             barbershop,
             services);
+    }
+
+    private static string FormatPhoneForWhatsapp(string phone)
+    {
+        if (string.IsNullOrWhiteSpace(phone))
+        {
+            return string.Empty;
+        }
+
+        // Remove all non-numeric characters
+        var cleaned = new string(phone.Where(char.IsDigit).ToArray());
+
+        // If it's a Brazilian phone number (10 or 11 digits), add country code
+        if (cleaned.Length == 10 || cleaned.Length == 11)
+        {
+            return $"+55{cleaned}";
+        }
+
+        // If it already has country code, return as is
+        if (cleaned.StartsWith("55") && cleaned.Length == 12 || cleaned.Length == 13)
+        {
+            return $"+{cleaned}";
+        }
+
+        // For other cases, return cleaned version
+        return cleaned;
     }
 
     private PublicLandingPageOutput MapToPublicOutput(LandingPageConfig config)
