@@ -19,6 +19,7 @@ using Microsoft.OpenApi.Models;
 using Prometheus;
 using Serilog;
 using Sentry.AspNetCore;
+using Microsoft.AspNetCore.ResponseCompression;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -176,6 +177,23 @@ builder.Services.AddScoped<ICompleteAppointmentUseCase, CompleteAppointmentUseCa
 builder.Services.AddScoped<ILandingPageService, LandingPageService>();
 
 // ══════════════════════════════════════════════════════════
+// OUTPUT CACHE CONFIGURATION
+// ══════════════════════════════════════════════════════════
+builder.Services.AddOutputCache(options =>
+{
+    options.AddBasePolicy(builder => builder.Cache());
+});
+
+// ══════════════════════════════════════════════════════════
+// RESPONSE COMPRESSION CONFIGURATION
+// ══════════════════════════════════════════════════════════
+builder.Services.AddResponseCompression(options =>
+{
+    options.EnableForHttps = true;
+    options.Providers.Add<GzipCompressionProvider>();
+});
+
+// ══════════════════════════════════════════════════════════
 // AUTHENTICATION & AUTHORIZATION
 // ══════════════════════════════════════════════════════════
 builder.Services.AddJwtAuthentication(builder.Configuration);
@@ -210,6 +228,13 @@ builder.Services.AddCors(options =>
             .AllowAnyMethod()
             .AllowAnyHeader()
             .AllowCredentials();
+    });
+
+    options.AddPolicy("PublicLandingPage", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
     });
 });
 
@@ -341,6 +366,12 @@ if (app.Environment.IsDevelopment())
 
 // CORS
 app.UseCors(app.Environment.IsDevelopment() ? "DevelopmentCors" : "ProductionCors");
+
+// Response Compression
+app.UseResponseCompression();
+
+// Output Cache
+app.UseOutputCache();
 
 // Authentication & Authorization
 app.UseAuthentication();
