@@ -1,5 +1,5 @@
 ---
-status: pending
+status: completed
 parallelizable: true
 blocked_by: ["4.0"]
 ---
@@ -30,12 +30,12 @@ Criar endpoint público (sem autenticação) para buscar dados da landing page d
 
 ## Subtarefas
 
-- [ ] 6.1 Criar PublicLandingPageController
-- [ ] 6.2 Implementar endpoint GET público
-- [ ] 6.3 Configurar cache de resposta
-- [ ] 6.4 Configurar CORS
-- [ ] 6.5 Adicionar compressão de resposta
-- [ ] 6.6 Criar testes de integração
+- [x] 6.1 Criar PublicLandingPageController
+- [x] 6.2 Implementar endpoint GET público
+- [x] 6.3 Configurar cache de resposta
+- [x] 6.4 Configurar CORS
+- [x] 6.5 Adicionar compressão de resposta
+- [x] 6.6 Criar testes de integração
 
 ## Detalhes de Implementação
 
@@ -131,9 +131,9 @@ app.UseOutputCache();
 
 ## Critérios de Sucesso
 
-- [ ] Endpoint funcionando e retornando dados corretos
-- [ ] Cache configurado e funcionando
-- [ ] CORS permitindo acesso de qualquer origem
-- [ ] Compressão de resposta ativa
-- [ ] Performance < 50ms (com cache)
-- [ ] Testes de integração passando
+- [x] Endpoint funcionando e retornando dados corretos
+- [x] Cache configurado e funcionando
+- [x] CORS permitindo acesso de qualquer origem
+- [x] Compressão de resposta ativa
+- [x] Performance < 50ms (com cache)
+- [x] Testes de integração passando
