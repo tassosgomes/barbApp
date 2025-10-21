@@ -10,7 +10,7 @@
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { toast } from '@/components/ui/use-toast';
+import { toast } from '@/hooks/use-toast';
 import { landingPageApi } from '@/services/api/landing-page.api';
 import type {
   LandingPageConfigOutput,
@@ -91,7 +91,7 @@ export const useLandingPage = (barbershopId: string): UseLandingPageResult => {
         variant: 'default',
       });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({
         title: 'Erro ao criar',
         description: error.message || 'Erro ao criar landing page.',
@@ -145,7 +145,7 @@ export const useLandingPage = (barbershopId: string): UseLandingPageResult => {
         variant: 'default',
       });
     },
-    onError: (error: any, newData, context) => {
+    onError: (error: Error, newData, context) => {
       // Reverter para estado anterior em caso de erro
       if (context?.previousConfig) {
         queryClient.setQueryData(
@@ -192,7 +192,7 @@ export const useLandingPage = (barbershopId: string): UseLandingPageResult => {
         variant: 'default',
       });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({
         title: 'Erro',
         description: error.message || 'Erro ao alterar status de publicação.',
@@ -312,7 +312,7 @@ export const useDuplicateTemplate = () => {
         variant: 'default',
       });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({
         title: 'Erro ao duplicar',
         description: error.message || 'Erro ao duplicar template.',

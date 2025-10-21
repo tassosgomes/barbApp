@@ -8,6 +8,7 @@
  * @date 2025-10-21
  */
 
+import React from 'react';
 import { renderHook, waitFor, act } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
@@ -29,16 +30,16 @@ vi.mock('@/services/api/landing-page.api', () => ({
 }));
 
 // Mock do toast
-vi.mock('@/components/ui/use-toast', () => ({
+vi.mock('@/hooks/use-toast', () => ({
   toast: vi.fn(),
 }));
 
 // Mock FileReader
 class MockFileReader {
-  onloadend: ((this: FileReader, ev: ProgressEvent<FileReader>) => any) | null = null;
+  onloadend: ((this: FileReader, ev: ProgressEvent<FileReader>) => unknown) | null = null;
   result: string | ArrayBuffer | null = null;
 
-  readAsDataURL(file: Blob) {
+  readAsDataURL() {
     this.result = `data:image/jpeg;base64,mockbase64data`;
     setTimeout(() => {
       if (this.onloadend) {
@@ -48,6 +49,7 @@ class MockFileReader {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 global.FileReader = MockFileReader as any;
 
 // ============================================================================
@@ -84,9 +86,12 @@ const createWrapper = () => {
     },
   });
 
-  return ({ children }: { children: React.ReactNode }) => (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-  );
+  function Wrapper({ children }: { children: React.ReactNode }) {
+    return (
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    );
+  }
+  return Wrapper;
 };
 
 // ============================================================================

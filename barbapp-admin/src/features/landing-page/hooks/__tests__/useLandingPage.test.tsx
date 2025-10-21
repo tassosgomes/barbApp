@@ -8,6 +8,7 @@
  * @date 2025-10-21
  */
 
+import React from 'react';
 import { renderHook, waitFor, act } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
@@ -30,7 +31,7 @@ vi.mock('@/services/api/landing-page.api', () => ({
 }));
 
 // Mock do toast
-vi.mock('@/components/ui/use-toast', () => ({
+vi.mock('@/hooks/use-toast', () => ({
   toast: vi.fn(),
 }));
 
@@ -82,9 +83,12 @@ const createWrapper = () => {
     },
   });
 
-  return ({ children }: { children: React.ReactNode }) => (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-  );
+  function Wrapper({ children }: { children: React.ReactNode }) {
+    return (
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    );
+  }
+  return Wrapper;
 };
 
 // ============================================================================
@@ -94,13 +98,11 @@ const createWrapper = () => {
 describe('useLandingPage', () => {
   let mockGetConfig: ReturnType<typeof vi.fn>;
   let mockUpdateConfig: ReturnType<typeof vi.fn>;
-  let mockCreateConfig: ReturnType<typeof vi.fn>;
   let mockTogglePublish: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
     mockGetConfig = vi.mocked(landingPageApi.getConfig);
     mockUpdateConfig = vi.mocked(landingPageApi.updateConfig);
-    mockCreateConfig = vi.mocked(landingPageApi.createConfig);
     mockTogglePublish = vi.mocked(landingPageApi.togglePublish);
   });
 

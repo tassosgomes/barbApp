@@ -11,7 +11,7 @@
 
 import { useState, useCallback } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { toast } from '@/components/ui/use-toast';
+import { toast } from '@/hooks/use-toast';
 import { landingPageApi, validateLogoFile } from '@/services/api/landing-page.api';
 import { LANDING_PAGE_QUERY_KEYS } from './useLandingPage';
 import type {
@@ -140,7 +140,7 @@ export const useLogoUpload = (
 
       onSuccess?.(response.logoUrl);
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       const errorMessage = error.message || 'Erro ao enviar logo.';
       
       setUploadState(prev => ({
@@ -187,7 +187,7 @@ export const useLogoUpload = (
         variant: 'default',
       });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({
         title: 'Erro ao remover',
         description: error.message || 'Erro ao remover logo.',

@@ -22,11 +22,7 @@ import type {
 // Types
 // ============================================================================
 
-interface ApiResponse<T> {
-  data: T;
-  message?: string;
-  status: number;
-}
+// Note: ApiResponse type is available for future use if needed
 
 // ============================================================================
 // API Service Implementation
