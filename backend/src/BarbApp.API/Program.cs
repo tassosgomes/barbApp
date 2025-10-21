@@ -175,6 +175,8 @@ builder.Services.AddScoped<IConfirmAppointmentUseCase, ConfirmAppointmentUseCase
 builder.Services.AddScoped<ICancelAppointmentUseCase, CancelAppointmentUseCase>();
 builder.Services.AddScoped<ICompleteAppointmentUseCase, CompleteAppointmentUseCase>();
 builder.Services.AddScoped<ILandingPageService, LandingPageService>();
+builder.Services.AddScoped<ILogoUploadService, LocalLogoUploadService>();
+builder.Services.AddScoped<IImageProcessor, ImageSharpProcessor>();
 
 // ══════════════════════════════════════════════════════════
 // OUTPUT CACHE CONFIGURATION

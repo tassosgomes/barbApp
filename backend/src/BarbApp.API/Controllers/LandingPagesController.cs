@@ -1,5 +1,6 @@
 using BarbApp.Application.DTOs;
 using BarbApp.Application.Interfaces.UseCases;
+using BarbApp.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,13 +13,16 @@ namespace BarbApp.API.Controllers;
 public class LandingPagesController : ControllerBase
 {
     private readonly ILandingPageService _landingPageService;
+    private readonly ILogoUploadService _logoUploadService;
     private readonly ILogger<LandingPagesController> _logger;
 
     public LandingPagesController(
         ILandingPageService landingPageService,
+        ILogoUploadService logoUploadService,
         ILogger<LandingPagesController> logger)
     {
         _landingPageService = landingPageService;
+        _logoUploadService = logoUploadService;
         _logger = logger;
     }
 
@@ -162,33 +166,20 @@ public class LandingPagesController : ControllerBase
             return BadRequest(new { error = "Nenhum arquivo foi enviado" });
         }
 
-        // Validar tipo de arquivo
-        var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".svg" };
-        var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+        // Usar o serviço de upload de logo
+        var uploadResult = await _logoUploadService.UploadLogoAsync(barbershopId, file, cancellationToken);
 
-        if (!allowedExtensions.Contains(extension))
+        if (!uploadResult.IsSuccess)
         {
-            return BadRequest(new { error = "Tipo de arquivo não permitido. Use JPG, PNG ou SVG" });
+            _logger.LogWarning("Logo upload failed for barbershop: {BarbershopId}. Error: {Error}",
+                barbershopId, uploadResult.Error);
+            return BadRequest(new { error = uploadResult.Error });
         }
-
-        // Validar tamanho (2MB = 2097152 bytes)
-        const long maxFileSize = 2 * 1024 * 1024;
-        if (file.Length > maxFileSize)
-        {
-            return BadRequest(new { error = "Arquivo muito grande. Tamanho máximo: 2MB" });
-        }
-
-        // TODO: Implementar upload para storage (AWS S3, Azure Blob ou Cloudinary)
-        // Por enquanto, retornamos um stub
-        var stubLogoUrl = $"https://cdn.barbapp.com/logos/{barbershopId}{extension}";
-
-        _logger.LogInformation("Logo upload simulated for barbershop: {BarbershopId}. URL: {Url}", 
-            barbershopId, stubLogoUrl);
 
         // Atualizar landing page com nova URL do logo
         var updateInput = new UpdateLandingPageInput(
             TemplateId: null,
-            LogoUrl: stubLogoUrl,
+            LogoUrl: uploadResult.Data,
             AboutText: null,
             OpeningHours: null,
             InstagramUrl: null,
@@ -204,7 +195,7 @@ public class LandingPagesController : ControllerBase
             
             return Ok(new
             {
-                logoUrl = stubLogoUrl,
+                logoUrl = uploadResult.Data,
                 message = "Logo atualizado com sucesso"
             });
         }
