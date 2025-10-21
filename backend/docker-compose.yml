@@ -1,0 +1,109 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: src/Dockerfile
+    networks:
+      - traefik-public
+      - barbapp-internal
+    environment:
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=barbapp;Username=barbapp;Password=4cd7e2e32c5994fcba50555430efe763
+      - JwtSettings__Secret=c3df06950022492321151d5fdff463d351350166a50d3f94d4a86daa363d52e0
+      - JwtSettings__Issuer=BarbApp-Dev
+      - JwtSettings__Audience=BarbApp-Dev-Users
+      - JwtSettings__ExpirationMinutes=60
+      - AppSettings__FrontendUrl=https://dev-barbapp.tasso.dev.br
+      - SmtpSettings__Host=smtp4dev
+      - SmtpSettings__Port=25
+      - SmtpSettings__UseSsl=false
+      - SmtpSettings__Username=
+      - SmtpSettings__Password=
+      - SmtpSettings__FromEmail=dev@barbapp.tasso.dev.br
+      - SmtpSettings__FromName=BarbApp Dev
+      - Sentry__Dsn=https://09990f518caa4176052bb09421bec544@o4510170952171520.ingest.us.sentry.io/4510170955055104
+      - Sentry__Environment=Development
+      - Sentry__Release=barbapp-api-0.1.0
+      - Sentry__TracesSampleRate=1
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.barbapp-backend.rule=Host(`dev-api-barberapp.tasso.dev.br`)"
+        - "traefik.http.routers.barbapp-backend.entrypoints=websecure"
+        - "traefik.http.routers.barbapp-backend.tls.certresolver=myresolver"
+        - "traefik.http.services.barbapp-backend.loadbalancer.server.port=80"
+      restart_policy:
+        condition: on-failure
+
+  postgres:
+    image: postgres:16
+    networks:
+      - barbapp-internal
+    environment:
+      - POSTGRES_USER=barbapp
+      - POSTGRES_PASSWORD=4cd7e2e32c5994fcba50555430efe763
+      - POSTGRES_DB=barbapp
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    deploy:
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.role == manager
+
+  smtp4dev:
+    image: rnwood/smtp4dev:latest
+    networks:
+      - traefik-public
+      - barbapp-internal
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.smtp4dev.rule=Host(`mail.tasso.dev.br`)"
+        - "traefik.http.routers.smtp4dev.entrypoints=websecure"
+        - "traefik.http.routers.smtp4dev.tls.certresolver=myresolver"
+        - "traefik.http.services.smtp4dev.loadbalancer.server.port=80"
+      restart_policy:
+        condition: on-failure
+
+  traefik:
+    image: traefik:v2.10
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    networks:
+      - traefik-public
+      - barbapp-internal
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - traefik-data:/etc/traefik
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker.swarmMode=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+      - "--certificatesresolvers.myresolver.acme.email=gomestasso@gmail.com"
+      - "--certificatesresolvers.myresolver.acme.storage=/etc/traefik/acme.json"
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+    deploy:
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.role == manager
+
+networks:
+  traefik-public:
+    external: true
+  barbapp-internal:
+    external: true
+
+volumes:
+  postgres-data:
+  traefik-data:
