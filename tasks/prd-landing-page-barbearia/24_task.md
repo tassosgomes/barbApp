@@ -3,6 +3,44 @@ status: pending
 parallelizable: true
 blocked_by: ["22.0", "23.0"]
 ---
+
 # Tarefa 24.0: Template 1 - Clássico
-Implementar template clássico (preto, dourado, serif).
-Ver techspec-frontend.md seção 2.5.
+
+## Visão Geral
+Implementar o componente `Template1Classic.tsx` para a landing page pública. Este template deve seguir uma identidade visual elegante e tradicional, com uma paleta de cores focada em preto, dourado e branco.
+
+## Requisitos de Design (prd.md Seção 2.2)
+- **Tema**: Elegante e tradicional.
+- **Cores**: Preto (`#1A1A1A`), Dourado (`#D4AF37`), Branco (`#FFFFFF`).
+- **Fontes**: `Playfair Display` (serif) para títulos, `Inter` (sans-serif) para corpo de texto.
+- **Layout**: Header com logo centralizado, seção hero com imagem de fundo, grid de serviços, rodapé com informações.
+- **Ícones**: Usar ícones tradicionais (tesoura, navalha) se possível, ou os ícones padrão do `lucide-react`.
+
+## Detalhes de Implementação (techspec-frontend.md Seção 2.5)
+- **Framework**: React com TypeScript.
+- **Estilização**: Tailwind CSS. As cores e fontes customizadas devem ser configuradas no `tailwind.config.js`.
+- **Props**: O componente receberá `data: PublicLandingPage` contendo todas as informações da barbearia e da landing page.
+- **Componentes Reutilizáveis**: Utilizar os componentes compartilhados criados na Tarefa 23.0, como `ServiceCard` e `WhatsAppButton`.
+- **Hooks**: Utilizar o hook `useServiceSelection` para gerenciar a seleção de serviços e o `useNavigate` do `react-router-dom` para o agendamento.
+
+## Estrutura do Componente (`Template1Classic.tsx`)
+- **Busca de Dados**: Os dados virão por props, fornecidos pela página `LandingPage.tsx`.
+- **Gerenciamento de Estado**: `const { selectedIds, totalPrice, hasSelection, toggleService } = useServiceSelection(landingPage.services);`
+- **Handler de Agendamento**: `handleSchedule()` que constrói a URL de agendamento com base nos serviços selecionados e navega para a página de agendamento.
+- **Renderização das Seções**:
+  - **Header**: Logo, nome da barbearia, navegação interna (`#servicos`, `#sobre`, `#contato`) e botão "Agendar Agora".
+  - **Hero**: Imagem de fundo (pode ser uma imagem estática do template), título, subtítulo e botões de ação.
+  - **Serviços**: Título da seção e um grid renderizando os componentes `ServiceCard`.
+  - **Sobre**: Seção condicional que só aparece se `landingPage.aboutText` existir.
+  - **Contato/Informações**: Exibe endereço, horário de funcionamento e redes sociais.
+  - **Footer**: Copyright e link para a "Área Admin".
+  - **Botões Flutuantes**: `WhatsAppButton` (fixo) e o botão de agendamento que aparece condicionalmente (`hasSelection`).
+
+## Critérios de Aceitação
+- [ ] O componente renderiza todas as informações da barbearia (logo, nome, textos) corretamente.
+- [ ] A paleta de cores (preto, dourado, branco) e as fontes (serif/sans-serif) são aplicadas corretamente.
+- [ ] O layout é responsivo e se adapta bem em dispositivos mobile, tablet e desktop.
+- [ ] A seleção de serviços funciona, e o botão flutuante de agendamento aparece com o número de serviços e o preço total.
+- [ ] Clicar em "Agendar Agora" (com ou sem serviços selecionados) redireciona para a URL de agendamento correta.
+- [ ] O botão do WhatsApp abre o link `wa.me` com o número e a mensagem corretos.
+- [ ] As seções "Sobre" e "Redes Sociais" são renderizadas condicionalmente, apenas se os dados existirem.

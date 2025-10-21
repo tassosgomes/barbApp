@@ -80,6 +80,7 @@ export type {
 // ============================================================================
 
 export { TemplateGallery } from './components/TemplateGallery';
+export { LogoUploader } from './components/LogoUploader';
 
 // ============================================================================
 // Re-exports for Convenience
