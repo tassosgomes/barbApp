@@ -1,0 +1,41 @@
+feat(api): implementar endpoints de gestão de landing page para admin
+
+Adiciona 3 endpoints REST para gerenciamento de landing pages no painel administrativo:
+- GET /api/admin/landing-pages/{barbershopId} - Buscar configuração
+- PUT /api/admin/landing-pages/{barbershopId} - Atualizar configuração
+- POST /api/admin/landing-pages/{barbershopId}/logo - Upload de logo (stub)
+
+Implementação inclui:
+- Controller LandingPagesController com autenticação JWT role-based (AdminBarbearia)
+- Validação de propriedade da barbearia via claim "barbeariaId"
+- Tratamento de erros padronizado (400, 401, 403, 404)
+- Logging estruturado com ILogger em todos os pontos críticos
+- Documentação Swagger completa com XML comments
+- Validação de entrada (ModelState + validações de arquivo)
+- 15 testes de integração com 100% de sucesso
+
+Testes cobrem:
+- GetConfig: 4 cenários (200, 401, 403, 404)
+- UpdateConfig: 5 cenários (204, 401, 403, 404, validação de services)
+- UploadLogo: 6 cenários (200, 400 múltiplos casos, 401, 403)
+
+Helpers de teste implementados:
+- CreateAuthorizedClient(Guid) - Cria HttpClient com JWT válido
+- GenerateRandomUniqueCode() - Gera códigos únicos no formato correto
+- GenerateRandomCNPJ() - Gera CNPJs válidos com dígitos verificadores
+
+Issues resolvidas durante implementação:
+- Corrigido uso de factory methods para entidades DDD
+- Ajustado geração de UniqueCode (excluindo I, O, 0, 1)
+- Implementado CNPJ com cálculo correto de dígitos verificadores
+- Isolamento de HttpClient em testes paralelos
+- Correção de claim de autorização (barbeariaId vs BarbershopId)
+
+Itens adiados (não-bloqueantes):
+- Rate limiting (dependência AspNetCoreRateLimit não disponível)
+- Storage real de logos (planejado para tarefa 7.0)
+
+Relacionado: Tarefa 5.0 - PRD Landing Page Personalizável
+Desbloqueia: Tarefa 11.0 (Hook useLandingPage no Admin)
+
+Co-authored-by: GitHub Copilot <noreply@github.com>
