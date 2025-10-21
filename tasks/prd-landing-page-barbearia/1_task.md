@@ -1,5 +1,6 @@
 ---
-status: pending
+status: deprecated
+reason: "Projeto usa EF Core Code-First - migrations são geradas automaticamente a partir das Entities e EntityTypeConfiguration. Esta tarefa foi incorporada na Tarefa 2.0"
 parallelizable: false
 blocked_by: []
 ---
@@ -13,7 +14,9 @@ blocked_by: []
 <unblocks>2.0</unblocks>
 </task_context>
 
-# Tarefa 1.0: Estrutura de Banco de Dados e Migrations
+# Tarefa 1.0: ~~Estrutura de Banco de Dados e Migrations~~ [DEPRECATED]
+
+> ⚠️ **TAREFA DESCONTINUADA**: Este projeto usa EF Core com abordagem Code-First. As migrations são geradas automaticamente através do comando `dotnet ef migrations add` após criar as Entities e EntityTypeConfiguration. Todo o conteúdo desta tarefa foi incorporado na Tarefa 2.0.
 
 ## Visão Geral
 

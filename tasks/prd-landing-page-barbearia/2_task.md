@@ -1,7 +1,7 @@
 ---
 status: pending
 parallelizable: false
-blocked_by: ["1.0"]
+blocked_by: []
 ---
 
 <task_context>
@@ -13,34 +13,43 @@ blocked_by: ["1.0"]
 <unblocks>3.0</unblocks>
 </task_context>
 
-# Tarefa 2.0: Entities e DTOs do Domínio Landing Page
+# Tarefa 2.0: Entities, DTOs, EntityTypeConfiguration e Migration
 
 ## Visão Geral
 
-Criar as entidades de domínio, DTOs de request/response e modelos de dados necessários para representar o sistema de landing pages na camada de domínio do backend.
+Criar as entidades de domínio, DTOs de request/response, configurações EF Core (EntityTypeConfiguration) e gerar a migration para o sistema de landing pages. Esta tarefa segue a abordagem Code-First do EF Core utilizada em todo o projeto.
 
 <requirements>
 - Entity `LandingPageConfig` mapeando tabela do banco
 - Entity `LandingPageService` para relação com serviços
+- EntityTypeConfiguration para ambas as entidades (padrão EF Core)
 - DTOs de Request: `CreateLandingPageRequest`, `UpdateLandingPageRequest`
 - DTOs de Response: `LandingPageConfigResponse`, `PublicLandingPageResponse`
-- Validações nos DTOs (DataAnnotations ou FluentValidation)
-- Mapeamento entre Entities e DTOs
+- Validações nos DTOs (DataAnnotations)
+- Mapeamento entre Entities e DTOs (AutoMapper)
+- Migration gerada e aplicada no banco
 </requirements>
 
 ## Subtarefas
 
 - [ ] 2.1 Criar entidade `LandingPageConfig`
 - [ ] 2.2 Criar entidade `LandingPageService`
-- [ ] 2.3 Criar DTOs de Request com validações
-- [ ] 2.4 Criar DTOs de Response
-- [ ] 2.5 Configurar AutoMapper profiles
-- [ ] 2.6 Adicionar validações customizadas (WhatsApp, URLs)
-- [ ] 2.7 Criar testes unitários para validações
+- [ ] 2.3 Criar `LandingPageConfigConfiguration` (IEntityTypeConfiguration)
+- [ ] 2.4 Criar `LandingPageServiceConfiguration` (IEntityTypeConfiguration)
+- [ ] 2.5 Criar DTOs de Request com validações
+- [ ] 2.6 Criar DTOs de Response
+- [ ] 2.7 Configurar AutoMapper profiles
+- [ ] 2.8 Adicionar validações customizadas (WhatsApp, URLs)
+- [ ] 2.9 Gerar migration: `dotnet ef migrations add AddLandingPageEntities`
+- [ ] 2.10 Aplicar migration: `dotnet ef database update`
+- [ ] 2.11 Validar estrutura no banco (tabelas, FKs, índices, constraints)
+- [ ] 2.12 Criar testes unitários para validações
 
 ## Detalhes de Implementação
 
-### Entity: LandingPageConfig.cs
+### 1. Entities
+
+#### Entity: LandingPageConfig.cs
 
 ```csharp
 namespace BarbApp.Domain.Entities
@@ -67,7 +76,7 @@ namespace BarbApp.Domain.Entities
 }
 ```
 
-### Entity: LandingPageService.cs
+#### Entity: LandingPageService.cs
 
 ```csharp
 namespace BarbApp.Domain.Entities
@@ -86,7 +95,167 @@ namespace BarbApp.Domain.Entities
 }
 ```
 
-### DTO: UpdateLandingPageRequest.cs
+### 2. EntityTypeConfiguration (EF Core)
+
+#### LandingPageConfigConfiguration.cs
+
+```csharp
+using BarbApp.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace BarbApp.Infrastructure.Persistence.Configurations;
+
+public class LandingPageConfigConfiguration : IEntityTypeConfiguration<LandingPageConfig>
+{
+    public void Configure(EntityTypeBuilder<LandingPageConfig> builder)
+    {
+        builder.ToTable("landing_page_configs");
+
+        builder.HasKey(l => l.Id);
+        builder.Property(l => l.Id)
+            .HasColumnName("landing_page_config_id")
+            .ValueGeneratedOnAdd();
+
+        builder.Property(l => l.BarbershopId)
+            .HasColumnName("barbershop_id")
+            .IsRequired();
+
+        builder.Property(l => l.TemplateId)
+            .HasColumnName("template_id")
+            .IsRequired();
+
+        builder.Property(l => l.LogoUrl)
+            .HasColumnName("logo_url")
+            .HasMaxLength(500);
+
+        builder.Property(l => l.AboutText)
+            .HasColumnName("about_text")
+            .HasMaxLength(2000);
+
+        builder.Property(l => l.OpeningHours)
+            .HasColumnName("opening_hours")
+            .HasMaxLength(500);
+
+        builder.Property(l => l.InstagramUrl)
+            .HasColumnName("instagram_url")
+            .HasMaxLength(255);
+
+        builder.Property(l => l.FacebookUrl)
+            .HasColumnName("facebook_url")
+            .HasMaxLength(255);
+
+        builder.Property(l => l.WhatsappNumber)
+            .HasColumnName("whatsapp_number")
+            .HasMaxLength(20)
+            .IsRequired();
+
+        builder.Property(l => l.IsPublished)
+            .HasColumnName("is_published")
+            .IsRequired()
+            .HasDefaultValue(true);
+
+        builder.Property(l => l.CreatedAt)
+            .HasColumnName("created_at")
+            .IsRequired();
+
+        builder.Property(l => l.UpdatedAt)
+            .HasColumnName("updated_at")
+            .IsRequired();
+
+        // Relationships
+        builder.HasOne(l => l.Barbershop)
+            .WithMany()
+            .HasForeignKey(l => l.BarbershopId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // Indexes and Constraints
+        builder.HasIndex(l => l.BarbershopId)
+            .HasDatabaseName("ix_landing_page_configs_barbershop_id");
+
+        builder.HasIndex(l => l.IsPublished)
+            .HasDatabaseName("ix_landing_page_configs_is_published");
+
+        builder.HasIndex(l => l.BarbershopId)
+            .IsUnique()
+            .HasDatabaseName("uq_landing_page_configs_barbershop");
+    }
+}
+```
+
+#### LandingPageServiceConfiguration.cs
+
+```csharp
+using BarbApp.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace BarbApp.Infrastructure.Persistence.Configurations;
+
+public class LandingPageServiceConfiguration : IEntityTypeConfiguration<LandingPageService>
+{
+    public void Configure(EntityTypeBuilder<LandingPageService> builder)
+    {
+        builder.ToTable("landing_page_services");
+
+        builder.HasKey(l => l.Id);
+        builder.Property(l => l.Id)
+            .HasColumnName("landing_page_service_id")
+            .ValueGeneratedOnAdd();
+
+        builder.Property(l => l.LandingPageConfigId)
+            .HasColumnName("landing_page_config_id")
+            .IsRequired();
+
+        builder.Property(l => l.ServiceId)
+            .HasColumnName("service_id")
+            .IsRequired();
+
+        builder.Property(l => l.DisplayOrder)
+            .HasColumnName("display_order")
+            .IsRequired()
+            .HasDefaultValue(0);
+
+        builder.Property(l => l.IsVisible)
+            .HasColumnName("is_visible")
+            .IsRequired()
+            .HasDefaultValue(true);
+
+        builder.Property(l => l.CreatedAt)
+            .HasColumnName("created_at")
+            .IsRequired();
+
+        // Relationships
+        builder.HasOne(l => l.LandingPageConfig)
+            .WithMany(lp => lp.Services)
+            .HasForeignKey(l => l.LandingPageConfigId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasOne(l => l.Service)
+            .WithMany()
+            .HasForeignKey(l => l.ServiceId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // Indexes and Constraints
+        builder.HasIndex(l => l.LandingPageConfigId)
+            .HasDatabaseName("ix_landing_page_services_config_id");
+
+        builder.HasIndex(l => l.ServiceId)
+            .HasDatabaseName("ix_landing_page_services_service_id");
+
+        builder.HasIndex(l => new { l.LandingPageConfigId, l.DisplayOrder })
+            .HasDatabaseName("ix_landing_page_services_config_order");
+
+        builder.HasIndex(l => new { l.LandingPageConfigId, l.ServiceId })
+            .IsUnique()
+            .HasDatabaseName("uq_landing_page_services_config_service");
+    }
+}
+```
+
+### 3. DTOs
+
+#### DTO: UpdateLandingPageRequest.cs
 
 ```csharp
 using System.ComponentModel.DataAnnotations;
@@ -129,7 +298,7 @@ namespace BarbApp.Application.DTOs.LandingPage
 }
 ```
 
-### DTO: LandingPageConfigResponse.cs
+#### DTO: LandingPageConfigResponse.cs
 
 ```csharp
 namespace BarbApp.Application.DTOs.LandingPage
@@ -173,7 +342,7 @@ namespace BarbApp.Application.DTOs.LandingPage
 }
 ```
 
-### DTO: PublicLandingPageResponse.cs
+#### DTO: PublicLandingPageResponse.cs
 
 ```csharp
 namespace BarbApp.Application.DTOs.LandingPage
@@ -215,7 +384,9 @@ namespace BarbApp.Application.DTOs.LandingPage
 }
 ```
 
-### AutoMapper Profile: LandingPageProfile.cs
+### 4. AutoMapper Profile
+
+#### AutoMapper Profile: LandingPageProfile.cs
 
 ```csharp
 using AutoMapper;
@@ -260,17 +431,61 @@ namespace BarbApp.Application.Mappings
 }
 ```
 
+### 5. Comandos de Migration
+
+```bash
+# Navegar para o diretório do projeto
+cd backend/src/BarbApp.API
+
+# Gerar a migration
+dotnet ef migrations add AddLandingPageEntities --project ../BarbApp.Infrastructure --startup-project .
+
+# Aplicar a migration no banco
+dotnet ef database update --project ../BarbApp.Infrastructure --startup-project .
+
+# Verificar a migration gerada em:
+# backend/src/BarbApp.Infrastructure/Migrations/[timestamp]_AddLandingPageEntities.cs
+```
+
+### 6. Validação no Banco de Dados
+
+Após aplicar a migration, validar:
+
+```sql
+-- Verificar tabelas criadas
+\dt landing_page_*
+
+-- Verificar estrutura de landing_page_configs
+\d landing_page_configs
+
+-- Verificar estrutura de landing_page_services
+\d landing_page_services
+
+-- Verificar índices
+\di landing_page_*
+
+-- Verificar constraints
+SELECT conname, contype 
+FROM pg_constraint 
+WHERE conrelid::regclass::text LIKE 'landing_page_%';
+```
+
 ## Sequenciamento
 
-- **Bloqueado por**: 1.0 (Banco de Dados)
+- **Bloqueado por**: Nenhuma (primeira tarefa agora)
 - **Desbloqueia**: 3.0 (Repositórios)
 - **Paralelizável**: Não
 
 ## Critérios de Sucesso
 
 - [ ] Todas as entidades criadas e configuradas
+- [ ] EntityTypeConfiguration completas com todos os mapeamentos
 - [ ] DTOs com validações funcionando
 - [ ] AutoMapper configurado e testado
+- [ ] Migration gerada com sucesso
+- [ ] Migration aplicada sem erros no banco
+- [ ] Todas as tabelas, FKs, índices e constraints criados corretamente
+- [ ] Constraint de unicidade (1 landing page por barbearia) funcionando
 - [ ] Validações customizadas implementadas
 - [ ] Testes unitários de validação passando
 - [ ] Documentação XML nos tipos públicos
