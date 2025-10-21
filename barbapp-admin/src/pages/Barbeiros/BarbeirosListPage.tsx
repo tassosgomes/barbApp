@@ -78,6 +78,15 @@ export function BarbeirosListPage() {
   const [selectedBarbeiro, setSelectedBarbeiro] = useState<{
     id: string;
     name: string;
+    email?: string;
+  } | null>(null);
+
+  // Modal de confirmação de reset de senha
+  const [resetPasswordModalOpen, setResetPasswordModalOpen] = useState(false);
+  const [selectedBarberForReset, setSelectedBarberForReset] = useState<{
+    id: string;
+    name: string;
+    email: string;
   } | null>(null);
 
   // Mutation para desativar barbeiro
@@ -121,6 +130,26 @@ export function BarbeirosListPage() {
     },
   });
 
+  // Mutation para resetar senha do barbeiro
+  const resetPasswordMutation = useMutation({
+    mutationFn: barbeiroService.resetPassword,
+    onSuccess: () => {
+      toast({
+        title: 'Senha redefinida com sucesso',
+        description: `Uma nova senha foi enviada para o email de ${selectedBarberForReset?.name}.`,
+      });
+      setResetPasswordModalOpen(false);
+      setSelectedBarberForReset(null);
+    },
+    onError: () => {
+      toast({
+        title: 'Erro ao redefinir senha',
+        description: 'Não foi possível redefinir a senha. Tente novamente mais tarde.',
+        variant: 'destructive',
+      });
+    },
+  });
+
   // Handlers
   const handleCreateNew = () => {
     navigate(`/${barbearia?.codigo}/barbeiros/novo`);
@@ -143,6 +172,21 @@ export function BarbeirosListPage() {
 
   const handleReactivate = (id: string) => {
     reactivateMutation.mutate(id);
+  };
+
+  const handleResetPassword = (barbeiro: Barber) => {
+    setSelectedBarberForReset({
+      id: barbeiro.id,
+      name: barbeiro.name,
+      email: barbeiro.email,
+    });
+    setResetPasswordModalOpen(true);
+  };
+
+  const confirmResetPassword = () => {
+    if (selectedBarberForReset) {
+      resetPasswordMutation.mutate(selectedBarberForReset.id);
+    }
   };
 
   // Colunas da tabela
@@ -212,6 +256,16 @@ export function BarbeirosListPage() {
           >
             Editar
           </Button>
+          {barbeiro.isActive && (
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={() => handleResetPassword(barbeiro)}
+              disabled={resetPasswordMutation.isPending}
+            >
+              Redefinir Senha
+            </Button>
+          )}
           {barbeiro.isActive ? (
             <Button
               size="sm"
@@ -304,6 +358,40 @@ export function BarbeirosListPage() {
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               {deactivateMutation.isPending ? 'Desativando...' : 'Desativar'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Modal de confirmação de reset de senha */}
+      <AlertDialog
+        open={resetPasswordModalOpen}
+        onOpenChange={setResetPasswordModalOpen}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Redefinir Senha</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja redefinir a senha de{' '}
+              <strong>{selectedBarberForReset?.name}</strong>?
+              <br />
+              <br />
+              Uma nova senha será gerada automaticamente e enviada para:{' '}
+              <strong>{selectedBarberForReset?.email}</strong>
+              <br />
+              <br />
+              ⚠️ O barbeiro precisará usar a nova senha no próximo login.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={resetPasswordMutation.isPending}>
+              Cancelar
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmResetPassword}
+              disabled={resetPasswordMutation.isPending}
+            >
+              {resetPasswordMutation.isPending ? 'Redefinindo...' : 'Confirmar'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

@@ -238,6 +238,15 @@ Este documento detalha todos os endpoints da API BarbApp, incluindo descrições
   - `id` (Guid, na rota): ID do barbeiro.
 - **Parâmetros de Saída**: `204 No Content`.
 
+### `POST /api/barbers/{id}/reset-password`
+
+- **Descrição**: Redefine a senha de um barbeiro gerando uma nova senha segura e enviando por e-mail. Este endpoint permite que o Admin Barbearia redefina a senha de seus barbeiros quando necessário (esquecimento de senha, segurança, etc). O sistema valida o isolamento multi-tenant garantindo que o admin só possa redefinir senhas de barbeiros da sua própria barbearia.
+- **Role Necessária**: `AdminBarbearia`.
+- **Parâmetros de Entrada**:
+  - `id` (Guid, na rota): ID do barbeiro.
+- **Parâmetros de Saída**: Objeto JSON com mensagem de sucesso.
+  - `message` (string): Mensagem confirmando o envio do e-mail.
+
 ### `GET /api/barbers/schedule`
 
 - **Descrição**: Retorna a agenda consolidada de todos os barbeiros da barbearia para uma data específica. Pode ser filtrada por um barbeiro específico.
