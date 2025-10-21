@@ -75,85 +75,11 @@ export type {
 // Constants
 // ============================================================================
 
-// Hooks
-export {
-  useLandingPage,
-  useTemplates,
-  useLogoUpload,
-  LANDING_PAGE_QUERY_KEYS,
-  TEMPLATES_QUERY_KEYS,
-  LOGO_UPLOAD_QUERY_KEYS,
-} from './hooks';
-
-// API Services
-// TODO: Descomentar quando API for criada (próximas tarefas)
-// export { landingPageApi } from '../../../services/api/landing-page.api';
-
-// Templates
-export {
-  TEMPLATES,
-  TEMPLATES_MAP,
-  TEMPLATE_IDS,
-  DEFAULT_TEMPLATE_ID,
-  DEFAULT_TEMPLATE,
-  TEMPLATE_CATEGORIES,
-  TEMPLATE_COLOR_THEMES,
-  TEMPLATE_METADATA,
-  TEMPLATE_PREVIEW_URLS,
-  TEMPLATE_PLACEHOLDER_URL,
-  
-  // Template utilities
-  getTemplateById,
-  getTemplateByTheme,
-  isValidTemplateId,
-  getTemplatesByCategory,
-  getTemplatePrimaryColor,
-  getTemplateColors,
-  getTemplateConfig,
-} from './constants/templates';
-
-// Validation
-export {
-  CHARACTER_LIMITS,
-  VALIDATION_PATTERNS,
-  LOGO_UPLOAD_CONFIG,
-  ALLOWED_FILE_EXTENSIONS,
-  IMAGE_SIZE_LIMITS,
-  SERVICE_VALIDATION,
-  VALIDATION_RULES,
-  ERROR_MESSAGES,
-  DEFAULT_VALUES,
-  LANDING_PAGE_CONSTANTS,
-  
-  // Validation utilities
-  validateWhatsApp,
-  validateUrl,
-  validateInstagram,
-  validateFacebook,
-  validateTextLength,
-  validateFileType,
-  validateFileSize,
-  normalizeInstagramUrl,
-  normalizeFacebookUrl,
-  formatWhatsApp,
-} from './constants/validation';
-
 // ============================================================================
-// Hooks
+// Components
 // ============================================================================
 
-export {
-  useLandingPage,
-  usePublicLandingPage,
-  useDuplicateTemplate,
-  useLogoUpload,
-  useLogoDropzone,
-  LANDING_PAGE_QUERY_KEYS,
-  UPLOAD_CONFIG,
-  validateImageDimensions,
-  resizeImage,
-  LandingPageHooks,
-} from './hooks';
+export { TemplateGallery } from './components/TemplateGallery';
 
 // ============================================================================
 // Re-exports for Convenience
