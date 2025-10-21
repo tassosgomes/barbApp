@@ -173,6 +173,7 @@ builder.Services.AddScoped<IGetAppointmentDetailsUseCase, GetAppointmentDetailsU
 builder.Services.AddScoped<IConfirmAppointmentUseCase, ConfirmAppointmentUseCase>();
 builder.Services.AddScoped<ICancelAppointmentUseCase, CancelAppointmentUseCase>();
 builder.Services.AddScoped<ICompleteAppointmentUseCase, CompleteAppointmentUseCase>();
+builder.Services.AddScoped<ILandingPageService, LandingPageService>();
 
 // ══════════════════════════════════════════════════════════
 // AUTHENTICATION & AUTHORIZATION
