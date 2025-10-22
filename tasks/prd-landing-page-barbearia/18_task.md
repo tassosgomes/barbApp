@@ -1,10 +1,11 @@
 ---
-status: pending
+status: completed
 parallelizable: false
 blocked_by: ["11.0", "13.0", "17.0"]
+completed_date: 2025-10-22
 ---
 
-# Tarefa 18.0: Página LandingPageEditor
+# Tarefa 18.0: Página LandingPageEditor ✅ CONCLUÍDA
 
 ## Visão Geral
 Criar a página `LandingPageEditor.tsx`, que servirá como o ponto de entrada principal e a interface unificada para todo o gerenciamento da landing page no painel de administração. Esta página organizará as diferentes funcionalidades em abas (Tabs) para uma experiência de usuário clara e intuitiva.
@@ -41,11 +42,11 @@ Criar a página `LandingPageEditor.tsx`, que servirá como o ponto de entrada pr
     3. **Preview**: Contém `PreviewPanel` com a prop `fullScreen`.
 
 ## Critérios de Aceitação
-- [ ] A página renderiza a estrutura de abas com "Editar Informações", "Escolher Template" e "Preview".
-- [ ] A URL da landing page é exibida corretamente.
-- [ ] O botão "Copiar URL" copia a URL para a área de transferência e mostra uma notificação.
-- [ ] O botão "Abrir Landing Page" abre a URL pública em uma nova aba.
-- [ ] A aba "Editar Informações" mostra o formulário e o preview lado a lado em desktops.
-- [ ] A aba "Escolher Template" exibe a galeria de templates, e a seleção de um novo template o atualiza no backend.
-- [ ] A aba "Preview" mostra o painel de preview em tela cheia.
-- [ ] Os dados da landing page (buscados pelo hook `useLandingPage`) são passados corretamente para os componentes filhos (`LandingPageForm`, `TemplateGallery`, `PreviewPanel`).
+- [x] A página renderiza a estrutura de abas com "Editar Informações", "Escolher Template" e "Preview".
+- [x] A URL da landing page é exibida corretamente.
+- [x] O botão "Copiar URL" copia a URL para a área de transferência e mostra uma notificação.
+- [x] O botão "Abrir Landing Page" abre a URL pública em uma nova aba.
+- [x] A aba "Editar Informações" mostra o formulário e o preview lado a lado em desktops.
+- [x] A aba "Escolher Template" exibe a galeria de templates, e a seleção de um novo template o atualiza no backend.
+- [x] A aba "Preview" mostra o painel de preview em tela cheia.
+- [x] Os dados da landing page (buscados pelo hook `useLandingPage`) são passados corretamente para os componentes filhos (`LandingPageForm`, `TemplateGallery`, `PreviewPanel`).
