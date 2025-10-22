@@ -1,6 +1,6 @@
 import { NavLink, useParams } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { LayoutDashboard, Users, Scissors, Calendar, X } from 'lucide-react';
+import { LayoutDashboard, Users, Scissors, Calendar, Palette, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface SidebarProps {
@@ -35,6 +35,11 @@ export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
       path: `/${codigo}/agenda`,
       label: 'Agenda',
       icon: Calendar,
+    },
+    {
+      path: `/${codigo}/landing-page`,
+      label: 'Landing Page',
+      icon: Palette,
     },
   ];
 
