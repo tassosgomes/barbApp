@@ -12,37 +12,31 @@ public class UpdateLandingPageInputValidator : AbstractValidator<UpdateLandingPa
             .When(x => x.TemplateId.HasValue);
         
         RuleFor(x => x.WhatsappNumber)
-            .NotEmpty().WithMessage("WhatsApp não pode ser vazio")
             .Matches(@"^\+55\d{11}$").WithMessage("WhatsApp deve estar no formato +55XXXXXXXXXXX")
-            .When(x => x.WhatsappNumber != null);
+            .When(x => !string.IsNullOrWhiteSpace(x.WhatsappNumber));
         
         RuleFor(x => x.LogoUrl)
-            .NotEmpty().WithMessage("Logo URL não pode ser vazia")
             .MaximumLength(500).WithMessage("Logo URL deve ter no máximo 500 caracteres")
             .Must(BeValidUrlOrNull).WithMessage("Logo URL deve ser uma URL válida")
-            .When(x => x.LogoUrl != null);
+            .When(x => !string.IsNullOrWhiteSpace(x.LogoUrl));
         
         RuleFor(x => x.AboutText)
-            .NotEmpty().WithMessage("Texto 'Sobre' não pode ser vazio")
             .MaximumLength(2000).WithMessage("Texto 'Sobre' deve ter no máximo 2000 caracteres")
-            .When(x => x.AboutText != null);
+            .When(x => !string.IsNullOrWhiteSpace(x.AboutText));
         
         RuleFor(x => x.OpeningHours)
-            .NotEmpty().WithMessage("Horário não pode ser vazio")
             .MaximumLength(500).WithMessage("Horário deve ter no máximo 500 caracteres")
-            .When(x => x.OpeningHours != null);
+            .When(x => !string.IsNullOrWhiteSpace(x.OpeningHours));
         
         RuleFor(x => x.InstagramUrl)
-            .NotEmpty().WithMessage("Instagram URL não pode ser vazia")
             .MaximumLength(255).WithMessage("Instagram URL deve ter no máximo 255 caracteres")
             .Must(BeValidUrlOrNull).WithMessage("Instagram URL deve ser uma URL válida")
-            .When(x => x.InstagramUrl != null);
+            .When(x => !string.IsNullOrWhiteSpace(x.InstagramUrl));
         
         RuleFor(x => x.FacebookUrl)
-            .NotEmpty().WithMessage("Facebook URL não pode ser vazia")
             .MaximumLength(255).WithMessage("Facebook URL deve ter no máximo 255 caracteres")
             .Must(BeValidUrlOrNull).WithMessage("Facebook URL deve ser uma URL válida")
-            .When(x => x.FacebookUrl != null);
+            .When(x => !string.IsNullOrWhiteSpace(x.FacebookUrl));
         
         RuleForEach(x => x.Services)
             .ChildRules(service => 
@@ -50,7 +44,7 @@ public class UpdateLandingPageInputValidator : AbstractValidator<UpdateLandingPa
                 service.RuleFor(s => s.ServiceId).NotEmpty().WithMessage("Service ID é obrigatório");
                 service.RuleFor(s => s.DisplayOrder).GreaterThanOrEqualTo(0).WithMessage("Display order deve ser maior ou igual a 0");
             })
-            .When(x => x.Services != null);
+            .When(x => x.Services != null && x.Services.Any());
     }
     
     private bool BeValidUrlOrNull(string? url)
