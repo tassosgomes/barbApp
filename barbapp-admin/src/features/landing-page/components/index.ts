@@ -11,6 +11,7 @@ export { TemplateGallery } from './TemplateGallery';
 export { LogoUploader } from './LogoUploader';
 export { ServiceManager } from './ServiceManager';
 export { PreviewPanel } from './PreviewPanel';
+export { LandingPageForm } from './LandingPageForm';
 
 // Template components
 export * from './templates';
