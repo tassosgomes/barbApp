@@ -82,6 +82,7 @@ export type {
 export { TemplateGallery } from './components/TemplateGallery';
 export { LogoUploader } from './components/LogoUploader';
 export { ServiceManager } from './components/ServiceManager';
+export { PreviewPanel } from './components/PreviewPanel';
 
 // ============================================================================
 // Re-exports for Convenience
