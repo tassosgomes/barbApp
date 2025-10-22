@@ -25,6 +25,7 @@ describe('Sidebar', () => {
     expect(screen.getByText('Barbeiros')).toBeInTheDocument();
     expect(screen.getByText('Serviços')).toBeInTheDocument();
     expect(screen.getByText('Agenda')).toBeInTheDocument();
+    expect(screen.getByText('Landing Page')).toBeInTheDocument();
   });
 
   it('should render navigation links with correct paths', () => {
@@ -41,6 +42,9 @@ describe('Sidebar', () => {
 
     const agendaLink = screen.getByRole('link', { name: /agenda/i });
     expect(agendaLink).toHaveAttribute('href', '/TEST1234/agenda');
+
+    const landingPageLink = screen.getByRole('link', { name: /landing page/i });
+    expect(landingPageLink).toHaveAttribute('href', '/TEST1234/landing-page');
   });
 
   it('should apply correct visibility class when isOpen is false', () => {
