@@ -9,6 +9,7 @@ using BarbApp.Domain.Interfaces.Repositories;
 using BarbApp.Application.Configuration;
 using BarbApp.Infrastructure.Configuration;
 using BarbApp.Infrastructure.Middlewares;
+using BarbApp.Infrastructure.Options;
 using BarbApp.Infrastructure.Services;
 using BarbApp.Infrastructure.Persistence;
 using BarbApp.Infrastructure.Persistence.Repositories;
@@ -138,6 +139,10 @@ builder.Services.Configure<SmtpSettings>(
 builder.Services.Configure<AppSettings>(
     builder.Configuration.GetSection("AppSettings"));
 
+// R2 Storage Settings
+builder.Services.Configure<R2StorageOptions>(
+    builder.Configuration.GetSection("R2Storage"));
+
 // ══════════════════════════════════════════════════════════
 // DEPENDENCY INJECTION - Use Cases
 // ══════════════════════════════════════════════════════════
@@ -181,7 +186,8 @@ builder.Services.AddScoped<IConfirmAppointmentUseCase, ConfirmAppointmentUseCase
 builder.Services.AddScoped<ICancelAppointmentUseCase, CancelAppointmentUseCase>();
 builder.Services.AddScoped<ICompleteAppointmentUseCase, CompleteAppointmentUseCase>();
 builder.Services.AddScoped<ILandingPageService, LandingPageService>();
-builder.Services.AddScoped<ILogoUploadService, LocalLogoUploadService>();
+builder.Services.AddSingleton<IR2StorageService, R2StorageService>();
+builder.Services.AddScoped<ILogoUploadService, R2LogoUploadService>();
 builder.Services.AddScoped<IImageProcessor, ImageSharpProcessor>();
 
 // ══════════════════════════════════════════════════════════
