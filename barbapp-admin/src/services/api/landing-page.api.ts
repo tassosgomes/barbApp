@@ -13,7 +13,6 @@ import {
   LandingPageConfig,
   CreateLandingPageInput,
   UpdateLandingPageInput,
-  LandingPageConfigOutput,
   ApiResponse,
   Template,
 } from '@/features/landing-page/types/landing-page.types';
@@ -30,21 +29,21 @@ export const landingPageApi = {
    * Busca configuração da landing page por ID da barbearia
    */
   getConfig: async (barbershopId: string): Promise<LandingPageConfig> => {
-    const { data } = await api.get<ApiResponse<LandingPageConfigOutput>>(
+    const { data } = await api.get<LandingPageConfig>(
       `/admin/landing-pages/${barbershopId}`
     );
-    return data.data!.landingPage;
+    return data;
   },
 
   /**
    * Cria nova configuração de landing page
    */
   createConfig: async (barbershopId: string, payload: CreateLandingPageInput): Promise<LandingPageConfig> => {
-    const { data } = await api.post<ApiResponse<LandingPageConfigOutput>>(
+    const { data } = await api.post<LandingPageConfig>(
       `/admin/landing-pages/${barbershopId}`,
       payload
     );
-    return data.data!.landingPage;
+    return data;
   },
 
   /**
