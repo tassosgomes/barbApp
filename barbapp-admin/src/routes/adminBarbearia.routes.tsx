@@ -6,6 +6,7 @@ import { Dashboard } from '@/pages/Dashboard';
 import { BarbeirosListPage, BarbeiroFormPage } from '@/pages/Barbeiros';
 import { ServicosListPage, ServicoFormPage } from '@/pages/Servicos';
 import { AgendaListPage } from '@/pages/Agenda';
+import { LandingPageEditor } from '@/pages/LandingPage';
 
 /**
  * Routes for Admin Barbearia
@@ -66,6 +67,10 @@ export const adminBarbeariaRoutes: RouteObject[] = [
       {
         path: 'agenda',
         element: <AgendaListPage />,
+      },
+      {
+        path: 'landing-page',
+        element: <LandingPageEditor />,
       },
     ],
   },
