@@ -68,7 +68,7 @@ export const landingPageApi = {
    */
   uploadLogo: async (barbershopId: string, file: File): Promise<string> => {
     const formData = new FormData();
-    formData.append('logo', file);
+    formData.append('file', file);
 
     const { data } = await api.post<ApiResponse<{ logoUrl: string }>>(
       `/admin/landing-pages/${barbershopId}/logo`,

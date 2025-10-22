@@ -9,10 +9,11 @@
 
 | Fase | Descrição | Duração Estimada | Bugs Corrigidos | Status |
 |------|-----------|------------------|-----------------|--------|
-| **Fase 1** | Correções Críticas Imediatas | 1-2 dias | Bug #4, #5 | 🔴 Pendente |
-| **Fase 2** | Landing Page Pública - MVP | 3-5 dias | Bug #1, #2, #3 | 🔴 Pendente |
-| **Fase 3** | Templates Adicionais | 2-3 dias | - | 🔴 Pendente |
-| **Fase 4** | Deploy e Finalização | 1-2 dias | - | 🔴 Pendente |
+| **Fase 1** | Correções Críticas Imediatas | 2-3 dias | Bug #4, #5 | � 50% (1/2) |
+| **Fase 2** | Refatoração Infraestrutura | 1 dia | - | �🔴 Pendente |
+| **Fase 3** | Landing Page Pública - MVP | 3-5 dias | Bug #1, #2, #3 | 🔴 Pendente |
+| **Fase 4** | Templates Adicionais | 2-3 dias | - | 🔴 Pendente |
+| **Fase 5** | Deploy e Finalização | 1-2 dias | - | 🔴 Pendente |
 
 ---
 
@@ -20,17 +21,19 @@
 
 **Objetivo**: Garantir que o editor de landing page no admin funcione completamente.
 
-**Duração**: 1-2 dias  
+**Duração**: 2-3 dias  
 **Prioridade**: 🔥 Crítica  
-**Bugs Corrigidos**: Bug #4 (Upload), Bug #5 (Salvar)
+**Bugs Corrigidos**: Bug #4 (Upload), Bug #5 (Salvar)  
+**Status**: 🟡 50% (1/2 tasks)
 
 ---
 
 ### Task 34.0: Investigar e Corrigir Bug #5 (Salvar Alterações - Erro 400)
 
-**Status**: 🔴 Pendente  
+**Status**: ✅ COMPLETO  
 **Complexidade**: Média  
-**Duração**: 4 horas
+**Duração**: 4 horas  
+**Arquivo**: [34_task_COMPLETED.md](./34_task_COMPLETED.md)
 
 #### Subtarefas
 
@@ -71,9 +74,117 @@
 
 ### Task 35.0: Testar e Corrigir Bug #4 (Upload de Logo)
 
-**Status**: 🔴 Pendente  
+**Status**: ✅ COMPLETO  
 **Complexidade**: Média  
-**Duração**: 3 horas
+**Duração**: 3 horas  
+**Arquivo**: [35_task_IN_PROGRESS.md](./35_task_IN_PROGRESS.md)
+
+#### Problema Identificado
+
+Nome do campo FormData incorreto no frontend:
+- ❌ `formData.append('logo', file)` 
+- ✅ `formData.append('file', file)`
+
+#### Correção
+
+**Arquivo**: `/barbapp-admin/src/services/api/landing-page.api.ts` (linha 71)
+
+```typescript
+// ANTES (bug)
+formData.append('logo', file);
+
+// DEPOIS (correto)
+formData.append('file', file);
+```
+
+#### Validação
+
+- ✅ Upload via curl funcionou (200 OK)
+- ✅ Backend processa imagens corretamente
+- ✅ ImageSharp redimensiona para 300x300px
+- ✅ Correção aplicada no frontend
+- ✅ Upload funcional via interface
+
+---
+
+## � FASE 2: Refatoração de Infraestrutura
+
+**Objetivo**: Migrar upload de arquivos do filesystem local para Cloudflare R2 Object Storage.
+
+**Duração**: 1 dia (4-6 horas)  
+**Prioridade**: 🔥 Alta  
+**Status**: 📋 Backlog
+
+**Justificativa**: 
+- Arquivos salvos em containers são perdidos ao reiniciar
+- Não escala em ambientes multi-container
+- R2 oferece CDN integrado, backup automático e custo baixo
+
+---
+
+### Task 36.0: Refatorar Upload para Cloudflare R2
+
+**Status**: 📋 BACKLOG  
+**Complexidade**: Alta  
+**Duração**: 4-6 horas  
+**Arquivo**: [36_task_BACKLOG.md](./36_task_BACKLOG.md)
+
+#### Escopo
+
+**Backend:**
+1. Instalar AWSSDK.S3 NuGet package
+2. Criar `R2StorageService` (S3-compatible)
+3. Criar `R2LogoUploadService` (substitui `LocalLogoUploadService`)
+4. Configurar credenciais R2 em appsettings.json
+5. Registrar serviços no DI
+
+**Infraestrutura:**
+1. Criar bucket `barbapp-assets` no Cloudflare R2
+2. Configurar CORS
+3. Gerar Access Keys
+4. Configurar custom domain: `assets.barbapp.com`
+5. Adicionar secrets no Docker Swarm
+
+**Testes:**
+1. Testes unitários do R2StorageService
+2. Testes de integração do upload
+3. Testes E2E com Playwright
+4. Validação de CDN funcionando
+
+#### Benefícios
+
+- ✅ Persistência de dados (sobrevive restarts)
+- ✅ Escalabilidade (funciona em clusters)
+- ✅ CDN automático (performance)
+- ✅ Custo baixo (~$0.05/mês)
+- ✅ Backup e redundância
+- ✅ Zero egress fees
+
+#### Critérios de Aceitação
+
+- [ ] Logos salvos no R2 ao invés de filesystem
+- [ ] URLs retornadas apontam para CDN
+- [ ] Upload funciona em dev e produção
+- [ ] Migration guide criado (para logos existentes)
+- [ ] Testes passando (unit + integration + E2E)
+- [ ] Documentação atualizada
+
+---
+
+## 🔴 FASE 3: Landing Page Pública - MVP
+
+**Objetivo**: Criar aplicação frontend pública para exibir landing pages das barbearias.
+
+**Duração**: 3-5 dias  
+**Prioridade**: Alta  
+**Bugs Corrigidos**: Bug #1, #2, #3  
+**Status**: 🔴 Pendente
+
+**Requisitos**: Fase 1 e 2 completas
+
+---
+
+### Task 37.0: Setup Projeto barbapp-public
 
 #### Subtarefas
 

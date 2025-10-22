@@ -1,13 +1,13 @@
 # ✅ Checklist de Correção - Landing Page
 
 **Última atualização**: 22/10/2025  
-**Progresso Geral**: 0/18 tasks (0%)
+**Progresso Geral**: 2/19 tasks (10.5%)
 
 ---
 
-## 🔴 FASE 1: Correções Críticas Imediatas
+## � FASE 1: Correções Críticas Imediatas
 
-**Status**: 🟡 Em Progresso | **Progresso**: 1/2 tasks (50%)
+**Status**: ✅ COMPLETA | **Progresso**: 2/2 tasks (100%)
 
 ### Task 34: Corrigir Bug #5 (Salvar Alterações - Erro 400) ✅ COMPLETA
 - [x] 34.1 - Reproduzir erro com Playwright/DevTools
@@ -15,7 +15,7 @@
 - [x] 34.3 - Capturar payload enviado (Network tab)
 - [x] 34.4 - Comparar payload com DTO backend
 - [x] 34.5 - Identificar campo/validação causando erro
-- [x] 34.6 - Corrigir validação (backend ou frontend)
+- [x] 34.6 - Corrigir validação (UpdateLandingPageInputValidator.cs)
 - [x] 34.7 - Testar edição de todos os campos
 - [x] 34.8 - Garantir persistência no banco
 - [ ] 34.9 - Adicionar testes unitários (pendente)
@@ -24,40 +24,88 @@
 - [x] ✅ Editar "Sobre a Barbearia" e salvar sem erro
 - [x] ✅ API retorna 204 No Content
 - [x] ✅ Dados persistidos no banco
+- [x] ✅ Commit criado e documentado
+
+**Correção Aplicada**: Removido `.NotEmpty()` de campos opcionais no validator
 
 ---
 
-### Task 35: Corrigir Bug #4 (Upload de Logo)
-- [ ] 35.1 - Preparar arquivo de teste (PNG 300x300px)
-- [ ] 35.2 - Tentar upload via admin
-- [ ] 35.3 - Capturar erro (console/network)
-- [ ] 35.4 - Verificar endpoint backend
-- [ ] 35.5 - Verificar multipart/form-data
-- [ ] 35.6 - Verificar storage (local/S3)
-- [ ] 35.7 - Corrigir problemas
-- [ ] 35.8 - Testar formatos (PNG, JPG, SVG, WebP)
-- [ ] 35.9 - Testar validações (tamanho, formato)
-- [ ] 35.10 - Verificar preview do logo
+### Task 35: Corrigir Bug #4 (Upload de Logo) ✅ COMPLETA
+- [x] 35.1 - Preparar arquivo de teste (PNG 4.6KB)
+- [x] 35.2 - Tentar upload via admin (falhou com 400)
+- [x] 35.3 - Capturar erro (console/network)
+- [x] 35.4 - Verificar endpoint backend (OK via curl)
+- [x] 35.5 - Identificar problema (nome campo FormData)
+- [x] 35.6 - Corrigir `formData.append('logo')` → `formData.append('file')`
+- [x] 35.7 - Testar upload funcionando
+- [x] 35.8 - Validar preview do logo
+- [ ] 35.9 - Adicionar testes E2E (pendente)
+- [ ] 35.10 - Commit e documentação
 
 **Critério de Aceitação**:
-- [ ] ✅ Upload de PNG funciona
-- [ ] ✅ Logo aparece no preview
-- [ ] ✅ URL do logo salva no banco
+- [x] ✅ Upload de PNG funciona (200 OK)
+- [x] ✅ Backend processa com ImageSharp
+- [x] ✅ Logo redimensionado para 300x300px
+- [x] ✅ URL do logo salva no banco
+
+**Correção Aplicada**: `landing-page.api.ts` linha 71 - campo FormData correto
 
 ---
 
 **📊 Resultado da Fase 1**:
-- [ ] ✅ Admin 100% funcional
-- [ ] ✅ Editar e salvar dados sem erros
-- [ ] ✅ Upload de logo funcionando
+- [x] ✅ Admin 100% funcional
+- [x] ✅ Editar e salvar dados sem erros
+- [x] ✅ Upload de logo funcionando
 
 ---
 
-## 🟡 FASE 2: Landing Page Pública - MVP
+## � FASE 2: Refatoração de Infraestrutura
+
+**Status**: ⬜ Não Iniciada | **Progresso**: 0/1 tasks (0%)
+
+**Objetivo**: Migrar storage de arquivos para Cloudflare R2
+
+### Task 36: Refatorar Upload para Cloudflare R2 Object Storage
+- [ ] 36.1 - Criar bucket no Cloudflare R2
+- [ ] 36.2 - Configurar CORS e custom domain
+- [ ] 36.3 - Gerar Access Keys
+- [ ] 36.4 - Instalar AWSSDK.S3 NuGet
+- [ ] 36.5 - Criar R2StorageService
+- [ ] 36.6 - Criar R2LogoUploadService
+- [ ] 36.7 - Configurar appsettings.json
+- [ ] 36.8 - Registrar DI (substituir LocalLogoUploadService)
+- [ ] 36.9 - Testes unitários R2StorageService
+- [ ] 36.10 - Testes integração upload
+- [ ] 36.11 - Testes E2E com CDN
+- [ ] 36.12 - Migration guide (logos existentes)
+- [ ] 36.13 - Deploy staging
+- [ ] 36.14 - Validação produção
+
+**Critério de Aceitação**:
+- [ ] ✅ Logos salvos no R2 (não filesystem)
+- [ ] ✅ URLs apontam para CDN (assets.barbapp.com)
+- [ ] ✅ Upload funciona dev + prod
+- [ ] ✅ Logos persistem após restart containers
+- [ ] ✅ Testes passando (≥80% coverage)
+
+**Arquivo**: [36_task_BACKLOG.md](./36_task_BACKLOG.md)
+
+---
+
+**📊 Resultado da Fase 2**:
+- [ ] ✅ Upload escalável e persistente
+- [ ] ✅ CDN integrado (performance)
+- [ ] ✅ Custo otimizado (~$0.05/mês)
+
+---
+
+## 🔴 FASE 3: Landing Page Pública - MVP
 
 **Status**: ⬜ Não Iniciada | **Progresso**: 0/8 tasks (0%)
 
-### Task 36: Setup Projeto barbapp-public
+**Requisitos**: Fase 1 e 2 completas
+
+### Task 37: Setup Projeto barbapp-public
 - [ ] 36.1 - Criar projeto Vite + React + TypeScript
 - [ ] 36.2 - Instalar dependências
 - [ ] 36.3 - Configurar Tailwind CSS
