@@ -21,6 +21,24 @@ using Prometheus;
 using Serilog;
 using Sentry.AspNetCore;
 using Microsoft.AspNetCore.ResponseCompression;
+using DotNetEnv;
+
+// ══════════════════════════════════════════════════════════
+// LOAD ENVIRONMENT VARIABLES FROM .env FILE
+// ══════════════════════════════════════════════════════════
+// Carregar .env do diretório backend (não do diretório API)
+var backendRoot = Path.Combine(Directory.GetCurrentDirectory(), "..", "..");
+var envPath = Path.Combine(backendRoot, ".env");
+if (File.Exists(envPath))
+{
+    Env.Load(envPath);
+    Console.WriteLine($"✓ Loaded .env from: {envPath}");
+}
+else
+{
+    Console.WriteLine($"⚠ .env file not found at: {envPath}");
+    Console.WriteLine("  Environment variables will be loaded from system/container environment");
+}
 
 var builder = WebApplication.CreateBuilder(args);
 

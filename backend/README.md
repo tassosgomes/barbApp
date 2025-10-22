@@ -65,6 +65,26 @@ API → Infrastructure → Application → Domain
 ### Pré-requisitos
 - .NET 8 SDK
 - PostgreSQL (para produção/desenvolvimento completo)
+- Cloudflare R2 (para upload de logos) - veja [docs/cloudflare-r2-setup.md](../docs/cloudflare-r2-setup.md)
+
+### Configuração Inicial
+
+1. **Copiar arquivo de ambiente:**
+```bash
+cp .env.example .env
+```
+
+2. **Configurar credenciais no `.env`:**
+```bash
+# Edite backend/.env e preencha as credenciais do Cloudflare R2
+R2_ENDPOINT=https://YOUR_ACCOUNT_ID.r2.cloudflarestorage.com
+R2_BUCKET_NAME=barbapp-assets
+R2_PUBLIC_URL=https://pub-HASH.r2.dev
+R2_ACCESS_KEY_ID=your_access_key_id
+R2_SECRET_ACCESS_KEY=your_secret_access_key
+```
+
+📚 **Documentação completa**: [docs/environment-variables-guide.md](../docs/environment-variables-guide.md)
 
 ### Build
 ```bash
@@ -84,6 +104,8 @@ dotnet watch run
 ```
 
 A API estará disponível em: `https://localhost:7xxx` ou `http://localhost:5xxx`
+
+**Nota:** Ao iniciar, você verá `✓ Loaded .env from: /path/to/backend/.env` confirmando que as variáveis foram carregadas.
 
 ### Executar Testes
 ```bash
