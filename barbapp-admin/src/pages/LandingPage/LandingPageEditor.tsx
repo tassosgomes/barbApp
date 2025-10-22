@@ -78,7 +78,7 @@ export const LandingPageEditor: React.FC = () => {
         title: 'URL Copiada!',
         description: 'A URL da sua landing page foi copiada para a área de transferência.',
       });
-    } catch (error) {
+    } catch {
       toast({
         title: 'Erro ao copiar',
         description: 'Não foi possível copiar a URL. Tente novamente.',

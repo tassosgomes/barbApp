@@ -99,7 +99,7 @@ describe('LandingPageEditor', () => {
         error: null,
         updateConfig: vi.fn(),
         isUpdating: false,
-      } as any);
+      } as ReturnType<typeof useLandingPage>);
 
       render(<LandingPageEditor />, { wrapper: createWrapper() });
 
@@ -117,7 +117,7 @@ describe('LandingPageEditor', () => {
         error: null,
         updateConfig: vi.fn(),
         isUpdating: false,
-      } as any);
+      } as ReturnType<typeof useLandingPage>);
 
       render(<LandingPageEditor />, { wrapper: createWrapper() });
 
@@ -133,7 +133,7 @@ describe('LandingPageEditor', () => {
         error: null,
         updateConfig: vi.fn(),
         isUpdating: false,
-      } as any);
+      } as ReturnType<typeof useLandingPage>);
 
       render(<LandingPageEditor />, { wrapper: createWrapper() });
 
@@ -149,7 +149,7 @@ describe('LandingPageEditor', () => {
         error: null,
         updateConfig: vi.fn(),
         isUpdating: false,
-      } as any);
+      } as ReturnType<typeof useLandingPage>);
 
       render(<LandingPageEditor />, { wrapper: createWrapper() });
 
@@ -168,7 +168,7 @@ describe('LandingPageEditor', () => {
         error: null,
         updateConfig: vi.fn(),
         isUpdating: false,
-      } as any);
+      } as ReturnType<typeof useLandingPage>);
 
       render(<LandingPageEditor />, { wrapper: createWrapper() });
 
