@@ -5,27 +5,29 @@ services:
     build:
       context: .
       dockerfile: src/Dockerfile
+    env_file:
+      - .env
     networks:
       - traefik-public
       - barbapp-internal
     environment:
-      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=barbapp;Username=barbapp;Password=4cd7e2e32c5994fcba50555430efe763
-      - JwtSettings__Secret=c3df06950022492321151d5fdff463d351350166a50d3f94d4a86daa363d52e0
-      - JwtSettings__Issuer=BarbApp-Dev
-      - JwtSettings__Audience=BarbApp-Dev-Users
-      - JwtSettings__ExpirationMinutes=60
-      - AppSettings__FrontendUrl=https://dev-barbapp.tasso.dev.br
-      - SmtpSettings__Host=smtp4dev
-      - SmtpSettings__Port=25
-      - SmtpSettings__UseSsl=false
-      - SmtpSettings__Username=
-      - SmtpSettings__Password=
-      - SmtpSettings__FromEmail=dev@barbapp.tasso.dev.br
-      - SmtpSettings__FromName=BarbApp Dev
-      - Sentry__Dsn=https://09990f518caa4176052bb09421bec544@o4510170952171520.ingest.us.sentry.io/4510170955055104
-      - Sentry__Environment=Development
-      - Sentry__Release=barbapp-api-0.1.0
-      - Sentry__TracesSampleRate=1
+      - ConnectionStrings__DefaultConnection=${DB_CONNECTION_STRING}
+      - JwtSettings__Secret=${JWT_SECRET}
+      - JwtSettings__Issuer=${JWT_ISSUER}
+      - JwtSettings__Audience=${JWT_AUDIENCE}
+      - JwtSettings__ExpirationMinutes=${JWT_EXPIRATION_MINUTES}
+      - AppSettings__FrontendUrl=${FRONTEND_URL}
+      - SmtpSettings__Host=${SMTP_HOST}
+      - SmtpSettings__Port=${SMTP_PORT}
+      - SmtpSettings__UseSsl=${SMTP_USE_SSL}
+      - SmtpSettings__Username=${SMTP_USERNAME}
+      - SmtpSettings__Password=${SMTP_PASSWORD}
+      - SmtpSettings__FromEmail=${SMTP_FROM_EMAIL}
+      - SmtpSettings__FromName=${SMTP_FROM_NAME}
+      - Sentry__Dsn=${SENTRY_DSN}
+      - Sentry__Environment=${SENTRY_ENVIRONMENT}
+      - Sentry__Release=${SENTRY_RELEASE}
+      - Sentry__TracesSampleRate=${SENTRY_TRACES_SAMPLE_RATE}
     deploy:
       labels:
         - "traefik.enable=true"
@@ -41,9 +43,9 @@ services:
     networks:
       - barbapp-internal
     environment:
-      - POSTGRES_USER=barbapp
-      - POSTGRES_PASSWORD=4cd7e2e32c5994fcba50555430efe763
-      - POSTGRES_DB=barbapp
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
     volumes:
       - postgres-data:/var/lib/postgresql/data
     deploy:
@@ -61,9 +63,9 @@ services:
     deploy:
       labels:
         - "traefik.enable=true"
-        - "traefik.http.routers.smtp4dev.rule=Host(`mail.tasso.dev.br`)"
+        - "traefik.http.routers.smtp4dev.rule=Host(`${SMTP_HOSTNAME}`)"
         - "traefik.http.routers.smtp4dev.entrypoints=websecure"
-        - "traefik.http.routers.smtp4dev.tls.certresolver=myresolver"
+        - "traefik.http.routers.smtp4dev.tls.certresolver=${TRAEFIK_CERT_RESOLVER}"
         - "traefik.http.services.smtp4dev.loadbalancer.server.port=80"
       restart_policy:
         condition: on-failure
@@ -86,9 +88,9 @@ services:
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
-      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
-      - "--certificatesresolvers.myresolver.acme.email=gomestasso@gmail.com"
-      - "--certificatesresolvers.myresolver.acme.storage=/etc/traefik/acme.json"
+      - "--certificatesresolvers.${TRAEFIK_CERT_RESOLVER}.acme.tlschallenge=true"
+      - "--certificatesresolvers.${TRAEFIK_CERT_RESOLVER}.acme.email=${TRAEFIK_ACME_EMAIL}"
+      - "--certificatesresolvers.${TRAEFIK_CERT_RESOLVER}.acme.storage=${TRAEFIK_ACME_STORAGE}"
       - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
       - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
     deploy:
