@@ -17,8 +17,26 @@ public class JwtTokenGenerator : IJwtTokenGenerator
     public JwtTokenGenerator(JwtSettings jwtSettings, ISecretManager secretManager)
     {
         _jwtSettings = jwtSettings;
-        _secret = secretManager.GetSecretAsync("JWT_SECRET").GetAwaiter().GetResult();
-        _jwtSettings.Secret = _secret;
+        try
+        {
+            _secret = secretManager.GetSecretAsync("JWT_SECRET").GetAwaiter().GetResult();
+            _jwtSettings.Secret = _secret;
+            Console.WriteLine("✓ JWT Secret loaded successfully from Infisical");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"✗ Failed to load JWT Secret from Infisical: {ex.Message}");
+            // Fallback to configuration if available
+            if (!string.IsNullOrEmpty(_jwtSettings.Secret))
+            {
+                _secret = _jwtSettings.Secret;
+                Console.WriteLine("✓ Using JWT Secret from configuration as fallback");
+            }
+            else
+            {
+                throw new InvalidOperationException("JWT Secret not available from Infisical or configuration", ex);
+            }
+        }
     }
 
     public JwtToken GenerateToken(string userId, string userType, string email, Guid? barbeariaId, string? barbeariaCode = null)

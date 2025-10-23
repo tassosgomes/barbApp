@@ -34,20 +34,38 @@ public class InfisicalService : ISecretManager
         var clientId = configuration["Infisical:ClientId"];
         var clientSecret = configuration["Infisical:ClientSecret"];
 
-        _infisicalClient.Auth().UniversalAuth().LoginAsync(clientId, clientSecret).GetAwaiter().GetResult();
+        try
+        {
+            _infisicalClient.Auth().UniversalAuth().LoginAsync(clientId, clientSecret).GetAwaiter().GetResult();
+            Console.WriteLine("✓ Infisical authentication successful");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"✗ Infisical authentication failed: {ex.Message}");
+            throw;
+        }
     }
 
     public async Task<string> GetSecretAsync(string secretName)
     {
-        var options = new GetSecretOptions
+        try
         {
-            SecretName = secretName,
-            EnvironmentSlug = _environment,
-            ProjectId = _projectId,
-            SecretPath = "" // Root folder
-        };
+            var options = new GetSecretOptions
+            {
+                SecretName = secretName,
+                EnvironmentSlug = _environment,
+                ProjectId = _projectId
+                // SecretPath defaults to root when not specified
+            };
 
-        var secret = await _infisicalClient.Secrets().GetAsync(options);
-        return secret.SecretValue;
+            var secret = await _infisicalClient.Secrets().GetAsync(options);
+            Console.WriteLine($"✓ Secret '{secretName}' retrieved successfully");
+            return secret.SecretValue;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"✗ Failed to retrieve secret '{secretName}': {ex.Message}");
+            throw;
+        }
     }
 }
