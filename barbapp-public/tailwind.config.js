@@ -11,12 +11,19 @@ export default {
         'modern-dark': '#2C3E50',
         'modern-blue': '#3498DB',
         'modern-light': '#ECF0F1',
+        // Template 3 - Vintage colors
+        'vintage-brown': '#5D4037',
+        'vintage-cream': '#F5E6D3',
+        'vintage-red': '#B71C1C',
       },
       fontFamily: {
         serif: ['Playfair Display', 'serif'],
         sans: ['Inter', 'sans-serif'],
         // Template 2 - Modern fonts
         'modern-sans': ['Montserrat', 'Poppins', 'Inter', 'sans-serif'],
+        // Template 3 - Vintage fonts
+        'vintage-display': ['Lobster', 'Bebas Neue', 'serif'],
+        'vintage-sans': ['Inter', 'sans-serif'],
       },
     },
   },
