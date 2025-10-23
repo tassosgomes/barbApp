@@ -12,16 +12,19 @@ namespace BarbApp.Infrastructure.Services;
 public class JwtTokenGenerator : IJwtTokenGenerator
 {
     private readonly JwtSettings _jwtSettings;
+    private readonly string _secret;
 
-    public JwtTokenGenerator(JwtSettings jwtSettings)
+    public JwtTokenGenerator(JwtSettings jwtSettings, ISecretManager secretManager)
     {
         _jwtSettings = jwtSettings;
+        _secret = secretManager.GetSecretAsync("JwtSettings:Secret").GetAwaiter().GetResult();
+        _jwtSettings.Secret = _secret;
     }
 
     public JwtToken GenerateToken(string userId, string userType, string email, Guid? barbeariaId, string? barbeariaCode = null)
     {
         var securityKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(_jwtSettings.Secret))
+            Encoding.UTF8.GetBytes(_secret))
         {
             KeyId = "test-key"
         };
@@ -67,7 +70,7 @@ public class JwtTokenGenerator : IJwtTokenGenerator
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var securityKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(_jwtSettings.Secret))
+                Encoding.UTF8.GetBytes(_secret))
             {
                 KeyId = "test-key"
             };

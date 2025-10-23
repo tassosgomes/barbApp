@@ -168,6 +168,7 @@ builder.Services.AddScoped<IAppointmentRepository, AppointmentRepository>();
 builder.Services.AddSingleton<IPasswordHasher, PasswordHasher>();
 builder.Services.AddSingleton<IPasswordGenerator, SecurePasswordGenerator>();
 builder.Services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
+builder.Services.AddSingleton<ISecretManager, InfisicalService>();
 builder.Services.AddScoped<ITenantContext, TenantContext>();
 builder.Services.AddScoped<IUniqueCodeGenerator, UniqueCodeGenerator>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -266,7 +267,7 @@ builder.Services.AddResponseCompression(options =>
 // ══════════════════════════════════════════════════════════
 // AUTHENTICATION & AUTHORIZATION
 // ══════════════════════════════════════════════════════════
-builder.Services.AddJwtAuthentication(builder.Configuration);
+builder.Services.AddJwtAuthentication(builder.Configuration, builder.Services.BuildServiceProvider());
 
 // ══════════════════════════════════════════════════════════
 // CONTROLLERS & VALIDATION

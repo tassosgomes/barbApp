@@ -36,13 +36,17 @@ public static class AuthenticationConfiguration
 {
     public static IServiceCollection AddJwtAuthentication(
         this IServiceCollection services,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        IServiceProvider serviceProvider)
     {
         var jwtSettings = configuration
             .GetSection("JwtSettings")
             .Get<JwtSettings>();
 
         services.AddSingleton(jwtSettings!);
+
+        var secretManager = serviceProvider.GetRequiredService<ISecretManager>();
+        var secret = secretManager.GetSecretAsync("JwtSettings:Secret").GetAwaiter().GetResult();
 
         services.AddAuthentication(options =>
         {
@@ -55,7 +59,7 @@ public static class AuthenticationConfiguration
             {
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new SymmetricSecurityKey(
-                    Encoding.UTF8.GetBytes(jwtSettings!.Secret))
+                    Encoding.UTF8.GetBytes(secret))
                 {
                     KeyId = "test-key"
                 },
@@ -106,7 +110,7 @@ public static class AuthenticationConfiguration
 
 public class JwtSettings
 {
-    public string Secret { get; init; } = string.Empty;
+    public string Secret { get; set; } = string.Empty;
     public string Issuer { get; init; } = string.Empty;
     public string Audience { get; init; } = string.Empty;
     public int ExpirationMinutes { get; init; } = 60;
