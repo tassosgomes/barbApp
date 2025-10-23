@@ -2,6 +2,19 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 import { useLandingPageData } from '@/hooks/useLandingPageData';
 import { LoadingState, ErrorState } from '@/components';
+import { Template1Classic } from '@/templates';
+import type { PublicLandingPage } from '@/types/landing-page.types';
+
+interface TemplateComponentProps {
+  data: PublicLandingPage;
+}
+
+type TemplateComponent = React.FC<TemplateComponentProps>;
+
+const TEMPLATE_COMPONENTS: Record<number, TemplateComponent> = {
+  1: Template1Classic,
+  // 2, 3, 4, 5...
+};
 
 export const LandingPage: React.FC = () => {
   const { code } = useParams<{ code: string }>();
@@ -20,12 +33,7 @@ export const LandingPage: React.FC = () => {
     );
   }
 
-  // TODO: Implement template selection based on data.landingPage.templateId
-  return (
-    <div className="min-h-screen bg-white">
-      <h1>{data.barbershop.name}</h1>
-      <p>Template ID: {data.landingPage.templateId}</p>
-      {/* Placeholder for template component */}
-    </div>
-  );
+  const TemplateComponent = TEMPLATE_COMPONENTS[data.landingPage.templateId] || Template1Classic;
+
+  return <TemplateComponent data={data} />;
 };

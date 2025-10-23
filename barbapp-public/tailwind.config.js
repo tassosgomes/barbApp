@@ -4,6 +4,7 @@ export default {
   theme: {
     extend: {
       colors: {
+        primary: '#D4AF37',
         gold: '#D4AF37',
         'gold-dark': '#B8941E',
       },

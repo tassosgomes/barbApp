@@ -1,2 +1,3 @@
-// Landing page templates will be implemented here
-export {};
+// Landing page templates
+export { Template1Classic } from './Template1Classic';
+
