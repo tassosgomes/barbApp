@@ -25,7 +25,10 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
         <input
           type="checkbox"
           checked={isSelected}
-          onChange={onToggle}
+          onChange={(e) => {
+            e.stopPropagation();
+            onToggle();
+          }}
           className="w-5 h-5 cursor-pointer"
         />
       </div>
