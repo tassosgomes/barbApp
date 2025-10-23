@@ -15,6 +15,10 @@ export default {
         'vintage-brown': '#5D4037',
         'vintage-cream': '#F5E6D3',
         'vintage-red': '#B71C1C',
+        // Template 4 - Urban colors
+        'urban-black': '#000000',
+        'urban-red': '#E74C3C',
+        'urban-gray': '#95A5A6',
       },
       fontFamily: {
         serif: ['Playfair Display', 'serif'],
@@ -24,6 +28,9 @@ export default {
         // Template 3 - Vintage fonts
         'vintage-display': ['Lobster', 'Bebas Neue', 'serif'],
         'vintage-sans': ['Inter', 'sans-serif'],
+        // Template 4 - Urban fonts
+        'urban-display': ['Bebas Neue', 'Oswald', 'sans-serif'],
+        'urban-sans': ['Oswald', 'sans-serif'],
       },
     },
   },
