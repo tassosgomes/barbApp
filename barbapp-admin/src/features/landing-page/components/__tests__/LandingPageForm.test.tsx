@@ -15,7 +15,7 @@ import '@testing-library/jest-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { LandingPageForm } from '../LandingPageForm';
 import { useLandingPage } from '../../hooks/useLandingPage';
-import type { LandingPageConfig } from '../../types/landing-page.types';
+import type { LandingPageConfig, LandingPageService } from '../../types/landing-page.types';
 
 // ============================================================================
 // Mocks
@@ -23,17 +23,17 @@ import type { LandingPageConfig } from '../../types/landing-page.types';
 
 vi.mock('../../hooks/useLandingPage');
 vi.mock('../LogoUploader', () => ({
-  LogoUploader: ({ barbershopId, currentLogoUrl, disabled }: any) => (
+  LogoUploader: ({ barbershopId, currentLogoUrl, disabled }: { barbershopId: string; currentLogoUrl?: string; disabled?: boolean }) => (
     <div data-testid="logo-uploader">
       Logo Uploader - {barbershopId} - {currentLogoUrl || 'no-logo'} - {disabled ? 'disabled' : 'enabled'}
     </div>
   ),
 }));
 vi.mock('../ServiceManager', () => ({
-  ServiceManager: ({ services, onChange, disabled }: any) => (
+  ServiceManager: ({ services, onChange, disabled }: { services: LandingPageService[]; onChange: (services: LandingPageService[]) => void; disabled?: boolean }) => (
     <div data-testid="service-manager">
       Service Manager - {services.length} services - {disabled ? 'disabled' : 'enabled'}
-      <button onClick={() => onChange([...services, { serviceId: 'new', displayOrder: services.length + 1 }])}>
+      <button onClick={() => onChange([...services, { serviceId: 'new', serviceName: 'New Service', duration: 30, price: 40, displayOrder: services.length + 1, isVisible: true }])}>
         Add Service
       </button>
     </div>

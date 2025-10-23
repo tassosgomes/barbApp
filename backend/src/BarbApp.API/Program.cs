@@ -1,28 +1,6 @@
-using BarbApp.API;
-using BarbApp.API.Extensions;
-using BarbApp.API.Filters;
-using BarbApp.API.Configuration;
-using BarbApp.Application.UseCases;
-using BarbApp.Application.Interfaces;
-using BarbApp.Application.Interfaces.UseCases;
-using BarbApp.Domain.Interfaces;
-using BarbApp.Domain.Interfaces.Repositories;
-using BarbApp.Application.Configuration;
-using BarbApp.Infrastructure.Configuration;
-using BarbApp.Infrastructure.Middlewares;
-using BarbApp.Infrastructure.Options;
-using BarbApp.Infrastructure.Services;
-using BarbApp.Infrastructure.Persistence;
-using BarbApp.Infrastructure.Persistence.Repositories;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using Microsoft.OpenApi.Models;
-using Prometheus;
 using Serilog;
-using Sentry.AspNetCore;
-using Microsoft.AspNetCore.ResponseCompression;
-using DotNetEnv;
 
 // ══════════════════════════════════════════════════════════
 // LOAD ENVIRONMENT VARIABLES FROM .env FILE
