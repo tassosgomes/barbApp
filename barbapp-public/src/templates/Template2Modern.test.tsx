@@ -70,9 +70,9 @@ describe('Template2Modern', () => {
   it('should render hero section with CTA button', () => {
     renderWithRouter(<Template2Modern data={mockData} />);
 
-    // Check hero heading (h2)
-    const heroHeading = screen.getByRole('heading', { level: 2 });
-    expect(heroHeading).toHaveTextContent('Barbearia Moderna');
+    // Check hero heading (h2) - be more specific by looking for the one in the hero section
+    const heroHeading = screen.getByText('Barbearia Moderna', { selector: 'h2' });
+    expect(heroHeading).toBeInTheDocument();
     expect(screen.getByText('Experiência moderna e profissional para o seu cuidado pessoal')).toBeInTheDocument();
     expect(screen.getByText('Agendar Serviço')).toBeInTheDocument();
   });
