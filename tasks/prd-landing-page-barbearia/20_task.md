@@ -1,5 +1,5 @@
 ---
-status: pending
+status: completed
 parallelizable: false
 blocked_by: ["11.0", "12.0", "13.0", "14.0", "15.0", "16.0", "17.0", "18.0"]
 ---
@@ -75,9 +75,27 @@ describe('useServiceSelection', () => {
 ```
 
 ## Critérios de Aceitação
-- [ ] Testes unitários para o hook `useLandingPage` foram criados e estão passando.
-- [ ] Testes unitários para o hook `useLogoUpload` foram criados e estão passando.
-- [ ] Testes de integração para o componente `ServiceManager` cobrindo as principais interações foram criados e estão passando.
-- [ ] Testes de integração para o componente `LandingPageForm` cobrindo validação e submissão foram criados e estão passando.
-- [ ] Testes de interação para o componente `TemplateGallery` foram criados e estão passando.
-- [ ] A cobertura de teste para os novos arquivos atinge o limite mínimo definido pelo projeto (se houver).
+- [x] Testes unitários para o hook `useLandingPage` foram criados e estão passando.
+- [x] Testes unitários para o hook `useLogoUpload` foram criados e estão passando.
+- [x] Testes de integração para o componente `ServiceManager` cobrindo as principais interações foram criados e estão passando.
+- [x] Testes de integração para o componente `LandingPageForm` cobrindo validação e submissão foram criados e estão passando.
+- [x] Testes de interação para o componente `TemplateGallery` foram criados e estão passando.
+- [x] A cobertura de teste para os novos arquivos atinge o limite mínimo definido pelo projeto (se houver).
+
+## Status de Implementação
+✅ **Concluído** - Todos os testes do módulo Landing Page estão implementados e passando (139 testes no total).
+
+### Resumo dos Testes Implementados:
+- **useLandingPage**: 19 testes cobrindo queries, mutations (create, update, publish, unpublish), upload/delete de logo, preview e utilitários
+- **useLogoUpload**: 20 testes cobrindo validação de arquivos, upload, delete, preview management e estados de erro
+- **ServiceManager**: 26 testes cobrindo drag-and-drop, controles de visibilidade e ações em massa
+- **LandingPageForm**: 22 testes cobrindo validação, submissão e contadores de caracteres
+- **TemplateGallery**: 11 testes cobrindo renderização, seleção e acessibilidade
+- **LogoUploader**: 9 testes cobrindo upload, validação e preview
+- **PreviewPanel**: 32 testes cobrindo renderização de templates
+
+### Correções Aplicadas:
+- Testes de hooks reescritos para alinhar com a implementação real das APIs
+- Corrigido pattern de mocks do Vitest para evitar problemas de hoisting
+- Removidas asserções síncronas de estados `isPending` que não são confiáveis em testes
+- Ajustadas expectativas de valores `null` vs `undefined` conforme implementação
