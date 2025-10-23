@@ -2,7 +2,7 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 import { useLandingPageData } from '@/hooks/useLandingPageData';
 import { LoadingState, ErrorState } from '@/components';
-import { Template1Classic, Template2Modern, Template3Vintage, Template4Urban } from '@/templates';
+import { Template1Classic, Template2Modern, Template3Vintage, Template4Urban, Template5Premium } from '@/templates';
 import type { PublicLandingPage } from '@/types/landing-page.types';
 
 interface TemplateComponentProps {
@@ -16,7 +16,7 @@ const TEMPLATE_COMPONENTS: Record<number, TemplateComponent> = {
   2: Template2Modern,
   3: Template3Vintage,
   4: Template4Urban,
-  // 5...
+  5: Template5Premium,
 };
 
 export const LandingPage: React.FC = () => {
