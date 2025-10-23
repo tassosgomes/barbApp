@@ -1,2 +1,1 @@
-// Pages will be implemented here
-export {};
+export { LandingPage } from './LandingPage';
