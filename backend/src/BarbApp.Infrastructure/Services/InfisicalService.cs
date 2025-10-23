@@ -6,6 +6,12 @@ namespace BarbApp.Infrastructure.Services;
 
 public interface ISecretManager
 {
+    /// <summary>
+    /// Retrieves a secret value from Infisical by its name.
+    /// The secret name should be the flat name as stored in Infisical (e.g., "JWT_SECRET", not "JwtSettings:Secret").
+    /// </summary>
+    /// <param name="secretName">The name of the secret in Infisical</param>
+    /// <returns>The secret value as a string</returns>
     Task<string> GetSecretAsync(string secretName);
 }
 
