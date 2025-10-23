@@ -46,7 +46,7 @@ public static class AuthenticationConfiguration
         services.AddSingleton(jwtSettings!);
 
         var secretManager = serviceProvider.GetRequiredService<ISecretManager>();
-        var secret = secretManager.GetSecretAsync("JwtSettings:Secret").GetAwaiter().GetResult();
+        var secret = secretManager.GetSecretAsync("JWT_SECRET").GetAwaiter().GetResult();
 
         services.AddAuthentication(options =>
         {

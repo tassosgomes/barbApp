@@ -17,7 +17,7 @@ public class JwtTokenGenerator : IJwtTokenGenerator
     public JwtTokenGenerator(JwtSettings jwtSettings, ISecretManager secretManager)
     {
         _jwtSettings = jwtSettings;
-        _secret = secretManager.GetSecretAsync("JwtSettings:Secret").GetAwaiter().GetResult();
+        _secret = secretManager.GetSecretAsync("JWT_SECRET").GetAwaiter().GetResult();
         _jwtSettings.Secret = _secret;
     }
 
