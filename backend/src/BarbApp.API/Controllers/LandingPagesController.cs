@@ -7,6 +7,17 @@ using System.Security.Claims;
 
 namespace BarbApp.API.Controllers;
 
+/// <summary>
+/// Request model for logo upload
+/// </summary>
+public class UploadLogoRequest
+{
+    /// <summary>
+    /// Arquivo de imagem (JPG, PNG ou SVG, máx. 2MB)
+    /// </summary>
+    public IFormFile File { get; set; } = null!;
+}
+
 [ApiController]
 [Route("api/admin/landing-pages")]
 [Authorize(Roles = "AdminBarbearia,AdminCentral")]
@@ -135,7 +146,7 @@ public class LandingPagesController : ControllerBase
     /// Faz upload do logo da landing page
     /// </summary>
     /// <param name="barbershopId">ID da barbearia</param>
-    /// <param name="file">Arquivo de imagem (JPG, PNG ou SVG, máx. 2MB)</param>
+    /// <param name="request">Dados do upload do logo</param>
     /// <param name="cancellationToken">Token de cancelamento</param>
     /// <returns>URL do logo</returns>
     /// <response code="200">Logo enviado com sucesso</response>
@@ -144,6 +155,7 @@ public class LandingPagesController : ControllerBase
     /// <response code="403">Admin não pertence à barbearia solicitada</response>
     /// <response code="404">Landing page não encontrada</response>
     [HttpPost("{barbershopId:guid}/logo")]
+    [Consumes("multipart/form-data")]
     [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(object), StatusCodes.Status401Unauthorized)]
@@ -151,7 +163,7 @@ public class LandingPagesController : ControllerBase
     [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UploadLogo(
         [FromRoute] Guid barbershopId,
-        [FromForm] IFormFile file,
+        [FromForm] UploadLogoRequest request,
         CancellationToken cancellationToken)
     {
         _logger.LogInformation("Uploading logo for barbershop: {BarbershopId}", barbershopId);
@@ -162,13 +174,13 @@ public class LandingPagesController : ControllerBase
             return Forbid();
         }
 
-        if (file == null || file.Length == 0)
+        if (request.File == null || request.File.Length == 0)
         {
             return BadRequest(new { error = "Nenhum arquivo foi enviado" });
         }
 
         // Usar o serviço de upload de logo
-        var uploadResult = await _logoUploadService.UploadLogoAsync(barbershopId, file, cancellationToken);
+        var uploadResult = await _logoUploadService.UploadLogoAsync(barbershopId, request.File, cancellationToken);
 
         if (!uploadResult.IsSuccess)
         {

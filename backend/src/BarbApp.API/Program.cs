@@ -403,6 +403,10 @@ builder.Services.AddSwaggerGen(c =>
 
     // Add examples
     c.SchemaFilter<SwaggerExamplesSchemaFilter>();
+
+    // Handle file uploads
+    c.ParameterFilter<SwaggerFileUploadOperationFilter>();
+    c.OperationFilter<SwaggerFileUploadOperationFilter>();
 });
 
 // ══════════════════════════════════════════════════════════

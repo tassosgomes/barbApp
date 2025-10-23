@@ -1,4 +1,5 @@
 using BarbApp.Application.DTOs;
+using BarbApp.API.Controllers;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -12,6 +13,13 @@ public class SwaggerExamplesSchemaFilter : ISchemaFilter
 {
     public void Apply(OpenApiSchema schema, SchemaFilterContext context)
     {
+        if (context.Type == typeof(Microsoft.AspNetCore.Http.IFormFile))
+        {
+            schema.Type = "string";
+            schema.Format = "binary";
+            schema.Description = "Arquivo para upload";
+            return;
+        }
         if (context.Type == typeof(LoginAdminCentralInput))
         {
             schema.Example = new OpenApiObject
@@ -76,15 +84,11 @@ public class SwaggerExamplesSchemaFilter : ISchemaFilter
                 ["barbeariaNome"] = new OpenApiString("Barbearia Premium")
             };
         }
-        else if (context.Type == typeof(BarberInfo))
+        else if (context.Type == typeof(UploadLogoRequest))
         {
             schema.Example = new OpenApiObject
             {
-                ["id"] = new OpenApiString("3fa85f64-5717-4562-b3fc-2c963f66afa6"),
-                ["nome"] = new OpenApiString("João Silva"),
-                ["telefone"] = new OpenApiString("11987654321"),
-                ["barbeariaId"] = new OpenApiString("3fa85f64-5717-4562-b3fc-2c963f66afa6"),
-                ["nomeBarbearia"] = new OpenApiString("Barbearia Premium")
+                ["file"] = new OpenApiString("Arquivo de imagem (JPG, PNG ou SVG)")
             };
         }
         else if (context.Type == typeof(CreateBarberInput))
