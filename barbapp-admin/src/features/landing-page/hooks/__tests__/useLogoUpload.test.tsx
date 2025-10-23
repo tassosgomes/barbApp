@@ -4,53 +4,40 @@
  * Testes unitários para o hook useLogoUpload.
  * Inclui testes para upload, validação, preview e tratamento de erros.
  * 
- * @version 1.0
- * @date 2025-10-21
+ * @version 2.0
+ * @date 2025-10-23
  */
 
 import React from 'react';
 import { renderHook, waitFor, act } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { useLogoUpload, UPLOAD_CONFIG } from '../useLogoUpload';
-import { landingPageApi, validateLogoFile } from '@/services/api/landing-page.api';
-import type { LogoUploadResponse } from '../../types/landing-page.types';
+import { useLogoUpload } from '../useLogoUpload';
+import { LOGO_UPLOAD_CONFIG } from '../../constants/validation';
 
 // ============================================================================
 // Mocks
 // ============================================================================
 
-// Mock da API
 vi.mock('@/services/api/landing-page.api', () => ({
   landingPageApi: {
     uploadLogo: vi.fn(),
-    removeLogo: vi.fn(),
+    deleteLogo: vi.fn(),
   },
-  validateLogoFile: vi.fn(),
 }));
 
-// Mock do toast
-vi.mock('@/hooks/use-toast', () => ({
-  toast: vi.fn(),
+vi.mock('@/utils/toast', () => ({
+  showSuccessToast: vi.fn(),
+  showErrorToast: vi.fn(),
 }));
 
-// Mock FileReader
-class MockFileReader {
-  onloadend: ((this: FileReader, ev: ProgressEvent<FileReader>) => unknown) | null = null;
-  result: string | ArrayBuffer | null = null;
+// Import após mock para evitar problemas de hoisting
+import { landingPageApi } from '@/services/api/landing-page.api';
+import { showSuccessToast, showErrorToast } from '@/utils/toast';
 
-  readAsDataURL() {
-    this.result = `data:image/jpeg;base64,mockbase64data`;
-    setTimeout(() => {
-      if (this.onloadend) {
-        this.onloadend.call(this, {} as ProgressEvent<FileReader>);
-      }
-    }, 0);
-  }
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-global.FileReader = MockFileReader as any;
+// Mock URL.createObjectURL and URL.revokeObjectURL
+global.URL.createObjectURL = vi.fn(() => 'mock-object-url');
+global.URL.revokeObjectURL = vi.fn();
 
 // ============================================================================
 // Test Data
@@ -58,16 +45,17 @@ global.FileReader = MockFileReader as any;
 
 const mockBarbershopId = 'barbershop-123';
 
-const mockFile = new File(['test'], 'test.jpg', { type: 'image/jpeg' });
+const mockFile = new File(['test'], 'logo.png', { type: 'image/png' });
+Object.defineProperty(mockFile, 'size', { value: 1024 * 1024 }); // 1MB
+
 const mockLargeFile = new File(['x'.repeat(3 * 1024 * 1024)], 'large.jpg', { 
   type: 'image/jpeg' 
 });
+Object.defineProperty(mockLargeFile, 'size', { value: 3 * 1024 * 1024 }); // 3MB
+
 const mockInvalidFile = new File(['test'], 'test.txt', { type: 'text/plain' });
 
-const mockUploadResponse: LogoUploadResponse = {
-  logoUrl: 'https://cdn.example.com/logo.jpg',
-  message: 'Logo uploaded successfully',
-};
+const mockUploadResponse = 'https://cdn.example.com/logo.jpg';
 
 // ============================================================================
 // Test Utilities
@@ -99,14 +87,8 @@ const createWrapper = () => {
 // ============================================================================
 
 describe('useLogoUpload', () => {
-  let mockUploadLogo: ReturnType<typeof vi.fn>;
-  let mockRemoveLogo: ReturnType<typeof vi.fn>;
-  let mockValidateLogoFile: ReturnType<typeof vi.fn>;
-
   beforeEach(() => {
-    mockUploadLogo = vi.mocked(landingPageApi.uploadLogo);
-    mockRemoveLogo = vi.mocked(landingPageApi.removeLogo);
-    mockValidateLogoFile = vi.mocked(validateLogoFile);
+    vi.clearAllMocks();
   });
 
   afterEach(() => {
@@ -120,69 +102,54 @@ describe('useLogoUpload', () => {
         { wrapper: createWrapper() }
       );
 
-      expect(result.current.uploadState).toEqual({
-        status: 'idle',
-        progress: 0,
-        url: null,
-        error: null,
-      });
-      expect(result.current.preview).toBeNull();
-      expect(result.current.originalFile).toBeNull();
       expect(result.current.isUploading).toBe(false);
-      expect(result.current.canUpload).toBe(false);
-      expect(result.current.hasPreview).toBe(false);
+      expect(result.current.isDeleting).toBe(false);
+      expect(result.current.uploadError).toBeNull();
+      expect(result.current.deleteError).toBeNull();
       expect(result.current.validationError).toBeNull();
+      expect(result.current.previewUrl).toBeNull();
     });
   });
 
-  describe('File selection and validation', () => {
-    it('should select valid file and create preview', async () => {
-      mockValidateLogoFile.mockReturnValue(null);
-
-      const { result } = renderHook(
-        () => useLogoUpload(mockBarbershopId, { autoUpload: false }),
-        { wrapper: createWrapper() }
-      );
-
-      act(() => {
-        result.current.selectFile(mockFile);
-      });
-
-      expect(result.current.originalFile).toBe(mockFile);
-      expect(result.current.validationError).toBeNull();
-
-      // Wait for preview to be created
-      await waitFor(() => {
-        expect(result.current.hasPreview).toBe(true);
-      });
-
-      expect(result.current.preview).toBe('data:image/jpeg;base64,mockbase64data');
-      expect(result.current.canUpload).toBe(true);
-      expect(result.current.uploadState.status).toBe('selected');
-    });
-
-    it('should reject invalid file', () => {
-      const errorMessage = 'Formato inválido. Use JPG, PNG ou SVG.';
-      mockValidateLogoFile.mockReturnValue(errorMessage);
-
+  describe('File validation', () => {
+    it('should accept valid file', () => {
       const { result } = renderHook(
         () => useLogoUpload(mockBarbershopId),
         { wrapper: createWrapper() }
       );
 
-      act(() => {
-        result.current.selectFile(mockInvalidFile);
-      });
-
-      expect(result.current.validationError).toBe(errorMessage);
-      expect(result.current.originalFile).toBeNull();
-      expect(result.current.preview).toBeNull();
-      expect(result.current.canUpload).toBe(false);
+      const error = result.current.validateFile(mockFile);
+      expect(error).toBeNull();
     });
 
     it('should reject file that is too large', () => {
-      const errorMessage = 'Arquivo muito grande. Tamanho máximo: 2MB.';
-      mockValidateLogoFile.mockReturnValue(errorMessage);
+      const { result } = renderHook(
+        () => useLogoUpload(mockBarbershopId),
+        { wrapper: createWrapper() }
+      );
+
+      const error = result.current.validateFile(mockLargeFile);
+      expect(error).not.toBeNull();
+      expect(error?.type).toBe('size');
+      expect(error?.message).toContain('muito grande');
+    });
+
+    it('should reject invalid file type', () => {
+      const { result } = renderHook(
+        () => useLogoUpload(mockBarbershopId),
+        { wrapper: createWrapper() }
+      );
+
+      const error = result.current.validateFile(mockInvalidFile);
+      expect(error).not.toBeNull();
+      expect(error?.type).toBe('type');
+      expect(error?.message).toContain('não suportado');
+    });
+  });
+
+  describe('Logo upload', () => {
+    it('should upload valid file successfully', async () => {
+      vi.mocked(landingPageApi.uploadLogo).mockResolvedValue(mockUploadResponse);
 
       const { result } = renderHook(
         () => useLogoUpload(mockBarbershopId),
@@ -190,340 +157,314 @@ describe('useLogoUpload', () => {
       );
 
       act(() => {
-        result.current.selectFile(mockLargeFile);
+        result.current.uploadLogo(mockFile);
       });
 
-      expect(result.current.validationError).toBe(errorMessage);
-      expect(mockValidateLogoFile).toHaveBeenCalledWith(mockLargeFile);
-    });
-  });
-
-  describe('Auto upload', () => {
-    it('should auto upload when autoUpload is true', async () => {
-      mockValidateLogoFile.mockReturnValue(null);
-      mockUploadLogo.mockResolvedValue(mockUploadResponse);
-
-      const { result } = renderHook(
-        () => useLogoUpload(mockBarbershopId, { autoUpload: true }),
-        { wrapper: createWrapper() }
-      );
-
-      act(() => {
-        result.current.selectFile(mockFile);
-      });
 
       await waitFor(() => {
         expect(result.current.isUploading).toBe(false);
       });
 
-      expect(mockUploadLogo).toHaveBeenCalledWith(mockBarbershopId, mockFile);
-      expect(result.current.uploadState.status).toBe('success');
-      expect(result.current.uploadState.url).toBe(mockUploadResponse.logoUrl);
+      expect(landingPageApi.uploadLogo).toHaveBeenCalledWith(mockBarbershopId, mockFile);
+      expect(showSuccessToast).toHaveBeenCalled();
+      expect(result.current.validationError).toBeNull();
     });
 
-    it('should not auto upload when autoUpload is false', () => {
-      mockValidateLogoFile.mockReturnValue(null);
-
+    it('should not upload invalid file', () => {
       const { result } = renderHook(
-        () => useLogoUpload(mockBarbershopId, { autoUpload: false }),
+        () => useLogoUpload(mockBarbershopId),
         { wrapper: createWrapper() }
       );
 
       act(() => {
-        result.current.selectFile(mockFile);
+        result.current.uploadLogo(mockInvalidFile);
       });
 
-      expect(mockUploadLogo).not.toHaveBeenCalled();
-      expect(result.current.uploadState.status).toBe('selected');
-      expect(result.current.canUpload).toBe(true);
-    });
-  });
-
-  describe('Manual upload', () => {
-    it('should upload file manually', async () => {
-      mockValidateLogoFile.mockReturnValue(null);
-      mockUploadLogo.mockResolvedValue(mockUploadResponse);
-
-      const { result } = renderHook(
-        () => useLogoUpload(mockBarbershopId, { autoUpload: false }),
-        { wrapper: createWrapper() }
-      );
-
-      act(() => {
-        result.current.selectFile(mockFile);
-      });
-
-      await act(async () => {
-        await result.current.uploadFile();
-      });
-
-      expect(mockUploadLogo).toHaveBeenCalledWith(mockBarbershopId, mockFile);
-    });
-
-    it('should handle upload without file', async () => {
-      const { result } = renderHook(
-        () => useLogoUpload(mockBarbershopId, { autoUpload: false }),
-        { wrapper: createWrapper() }
-      );
-
-      await act(async () => {
-        await result.current.uploadFile();
-      });
-
-      expect(mockUploadLogo).not.toHaveBeenCalled();
-    });
-  });
-
-  describe('Upload states', () => {
-    it('should handle upload success', async () => {
-      mockValidateLogoFile.mockReturnValue(null);
-      mockUploadLogo.mockResolvedValue(mockUploadResponse);
-
-      const onSuccess = vi.fn();
-
-      const { result } = renderHook(
-        () => useLogoUpload(mockBarbershopId, { autoUpload: true, onSuccess }),
-        { wrapper: createWrapper() }
-      );
-
-      act(() => {
-        result.current.selectFile(mockFile);
-      });
-
-      await waitFor(() => {
-        expect(result.current.uploadState.status).toBe('success');
-      });
-
-      // Aguardar a limpeza do preview pelo useEffect
-      await waitFor(() => {
-        expect(result.current.preview).toBeNull();
-        expect(result.current.originalFile).toBeNull();
-      });
-
-      // Verificar se o estado final está correto
-      expect(result.current.uploadState.url).toBe(mockUploadResponse.logoUrl);
-      expect(result.current.uploadState.progress).toBe(100);
-      expect(onSuccess).toHaveBeenCalledWith(mockUploadResponse.logoUrl);
+      expect(landingPageApi.uploadLogo).not.toHaveBeenCalled();
+      expect(showErrorToast).toHaveBeenCalled();
+      expect(result.current.validationError).not.toBeNull();
     });
 
     it('should handle upload error', async () => {
-      const errorMessage = 'Upload failed';
-      const error = new Error(errorMessage);
-
-      mockValidateLogoFile.mockReturnValue(null);
-      mockUploadLogo.mockRejectedValue(error);
-
-      const onError = vi.fn();
+      const error = new Error('Upload failed');
+      vi.mocked(landingPageApi.uploadLogo).mockRejectedValue(error);
 
       const { result } = renderHook(
-        () => useLogoUpload(mockBarbershopId, { autoUpload: true, onError }),
+        () => useLogoUpload(mockBarbershopId),
         { wrapper: createWrapper() }
       );
 
       act(() => {
-        result.current.selectFile(mockFile);
-      });
-
-      await waitFor(() => {
-        expect(result.current.uploadState.status).toBe('error');
-      });
-
-      expect(result.current.uploadState.error).toBe(errorMessage);
-      expect(onError).toHaveBeenCalledWith(errorMessage);
-    });
-
-    it('should track uploading state', async () => {
-      mockValidateLogoFile.mockReturnValue(null);
-      
-      // Mock a slow upload
-      mockUploadLogo.mockImplementation(() => 
-        new Promise(resolve => setTimeout(() => resolve(mockUploadResponse), 100))
-      );
-
-      const { result } = renderHook(
-        () => useLogoUpload(mockBarbershopId, { autoUpload: true }),
-        { wrapper: createWrapper() }
-      );
-
-      act(() => {
-        result.current.selectFile(mockFile);
-      });
-
-      // Wait for uploading state
-      await waitFor(() => {
-        expect(result.current.isUploading).toBe(true);
-      });
-      
-      await waitFor(() => {
-        expect(result.current.uploadState.status).toBe('uploading');
+        result.current.uploadLogo(mockFile);
       });
 
       await waitFor(() => {
         expect(result.current.isUploading).toBe(false);
       });
 
-      expect(result.current.uploadState.status).toBe('success');
+      expect(showErrorToast).toHaveBeenCalled();
     });
   });
 
-  describe('File removal', () => {
-    it('should remove local file', async () => {
-      mockValidateLogoFile.mockReturnValue(null);
-
-      const { result } = renderHook(
-        () => useLogoUpload(mockBarbershopId, { autoUpload: false }),
-        { wrapper: createWrapper() }
-      );
-
-      act(() => {
-        result.current.selectFile(mockFile);
-      });
-
-      await waitFor(() => {
-        expect(result.current.hasPreview).toBe(true);
-      });
-
-      act(() => {
-        result.current.removeFile();
-      });
-
-      expect(result.current.originalFile).toBeNull();
-      expect(result.current.preview).toBeNull();
-      expect(result.current.validationError).toBeNull();
-      expect(result.current.uploadState).toEqual({
-        status: 'idle',
-        progress: 0,
-        url: null,
-        error: null,
-      });
-    });
-
-    it('should remove logo from server', async () => {
-      mockRemoveLogo.mockResolvedValue(undefined);
+  describe('Logo deletion', () => {
+    it('should delete logo successfully', async () => {
+      vi.mocked(landingPageApi.deleteLogo).mockResolvedValue(undefined);
 
       const { result } = renderHook(
         () => useLogoUpload(mockBarbershopId),
         { wrapper: createWrapper() }
       );
 
-      await act(async () => {
-        await result.current.removeLogo();
+      act(() => {
+        result.current.deleteLogo();
       });
 
-      expect(mockRemoveLogo).toHaveBeenCalledWith(mockBarbershopId);
+
+      await waitFor(() => {
+        expect(result.current.isDeleting).toBe(false);
+      });
+
+      expect(landingPageApi.deleteLogo).toHaveBeenCalledWith(mockBarbershopId);
+      expect(showSuccessToast).toHaveBeenCalled();
     });
 
-    it('should handle remove logo error', async () => {
-      const error = new Error('Remove failed');
-      mockRemoveLogo.mockRejectedValue(error);
+    it('should handle delete error', async () => {
+      const error = new Error('Delete failed');
+      vi.mocked(landingPageApi.deleteLogo).mockRejectedValue(error);
 
       const { result } = renderHook(
         () => useLogoUpload(mockBarbershopId),
         { wrapper: createWrapper() }
       );
 
-      await act(async () => {
-        await result.current.removeLogo();
+      act(() => {
+        result.current.deleteLogo();
       });
 
-      expect(mockRemoveLogo).toHaveBeenCalledWith(mockBarbershopId);
+      await waitFor(() => {
+        expect(result.current.isDeleting).toBe(false);
+      });
+
+      expect(showErrorToast).toHaveBeenCalled();
     });
   });
 
-  describe('State reset', () => {
-    it('should reset all state', async () => {
-      mockValidateLogoFile.mockReturnValue(null);
-
+  describe('Preview management', () => {
+    it('should create preview for valid file', () => {
       const { result } = renderHook(
-        () => useLogoUpload(mockBarbershopId, { autoUpload: false }),
+        () => useLogoUpload(mockBarbershopId),
         { wrapper: createWrapper() }
       );
 
       act(() => {
-        result.current.selectFile(mockFile);
+        result.current.createPreview(mockFile);
       });
 
-      await waitFor(() => {
-        expect(result.current.hasPreview).toBe(true);
-      });
+      expect(result.current.previewUrl).toBe('mock-object-url');
+      expect(result.current.validationError).toBeNull();
+      expect(global.URL.createObjectURL).toHaveBeenCalledWith(mockFile);
+    });
+
+    it('should not create preview for invalid file', () => {
+      const { result } = renderHook(
+        () => useLogoUpload(mockBarbershopId),
+        { wrapper: createWrapper() }
+      );
 
       act(() => {
-        result.current.resetState();
+        result.current.createPreview(mockInvalidFile);
       });
 
-      expect(result.current.uploadState).toEqual({
-        status: 'idle',
-        progress: 0,
-        url: null,
-        error: null,
+      expect(result.current.previewUrl).toBeNull();
+      expect(result.current.validationError).not.toBeNull();
+      expect(global.URL.createObjectURL).not.toHaveBeenCalled();
+    });
+
+    it('should clear preview', () => {
+      const { result } = renderHook(
+        () => useLogoUpload(mockBarbershopId),
+        { wrapper: createWrapper() }
+      );
+
+      // Create preview first
+      act(() => {
+        result.current.createPreview(mockFile);
       });
-      expect(result.current.preview).toBeNull();
-      expect(result.current.originalFile).toBeNull();
+
+      expect(result.current.previewUrl).toBe('mock-object-url');
+
+      // Clear preview
+      act(() => {
+        result.current.clearPreview();
+      });
+
+      expect(result.current.previewUrl).toBeNull();
       expect(result.current.validationError).toBeNull();
+      expect(global.URL.revokeObjectURL).toHaveBeenCalledWith('mock-object-url');
     });
   });
 
   describe('Configuration', () => {
-    it('should respect upload configuration', () => {
-      expect(UPLOAD_CONFIG.MAX_FILE_SIZE).toBe(2 * 1024 * 1024);
-      expect(UPLOAD_CONFIG.ALLOWED_TYPES).toContain('image/jpeg');
-      expect(UPLOAD_CONFIG.ALLOWED_TYPES).toContain('image/png');
-      expect(UPLOAD_CONFIG.ALLOWED_TYPES).toContain('image/svg+xml');
-      expect(UPLOAD_CONFIG.RECOMMENDED_SIZE).toBe('300x300px');
+    it('should have correct upload configuration', () => {
+      expect(LOGO_UPLOAD_CONFIG.maxSize).toBe(2 * 1024 * 1024);
+      expect(LOGO_UPLOAD_CONFIG.allowedTypes).toContain('image/jpeg');
+      expect(LOGO_UPLOAD_CONFIG.allowedTypes).toContain('image/png');
+      expect(LOGO_UPLOAD_CONFIG.allowedTypes).toContain('image/svg+xml');
+      expect(LOGO_UPLOAD_CONFIG.recommendedSize).toEqual({
+        width: 300,
+        height: 300,
+      });
     });
   });
 
-  describe('Computed values', () => {
-    it('should compute canUpload correctly', async () => {
-      mockValidateLogoFile.mockReturnValue(null);
+  describe('Error states', () => {
+    it('should track upload error', async () => {
+      const error = { response: { data: { message: 'Upload failed' } } };
+      vi.mocked(landingPageApi.uploadLogo).mockRejectedValue(error);
 
       const { result } = renderHook(
-        () => useLogoUpload(mockBarbershopId, { autoUpload: false }),
+        () => useLogoUpload(mockBarbershopId),
         { wrapper: createWrapper() }
       );
 
-      // Initially can't upload
-      expect(result.current.canUpload).toBe(false);
-
       act(() => {
-        result.current.selectFile(mockFile);
+        result.current.uploadLogo(mockFile);
       });
 
       await waitFor(() => {
-        expect(result.current.canUpload).toBe(true);
+        expect(result.current.uploadError).toBeTruthy();
       });
-
-      // Can't upload with validation error
-      act(() => {
-        result.current.removeFile();
-      });
-
-      mockValidateLogoFile.mockReturnValue('Invalid file');
-
-      act(() => {
-        result.current.selectFile(mockInvalidFile);
-      });
-
-      expect(result.current.canUpload).toBe(false);
     });
 
-    it('should compute hasPreview correctly', async () => {
-      mockValidateLogoFile.mockReturnValue(null);
+    it('should track delete error', async () => {
+      const error = { response: { data: { message: 'Delete failed' } } };
+      vi.mocked(landingPageApi.deleteLogo).mockRejectedValue(error);
 
       const { result } = renderHook(
-        () => useLogoUpload(mockBarbershopId, { autoUpload: false }),
+        () => useLogoUpload(mockBarbershopId),
         { wrapper: createWrapper() }
       );
 
-      expect(result.current.hasPreview).toBe(false);
-
       act(() => {
-        result.current.selectFile(mockFile);
+        result.current.deleteLogo();
       });
 
       await waitFor(() => {
-        expect(result.current.hasPreview).toBe(true);
+        expect(result.current.deleteError).toBeTruthy();
       });
+    });
+
+    it('should track validation error', () => {
+      const { result } = renderHook(
+        () => useLogoUpload(mockBarbershopId),
+        { wrapper: createWrapper() }
+      );
+
+      act(() => {
+        result.current.uploadLogo(mockLargeFile);
+      });
+
+      expect(result.current.validationError).not.toBeNull();
+      expect(result.current.validationError?.type).toBe('size');
+    });
+  });
+
+  describe('Integration with query cache', () => {
+    it('should update query cache on successful upload', async () => {
+      vi.mocked(landingPageApi.uploadLogo).mockResolvedValue(mockUploadResponse);
+
+      const { result } = renderHook(
+        () => useLogoUpload(mockBarbershopId),
+        { wrapper: createWrapper() }
+      );
+
+      act(() => {
+        result.current.uploadLogo(mockFile);
+      });
+
+      await waitFor(() => {
+        expect(result.current.isUploading).toBe(false);
+      });
+
+      expect(landingPageApi.uploadLogo).toHaveBeenCalledWith(mockBarbershopId, mockFile);
+    });
+
+    it('should update query cache on successful deletion', async () => {
+      vi.mocked(landingPageApi.deleteLogo).mockResolvedValue(undefined);
+
+      const { result } = renderHook(
+        () => useLogoUpload(mockBarbershopId),
+        { wrapper: createWrapper() }
+      );
+
+      act(() => {
+        result.current.deleteLogo();
+      });
+
+      await waitFor(() => {
+        expect(result.current.isDeleting).toBe(false);
+      });
+
+      expect(landingPageApi.deleteLogo).toHaveBeenCalledWith(mockBarbershopId);
+    });
+  });
+
+  describe('Cleanup', () => {
+    it('should clear preview and validation error on successful upload', async () => {
+      vi.mocked(landingPageApi.uploadLogo).mockResolvedValue(mockUploadResponse);
+
+      const { result } = renderHook(
+        () => useLogoUpload(mockBarbershopId),
+        { wrapper: createWrapper() }
+      );
+
+      // Create preview first
+      act(() => {
+        result.current.createPreview(mockFile);
+      });
+
+      expect(result.current.previewUrl).toBe('mock-object-url');
+
+      // Upload logo
+      act(() => {
+        result.current.uploadLogo(mockFile);
+      });
+
+      await waitFor(() => {
+        expect(result.current.isUploading).toBe(false);
+      });
+
+      // Preview should be cleared
+      expect(result.current.previewUrl).toBeNull();
+      expect(result.current.validationError).toBeNull();
+    });
+
+    it('should clear preview on successful deletion', async () => {
+      vi.mocked(landingPageApi.deleteLogo).mockResolvedValue(undefined);
+
+      const { result } = renderHook(
+        () => useLogoUpload(mockBarbershopId),
+        { wrapper: createWrapper() }
+      );
+
+      // Create preview first
+      act(() => {
+        result.current.createPreview(mockFile);
+      });
+
+      expect(result.current.previewUrl).toBe('mock-object-url');
+
+      // Delete logo
+      act(() => {
+        result.current.deleteLogo();
+      });
+
+      await waitFor(() => {
+        expect(result.current.isDeleting).toBe(false);
+      });
+
+      // Preview should be cleared
+      expect(result.current.previewUrl).toBeNull();
     });
   });
 });

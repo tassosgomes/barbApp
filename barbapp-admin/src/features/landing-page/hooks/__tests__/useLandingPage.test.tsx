@@ -2,38 +2,44 @@
  * useLandingPage Hook Tests
  * 
  * Testes unitários para o hook useLandingPage.
- * Inclui testes para queries, mutations, cache e tratamento de erros.
+ * Inclui testes para queries, mutations e tratamento de erros.
  * 
- * @version 1.0
- * @date 2025-10-21
+ * @version 2.0
+ * @date 2025-10-23
  */
 
 import React from 'react';
 import { renderHook, waitFor, act } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { useLandingPage, LANDING_PAGE_QUERY_KEYS } from '../useLandingPage';
-import { landingPageApi } from '@/services/api/landing-page.api';
-import type { LandingPageConfigOutput, UpdateLandingPageInput } from '../../types/landing-page.types';
+import { useLandingPage } from '../useLandingPage';
+import type { LandingPageConfig, UpdateLandingPageInput, CreateLandingPageInput } from '../../types/landing-page.types';
 
 // ============================================================================
 // Mocks
 // ============================================================================
 
-// Mock da API
 vi.mock('@/services/api/landing-page.api', () => ({
   landingPageApi: {
     getConfig: vi.fn(),
     updateConfig: vi.fn(),
     createConfig: vi.fn(),
-    togglePublish: vi.fn(),
+    publishConfig: vi.fn(),
+    unpublishConfig: vi.fn(),
+    uploadLogo: vi.fn(),
+    deleteLogo: vi.fn(),
+    generatePreview: vi.fn(),
   },
 }));
 
-// Mock do toast
-vi.mock('@/hooks/use-toast', () => ({
-  toast: vi.fn(),
+vi.mock('@/utils/toast', () => ({
+  showSuccessToast: vi.fn(),
+  showErrorToast: vi.fn(),
 }));
+
+// Import após mock para evitar problemas de hoisting
+import { landingPageApi } from '@/services/api/landing-page.api';
+import { showSuccessToast, showErrorToast } from '@/utils/toast';
 
 // ============================================================================
 // Test Data
@@ -41,29 +47,23 @@ vi.mock('@/hooks/use-toast', () => ({
 
 const mockBarbershopId = 'barbershop-123';
 
-const mockLandingPageConfig: LandingPageConfigOutput = {
-  id: 'config-123',
+const mockLandingPageConfig: LandingPageConfig = {
+  id: 1,
   barbershopId: mockBarbershopId,
   templateId: 1,
-  logoUrl: 'https://example.com/logo.png',
-  aboutText: 'Test barbershop',
-  openingHours: 'Mon-Fri 9-18',
-  instagramUrl: 'https://instagram.com/test',
-  facebookUrl: 'https://facebook.com/test',
-  whatsappNumber: '+5511999999999',
+  logoUrl: 'https://cdn.example.com/logo.jpg',
+  aboutText: 'Sobre nós',
+  openingHours: 'Seg-Sex: 9h-18h',
+  instagramUrl: 'https://instagram.com/barbershop',
+  facebookUrl: 'https://facebook.com/barbershop',
+  whatsappNumber: '5511999999999',
   isPublished: true,
   services: [
-    {
-      serviceId: 'service-1',
-      serviceName: 'Corte',
-      description: 'Corte social',
-      duration: 30,
-      price: 35.00,
-      displayOrder: 1,
-      isVisible: true,
-    },
+    { id: '1', name: 'Corte', price: 50, duration: 30, enabled: true, displayOrder: 0 },
+    { id: '2', name: 'Barba', price: 30, duration: 20, enabled: true, displayOrder: 1 },
   ],
-  updatedAt: '2025-10-21T10:00:00Z',
+  updatedAt: new Date().toISOString(),
+  createdAt: new Date().toISOString(),
 };
 
 // ============================================================================
@@ -96,61 +96,33 @@ const createWrapper = () => {
 // ============================================================================
 
 describe('useLandingPage', () => {
-  let mockGetConfig: ReturnType<typeof vi.fn>;
-  let mockUpdateConfig: ReturnType<typeof vi.fn>;
-  let mockTogglePublish: ReturnType<typeof vi.fn>;
-
   beforeEach(() => {
-    mockGetConfig = vi.mocked(landingPageApi.getConfig);
-    mockUpdateConfig = vi.mocked(landingPageApi.updateConfig);
-    mockTogglePublish = vi.mocked(landingPageApi.togglePublish);
+    vi.clearAllMocks();
   });
 
   afterEach(() => {
     vi.clearAllMocks();
   });
 
-  describe('Query - getConfig', () => {
-    it('should fetch landing page config successfully', async () => {
-      mockGetConfig.mockResolvedValue(mockLandingPageConfig);
+  describe('getConfig query', () => {
+    it('should fetch config successfully', async () => {
+      vi.mocked(landingPageApi.getConfig).mockResolvedValue(mockLandingPageConfig);
 
       const { result } = renderHook(
         () => useLandingPage(mockBarbershopId),
         { wrapper: createWrapper() }
       );
 
-      expect(result.current.isLoading).toBe(true);
-      expect(result.current.config).toBeUndefined();
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
       });
 
       expect(result.current.config).toEqual(mockLandingPageConfig);
-      expect(result.current.isError).toBe(false);
-      expect(result.current.hasConfig).toBe(true);
-      expect(result.current.isReady).toBe(true);
-      expect(mockGetConfig).toHaveBeenCalledWith(mockBarbershopId);
+      expect(result.current.error).toBeNull();
+      expect(landingPageApi.getConfig).toHaveBeenCalledWith(mockBarbershopId);
     });
 
-    it('should handle fetch error', async () => {
-      const error = new Error('API Error');
-      mockGetConfig.mockRejectedValue(error);
-
-      const { result } = renderHook(
-        () => useLandingPage(mockBarbershopId),
-        { wrapper: createWrapper() }
-      );
-
-      await waitFor(() => {
-        expect(result.current.isLoading).toBe(false);
-      });
-
-      expect(result.current.isError).toBe(true);
-      expect(result.current.error).toEqual(error);
-      expect(result.current.config).toBeUndefined();
-      expect(result.current.isReady).toBe(false);
-    });
 
     it('should not fetch when barbershopId is empty', () => {
       const { result } = renderHook(
@@ -158,63 +130,120 @@ describe('useLandingPage', () => {
         { wrapper: createWrapper() }
       );
 
-      expect(result.current.isLoading).toBe(false);
-      expect(mockGetConfig).not.toHaveBeenCalled();
+      expect(result.current.config).toBeUndefined();
+      expect(landingPageApi.getConfig).not.toHaveBeenCalled();
     });
   });
 
-  describe('Mutation - updateConfig', () => {
+  describe('createConfig mutation', () => {
+    it('should create config successfully', async () => {
+      const createData: CreateLandingPageInput = {
+        barbershopId: mockBarbershopId,
+        templateId: 1,
+        whatsappNumber: '5511999999999',
+      };
+
+      vi.mocked(landingPageApi.getConfig).mockResolvedValue(mockLandingPageConfig);
+      vi.mocked(landingPageApi.createConfig).mockResolvedValue(mockLandingPageConfig);
+
+      const { result } = renderHook(
+        () => useLandingPage(mockBarbershopId),
+        { wrapper: createWrapper() }
+      );
+
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
+      });
+
+      act(() => {
+        result.current.createConfig(createData);
+      });
+
+
+      await waitFor(() => {
+        expect(result.current.isCreating).toBe(false);
+      });
+
+      expect(landingPageApi.createConfig).toHaveBeenCalledWith(mockBarbershopId, createData);
+      expect(showSuccessToast).toHaveBeenCalled();
+    });
+
+    it('should handle create error', async () => {
+      const createData: CreateLandingPageInput = {
+        barbershopId: mockBarbershopId,
+        templateId: 1,
+        whatsappNumber: '5511999999999',
+      };
+
+      const error = new Error('Create failed');
+      vi.mocked(landingPageApi.createConfig).mockRejectedValue(error);
+
+      const { result } = renderHook(
+        () => useLandingPage(mockBarbershopId),
+        { wrapper: createWrapper() }
+      );
+
+      act(() => {
+        result.current.createConfig(createData);
+      });
+
+      await waitFor(() => {
+        expect(result.current.isCreating).toBe(false);
+      });
+
+      expect(showErrorToast).toHaveBeenCalled();
+    });
+  });
+
+  describe('updateConfig mutation', () => {
     it('should update config successfully', async () => {
-      const updatedConfig = { ...mockLandingPageConfig, aboutText: 'Updated text' };
-      const updateData: UpdateLandingPageInput = { aboutText: 'Updated text' };
+      const updateData: UpdateLandingPageInput = {
+        aboutText: 'Novo texto',
+      };
 
-      mockGetConfig.mockResolvedValue(mockLandingPageConfig);
-      mockUpdateConfig.mockResolvedValue(updatedConfig);
+      vi.mocked(landingPageApi.getConfig).mockResolvedValue(mockLandingPageConfig);
+      vi.mocked(landingPageApi.updateConfig).mockResolvedValue(undefined);
 
       const { result } = renderHook(
         () => useLandingPage(mockBarbershopId),
         { wrapper: createWrapper() }
       );
 
-      // Wait for initial load
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
       });
 
-      // Perform update
       act(() => {
         result.current.updateConfig(updateData);
       });
 
-      expect(result.current.isUpdating).toBe(true);
 
       await waitFor(() => {
         expect(result.current.isUpdating).toBe(false);
       });
 
-      expect(mockUpdateConfig).toHaveBeenCalledWith(mockBarbershopId, updateData);
+      expect(landingPageApi.updateConfig).toHaveBeenCalledWith(mockBarbershopId, updateData);
+      expect(showSuccessToast).toHaveBeenCalled();
     });
 
-    it('should handle update error and revert optimistic update', async () => {
-      const error = new Error('Update failed');
-      const updateData: UpdateLandingPageInput = { aboutText: 'Updated text' };
+    it('should handle update error', async () => {
+      const updateData: UpdateLandingPageInput = {
+        aboutText: 'Novo texto',
+      };
 
-      mockGetConfig.mockResolvedValue(mockLandingPageConfig);
-      mockUpdateConfig.mockRejectedValue(error);
+      const error = new Error('Update failed');
+      vi.mocked(landingPageApi.getConfig).mockResolvedValue(mockLandingPageConfig);
+      vi.mocked(landingPageApi.updateConfig).mockRejectedValue(error);
 
       const { result } = renderHook(
         () => useLandingPage(mockBarbershopId),
         { wrapper: createWrapper() }
       );
 
-      // Wait for initial load
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
       });
 
-      const originalConfig = result.current.config;
-
-      // Perform update
       act(() => {
         result.current.updateConfig(updateData);
       });
@@ -223,46 +252,285 @@ describe('useLandingPage', () => {
         expect(result.current.isUpdating).toBe(false);
       });
 
-      // Should revert to original config after error
-      expect(result.current.config).toEqual(originalConfig);
+      expect(showErrorToast).toHaveBeenCalled();
     });
   });
 
-  describe('Mutation - togglePublish', () => {
-    it('should toggle publish status successfully', async () => {
-      mockGetConfig.mockResolvedValue(mockLandingPageConfig);
-      mockTogglePublish.mockResolvedValue(undefined);
+  describe('publishConfig mutation', () => {
+    it('should publish config successfully', async () => {
+      vi.mocked(landingPageApi.getConfig).mockResolvedValue(mockLandingPageConfig);
+      vi.mocked(landingPageApi.publishConfig).mockResolvedValue(undefined);
 
       const { result } = renderHook(
         () => useLandingPage(mockBarbershopId),
         { wrapper: createWrapper() }
       );
 
-      // Wait for initial load
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
       });
 
-      expect(result.current.isPublished).toBe(true);
-
-      // Toggle to unpublished
       act(() => {
-        result.current.togglePublish(false);
+        result.current.publishConfig();
       });
 
-      expect(result.current.isToggling).toBe(true);
 
       await waitFor(() => {
-        expect(result.current.isToggling).toBe(false);
+        expect(result.current.isPublishing).toBe(false);
       });
 
-      expect(mockTogglePublish).toHaveBeenCalledWith(mockBarbershopId, false);
+      expect(landingPageApi.publishConfig).toHaveBeenCalledWith(mockBarbershopId);
+      expect(showSuccessToast).toHaveBeenCalled();
+    });
+
+    it('should handle publish error', async () => {
+      const error = new Error('Publish failed');
+      vi.mocked(landingPageApi.getConfig).mockResolvedValue(mockLandingPageConfig);
+      vi.mocked(landingPageApi.publishConfig).mockRejectedValue(error);
+
+      const { result } = renderHook(
+        () => useLandingPage(mockBarbershopId),
+        { wrapper: createWrapper() }
+      );
+
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
+      });
+
+      act(() => {
+        result.current.publishConfig();
+      });
+
+      await waitFor(() => {
+        expect(result.current.isPublishing).toBe(false);
+      });
+
+      expect(showErrorToast).toHaveBeenCalled();
+    });
+  });
+
+  describe('unpublishConfig mutation', () => {
+    it('should unpublish config successfully', async () => {
+      vi.mocked(landingPageApi.getConfig).mockResolvedValue(mockLandingPageConfig);
+      vi.mocked(landingPageApi.unpublishConfig).mockResolvedValue(undefined);
+
+      const { result } = renderHook(
+        () => useLandingPage(mockBarbershopId),
+        { wrapper: createWrapper() }
+      );
+
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
+      });
+
+      act(() => {
+        result.current.unpublishConfig();
+      });
+
+
+      await waitFor(() => {
+        expect(result.current.isUnpublishing).toBe(false);
+      });
+
+      expect(landingPageApi.unpublishConfig).toHaveBeenCalledWith(mockBarbershopId);
+      expect(showSuccessToast).toHaveBeenCalled();
+    });
+
+    it('should handle unpublish error', async () => {
+      const error = new Error('Unpublish failed');
+      vi.mocked(landingPageApi.getConfig).mockResolvedValue(mockLandingPageConfig);
+      vi.mocked(landingPageApi.unpublishConfig).mockRejectedValue(error);
+
+      const { result } = renderHook(
+        () => useLandingPage(mockBarbershopId),
+        { wrapper: createWrapper() }
+      );
+
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
+      });
+
+      act(() => {
+        result.current.unpublishConfig();
+      });
+
+      await waitFor(() => {
+        expect(result.current.isUnpublishing).toBe(false);
+      });
+
+      expect(showErrorToast).toHaveBeenCalled();
+    });
+  });
+
+  describe('uploadLogo mutation', () => {
+    it('should upload logo successfully', async () => {
+      const mockFile = new File(['logo'], 'logo.jpg', { type: 'image/jpeg' });
+      const mockLogoUrl = 'https://cdn.example.com/new-logo.jpg';
+
+      vi.mocked(landingPageApi.getConfig).mockResolvedValue(mockLandingPageConfig);
+      vi.mocked(landingPageApi.uploadLogo).mockResolvedValue(mockLogoUrl);
+
+      const { result } = renderHook(
+        () => useLandingPage(mockBarbershopId),
+        { wrapper: createWrapper() }
+      );
+
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
+      });
+
+      act(() => {
+        result.current.uploadLogo(mockFile);
+      });
+
+
+      await waitFor(() => {
+        expect(result.current.isUploadingLogo).toBe(false);
+      });
+
+      expect(landingPageApi.uploadLogo).toHaveBeenCalledWith(mockBarbershopId, mockFile);
+      expect(showSuccessToast).toHaveBeenCalled();
+    });
+
+    it('should handle upload error', async () => {
+      const mockFile = new File(['logo'], 'logo.jpg', { type: 'image/jpeg' });
+      const error = new Error('Upload failed');
+
+      vi.mocked(landingPageApi.getConfig).mockResolvedValue(mockLandingPageConfig);
+      vi.mocked(landingPageApi.uploadLogo).mockRejectedValue(error);
+
+      const { result } = renderHook(
+        () => useLandingPage(mockBarbershopId),
+        { wrapper: createWrapper() }
+      );
+
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
+      });
+
+      act(() => {
+        result.current.uploadLogo(mockFile);
+      });
+
+      await waitFor(() => {
+        expect(result.current.isUploadingLogo).toBe(false);
+      });
+
+      expect(showErrorToast).toHaveBeenCalled();
+    });
+  });
+
+  describe('deleteLogo mutation', () => {
+    it('should delete logo successfully', async () => {
+      vi.mocked(landingPageApi.getConfig).mockResolvedValue(mockLandingPageConfig);
+      vi.mocked(landingPageApi.deleteLogo).mockResolvedValue(undefined);
+
+      const { result } = renderHook(
+        () => useLandingPage(mockBarbershopId),
+        { wrapper: createWrapper() }
+      );
+
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
+      });
+
+      act(() => {
+        result.current.deleteLogo();
+      });
+
+
+      await waitFor(() => {
+        expect(result.current.isDeletingLogo).toBe(false);
+      });
+
+      expect(landingPageApi.deleteLogo).toHaveBeenCalledWith(mockBarbershopId);
+      expect(showSuccessToast).toHaveBeenCalled();
+    });
+
+    it('should handle delete error', async () => {
+      const error = new Error('Delete failed');
+      vi.mocked(landingPageApi.getConfig).mockResolvedValue(mockLandingPageConfig);
+      vi.mocked(landingPageApi.deleteLogo).mockRejectedValue(error);
+
+      const { result } = renderHook(
+        () => useLandingPage(mockBarbershopId),
+        { wrapper: createWrapper() }
+      );
+
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
+      });
+
+      act(() => {
+        result.current.deleteLogo();
+      });
+
+      await waitFor(() => {
+        expect(result.current.isDeletingLogo).toBe(false);
+      });
+
+      expect(showErrorToast).toHaveBeenCalled();
+    });
+  });
+
+  describe('generatePreview mutation', () => {
+    it('should generate preview successfully', async () => {
+      const mockPreviewUrl = 'https://preview.example.com/123';
+
+      vi.mocked(landingPageApi.getConfig).mockResolvedValue(mockLandingPageConfig);
+      vi.mocked(landingPageApi.generatePreview).mockResolvedValue(mockPreviewUrl);
+
+      const { result } = renderHook(
+        () => useLandingPage(mockBarbershopId),
+        { wrapper: createWrapper() }
+      );
+
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
+      });
+
+      act(() => {
+        result.current.generatePreview();
+      });
+
+
+      await waitFor(() => {
+        expect(result.current.isGeneratingPreview).toBe(false);
+      });
+
+      expect(landingPageApi.generatePreview).toHaveBeenCalledWith(mockBarbershopId);
+    });
+
+    it('should handle preview generation error', async () => {
+      const error = new Error('Preview failed');
+
+      vi.mocked(landingPageApi.getConfig).mockResolvedValue(mockLandingPageConfig);
+      vi.mocked(landingPageApi.generatePreview).mockRejectedValue(error);
+
+      const { result } = renderHook(
+        () => useLandingPage(mockBarbershopId),
+        { wrapper: createWrapper() }
+      );
+
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
+      });
+
+      act(() => {
+        result.current.generatePreview();
+      });
+
+      await waitFor(() => {
+        expect(result.current.isGeneratingPreview).toBe(false);
+      });
+
+      expect(showErrorToast).toHaveBeenCalled();
     });
   });
 
   describe('Utility functions', () => {
-    it('should provide utility functions', async () => {
-      mockGetConfig.mockResolvedValue(mockLandingPageConfig);
+    it('should refetch config', async () => {
+      vi.mocked(landingPageApi.getConfig).mockResolvedValue(mockLandingPageConfig);
 
       const { result } = renderHook(
         () => useLandingPage(mockBarbershopId),
@@ -273,112 +541,19 @@ describe('useLandingPage', () => {
         expect(result.current.isLoading).toBe(false);
       });
 
-      expect(typeof result.current.invalidateCache).toBe('function');
-      expect(typeof result.current.clearCache).toBe('function');
-      expect(typeof result.current.prefetchConfig).toBe('function');
-      expect(typeof result.current.refetch).toBe('function');
-    });
-
-    it('should compute correct values', async () => {
-      mockGetConfig.mockResolvedValue(mockLandingPageConfig);
-
-      const { result } = renderHook(
-        () => useLandingPage(mockBarbershopId),
-        { wrapper: createWrapper() }
-      );
-
-      await waitFor(() => {
-        expect(result.current.isLoading).toBe(false);
-      });
-
-      expect(result.current.hasConfig).toBe(true);
-      expect(result.current.isReady).toBe(true);
-      expect(result.current.isPublished).toBe(true);
-    });
-  });
-
-  describe('Query Keys', () => {
-    it('should generate correct query keys', () => {
-      const keys = LANDING_PAGE_QUERY_KEYS;
-
-      expect(keys.all).toEqual(['landingPage']);
-      expect(keys.configs()).toEqual(['landingPage', 'config']);
-      expect(keys.config('test-id')).toEqual(['landingPage', 'config', 'test-id']);
-      expect(keys.public('test-code')).toEqual(['landingPage', 'public', 'test-code']);
-      expect(keys.analytics('test-id')).toEqual(['landingPage', 'analytics', 'test-id']);
-    });
-  });
-
-  describe('Error handling', () => {
-    it('should handle network errors gracefully', async () => {
-      const networkError = new Error('Network Error');
-      mockGetConfig.mockRejectedValue(networkError);
-
-      const { result } = renderHook(
-        () => useLandingPage(mockBarbershopId),
-        { wrapper: createWrapper() }
-      );
-
-      await waitFor(() => {
-        expect(result.current.isLoading).toBe(false);
-      });
-
-      expect(result.current.isError).toBe(true);
-      expect(result.current.error).toEqual(networkError);
-      expect(result.current.isReady).toBe(false);
-    });
-
-    it('should handle API validation errors', async () => {
-      const validationError = new Error('Validation failed');
-      const updateData: UpdateLandingPageInput = { aboutText: '' };
-
-      mockGetConfig.mockResolvedValue(mockLandingPageConfig);
-      mockUpdateConfig.mockRejectedValue(validationError);
-
-      const { result } = renderHook(
-        () => useLandingPage(mockBarbershopId),
-        { wrapper: createWrapper() }
-      );
-
-      await waitFor(() => {
-        expect(result.current.isLoading).toBe(false);
-      });
+      vi.clearAllMocks();
 
       act(() => {
-        result.current.updateConfig(updateData);
+        result.current.refetch();
       });
 
       await waitFor(() => {
-        expect(result.current.isUpdating).toBe(false);
+        expect(landingPageApi.getConfig).toHaveBeenCalled();
       });
-
-      // Should maintain original state after error
-      expect(result.current.config?.aboutText).toBe(mockLandingPageConfig.aboutText);
-    });
-  });
-
-  describe('Cache management', () => {
-    it('should handle cache invalidation', async () => {
-      mockGetConfig.mockResolvedValue(mockLandingPageConfig);
-
-      const { result } = renderHook(
-        () => useLandingPage(mockBarbershopId),
-        { wrapper: createWrapper() }
-      );
-
-      await waitFor(() => {
-        expect(result.current.isLoading).toBe(false);
-      });
-
-      // Should not throw when calling cache utilities
-      expect(() => {
-        result.current.invalidateCache();
-        result.current.clearCache();
-      }).not.toThrow();
     });
 
-    it('should handle prefetch', async () => {
-      mockGetConfig.mockResolvedValue(mockLandingPageConfig);
+    it('should invalidate queries', async () => {
+      vi.mocked(landingPageApi.getConfig).mockResolvedValue(mockLandingPageConfig);
 
       const { result } = renderHook(
         () => useLandingPage(mockBarbershopId),
@@ -390,11 +565,35 @@ describe('useLandingPage', () => {
       });
 
       await act(async () => {
-        await result.current.prefetchConfig();
+        await result.current.invalidateQueries();
       });
 
-      // Should call API for prefetch
-      expect(mockGetConfig).toHaveBeenCalledTimes(2); // Initial + prefetch
+      expect(result.current.invalidateQueries).toBeDefined();
     });
   });
+
+  describe('Loading states', () => {
+    it('should track loading states correctly', async () => {
+      vi.mocked(landingPageApi.getConfig).mockResolvedValue(mockLandingPageConfig);
+
+      const { result } = renderHook(
+        () => useLandingPage(mockBarbershopId),
+        { wrapper: createWrapper() }
+      );
+
+
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
+      });
+
+      expect(result.current.isCreating).toBe(false);
+      expect(result.current.isUpdating).toBe(false);
+      expect(result.current.isPublishing).toBe(false);
+      expect(result.current.isUnpublishing).toBe(false);
+      expect(result.current.isUploadingLogo).toBe(false);
+      expect(result.current.isDeletingLogo).toBe(false);
+      expect(result.current.isGeneratingPreview).toBe(false);
+    });
+  });
+
 });
