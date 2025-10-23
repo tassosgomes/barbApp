@@ -19,6 +19,10 @@ export default {
         'urban-black': '#000000',
         'urban-red': '#E74C3C',
         'urban-gray': '#95A5A6',
+        // Template 5 - Premium colors
+        'premium-black': '#1C1C1C',
+        'premium-gold': '#C9A961',
+        'premium-gray': '#2E2E2E',
       },
       fontFamily: {
         serif: ['Playfair Display', 'serif'],
@@ -31,6 +35,9 @@ export default {
         // Template 4 - Urban fonts
         'urban-display': ['Bebas Neue', 'Oswald', 'sans-serif'],
         'urban-sans': ['Oswald', 'sans-serif'],
+        // Template 5 - Premium fonts
+        'premium-serif': ['Playfair Display', 'serif'],
+        'premium-sans': ['Lato', 'Roboto', 'Inter', 'sans-serif'],
       },
     },
   },
