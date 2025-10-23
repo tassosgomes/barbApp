@@ -44,7 +44,7 @@ public class InfisicalService : ISecretManager
             SecretName = secretName,
             EnvironmentSlug = _environment,
             ProjectId = _projectId,
-            SecretPath = "/"
+            SecretPath = "" // Root folder
         };
 
         var secret = await _infisicalClient.Secrets().GetAsync(options);
