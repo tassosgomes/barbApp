@@ -175,7 +175,7 @@ export const Template4Urban: React.FC<Template4UrbanProps> = ({ data }) => {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2 text-urban-gray">
                       <Clock size={16} />
-                      <span className="text-sm">{service.duration}min</span>
+                      <span className="text-sm">{service.durationMinutes}min</span>
                     </div>
                     <div className="text-2xl font-urban-display font-bold text-urban-red">
                       R$ {service.price.toFixed(2)}

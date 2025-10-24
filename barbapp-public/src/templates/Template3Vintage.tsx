@@ -145,7 +145,7 @@ export const Template3Vintage: React.FC<Template3VintageProps> = ({ data }) => {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 text-vintage-brown/60">
                     <Clock size={16} />
-                    <span className="text-sm">{service.duration}min</span>
+                    <span className="text-sm">{service.durationMinutes}min</span>
                   </div>
                   <div className="flex-1 mx-4 border-t-2 border-dotted border-vintage-brown/30"></div>
                   <div className="text-xl font-vintage-display font-bold text-vintage-red">

@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  barbapp-public:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: barbapp-public
+    ports:
+      - "3001:80"
+    environment:
+      - VITE_API_URL=http://localhost:5070/api
+    restart: unless-stopped
+    networks:
+      - barbapp-network
+
+networks:
+  barbapp-network:
+    external: true

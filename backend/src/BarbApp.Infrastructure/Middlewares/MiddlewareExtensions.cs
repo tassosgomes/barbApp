@@ -63,16 +63,15 @@ public static class AuthenticationConfiguration
             {
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new SymmetricSecurityKey(
-                    Encoding.UTF8.GetBytes(secret))
-                {
-                    KeyId = "test-key"
-                },
+                    Encoding.UTF8.GetBytes(secret)),
                 ValidateIssuer = true,
                 ValidIssuer = jwtSettings.Issuer,
                 ValidateAudience = true,
                 ValidAudience = jwtSettings.Audience,
                 ValidateLifetime = true,
-                ClockSkew = TimeSpan.Zero
+                ClockSkew = TimeSpan.FromMinutes(5), // Tolerância de 5 minutos
+                RequireExpirationTime = true,
+                RequireSignedTokens = true // IMPORTANTE: Requer tokens assinados
             };
 
             options.Events = new Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerEvents
@@ -84,6 +83,10 @@ public static class AuthenticationConfiguration
                     if (context.Exception is SecurityTokenExpiredException)
                     {
                         context.Response.Headers["Token-Expired"] = "true";
+                    }
+                    else if (context.Exception is SecurityTokenInvalidSignatureException)
+                    {
+                        logger.LogError("Invalid JWT signature detected");
                     }
                     return Task.CompletedTask;
                 },
@@ -102,6 +105,11 @@ public static class AuthenticationConfiguration
                     });
 
                     return context.Response.WriteAsync(result);
+                },
+                OnTokenValidated = context =>
+                {
+                    logger.LogDebug("JWT Token validated successfully");
+                    return Task.CompletedTask;
                 }
             };
         });

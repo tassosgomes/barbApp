@@ -86,7 +86,7 @@ export const Template2Modern: React.FC<Template2ModernProps> = ({ data }) => {
             Nossos Serviços
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {landingPage.Services.map((service) => (
+            {landingPage.services.map((service) => (
               <div
                 key={service.id}
                 className="transform transition-all duration-300 hover:shadow-xl hover:-translate-y-2"

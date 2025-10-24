@@ -170,7 +170,30 @@ public static class ServiceConfiguration
         });
 
         // Authentication & Authorization
-        var jwtSettings = services.BuildServiceProvider().GetRequiredService<IOptions<JwtSettings>>().Value;
+        // Build temporary service provider to get dependencies
+        var tempServiceProvider = services.BuildServiceProvider();
+        var jwtSettings = tempServiceProvider.GetRequiredService<IOptions<JwtSettings>>().Value;
+        var secretManager = tempServiceProvider.GetRequiredService<ISecretManager>();
+        var loggerFactory = tempServiceProvider.GetRequiredService<ILoggerFactory>();
+        var logger = loggerFactory.CreateLogger("JwtAuthentication");
+        
+        // Get JWT secret from Infisical
+        string jwtSecret;
+        try
+        {
+            jwtSecret = secretManager.GetSecretAsync("JWT_SECRET").GetAwaiter().GetResult();
+            logger.LogInformation("JWT Secret loaded successfully from Infisical for authentication");
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to load JWT Secret from Infisical, falling back to configuration");
+            jwtSecret = jwtSettings.Secret;
+            if (string.IsNullOrEmpty(jwtSecret))
+            {
+                throw new InvalidOperationException("JWT Secret not available from Infisical or configuration", ex);
+            }
+        }
+
         services.AddAuthentication(options =>
         {
             options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -186,7 +209,41 @@ public static class ServiceConfiguration
                 ValidateIssuerSigningKey = true,
                 ValidIssuer = jwtSettings.Issuer,
                 ValidAudience = jwtSettings.Audience,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Secret))
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret)),
+                ClockSkew = TimeSpan.FromMinutes(5),
+                RequireExpirationTime = true,
+                RequireSignedTokens = true,
+                RoleClaimType = System.Security.Claims.ClaimTypes.Role // IMPORTANTE: Define qual claim contém as roles
+            };
+
+            // Adicionar eventos para debug
+            options.Events = new Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerEvents
+            {
+                OnAuthenticationFailed = context =>
+                {
+                    logger.LogWarning("JWT Authentication failed: {Message}", context.Exception.Message);
+                    if (context.Exception is SecurityTokenExpiredException)
+                    {
+                        context.Response.Headers.Add("Token-Expired", "true");
+                    }
+                    else if (context.Exception is SecurityTokenInvalidSignatureException)
+                    {
+                        logger.LogError("Invalid JWT signature detected");
+                    }
+                    return Task.CompletedTask;
+                },
+                OnTokenValidated = context =>
+                {
+                    var claims = context.Principal?.Claims.Select(c => $"{c.Type}={c.Value}") ?? Array.Empty<string>();
+                    logger.LogDebug("JWT Token validated successfully. Claims: {Claims}", string.Join(", ", claims));
+                    return Task.CompletedTask;
+                },
+                OnChallenge = context =>
+                {
+                    logger.LogWarning("JWT Challenge triggered. Error: {Error}, ErrorDescription: {ErrorDescription}", 
+                        context.Error, context.ErrorDescription);
+                    return Task.CompletedTask;
+                }
             };
         });
         services.AddAuthorization();
@@ -206,7 +263,10 @@ public static class ServiceConfiguration
                         "http://localhost:5173",
                         "https://barberapp.tasso.dev.br",
                         "https://dev-barberapp.tasso.dev.br",
-                        "https://staging-barberapp.tasso.dev.br")
+                        "https://staging-barberapp.tasso.dev.br",
+                        "https://dev-admbarberapp.tasso.dev.br",
+                        "https://staging-admbarberapp.tasso.dev.br",
+                        "https://admbarberapp.tasso.dev.br")
                     .AllowAnyMethod()
                     .AllowAnyHeader()
                     .AllowCredentials();

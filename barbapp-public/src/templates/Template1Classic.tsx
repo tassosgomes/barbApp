@@ -84,7 +84,7 @@ export const Template1Classic: React.FC<Template1ClassicProps> = ({ data }) => {
             Nossos Serviços
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {landingPage.Services.map((service) => (
+            {landingPage.services.map((service) => (
               <ServiceCard
                 key={service.id}
                 service={service}
