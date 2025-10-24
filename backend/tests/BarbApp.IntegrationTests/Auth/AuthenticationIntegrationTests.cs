@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BarbApp.IntegrationTests.Auth;
@@ -21,10 +22,12 @@ public class AuthenticationIntegrationTests
     private readonly DatabaseFixture _dbFixture;
     private static bool _dbInitialized;
     private static readonly object _initLock = new();
+    private readonly ILogger _logger;
 
     public AuthenticationIntegrationTests(DatabaseFixture dbFixture)
     {
         _dbFixture = dbFixture;
+        _logger = LoggerFactory.Create(builder => builder.AddConsole()).CreateLogger<AuthenticationIntegrationTests>();
 
         // Initialize database once
         if (!_dbInitialized)
@@ -326,7 +329,7 @@ public class AuthenticationIntegrationTests
         authResult!.Token.Should().NotBeNullOrEmpty();
 
         // Debug: Print token for inspection
-        Console.WriteLine($"JWT Token: {authResult.Token}");
+        _logger.LogInformation("JWT Token: {Token}", authResult.Token);
 
         // Set the JWT token in the Authorization header for subsequent requests
         _client.DefaultRequestHeaders.Authorization =
@@ -334,7 +337,7 @@ public class AuthenticationIntegrationTests
 
         // Test authentication with weather forecast endpoint first
         var weatherResponse = await _client.GetAsync("/weatherforecast");
-        Console.WriteLine($"Weather forecast status: {weatherResponse.StatusCode}");
+        _logger.LogInformation("Weather forecast status: {StatusCode}", weatherResponse.StatusCode);
 
         // Act - List barbers (should only see barbers from barbearia1)
         var listResponse = await _client.GetAsync("/api/auth/barbeiros");

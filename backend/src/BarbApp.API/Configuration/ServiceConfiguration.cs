@@ -23,6 +23,9 @@ using Microsoft.AspNetCore.ResponseCompression;
 using DotNetEnv;
 using Microsoft.Extensions.DependencyInjection;
 using BarbApp.API.Filters;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace BarbApp.API.Configuration;
 
@@ -165,6 +168,28 @@ public static class ServiceConfiguration
             options.EnableForHttps = true;
             options.Providers.Add<GzipCompressionProvider>();
         });
+
+        // Authentication & Authorization
+        var jwtSettings = services.BuildServiceProvider().GetRequiredService<IOptions<JwtSettings>>().Value;
+        services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
+        .AddJwtBearer(options =>
+        {
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = jwtSettings.Issuer,
+                ValidAudience = jwtSettings.Audience,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Secret))
+            };
+        });
+        services.AddAuthorization();
 
         // Controllers & Validation
         services.AddControllers();

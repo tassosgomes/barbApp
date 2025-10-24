@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using DotNetEnv;
+using Serilog;
 
 namespace BarbApp.API.Configuration;
 
@@ -14,12 +15,12 @@ public static class EnvironmentConfiguration
         if (File.Exists(envPath))
         {
             Env.Load(envPath);
-            Console.WriteLine($"✓ Loaded .env from: {envPath}");
+            Log.Information("Loaded .env from: {EnvPath}", envPath);
         }
         else
         {
-            Console.WriteLine($"⚠ .env file not found at: {envPath}");
-            Console.WriteLine("  Environment variables will be loaded from system/container environment");
+            Log.Warning(".env file not found at: {EnvPath}", envPath);
+            Log.Information("Environment variables will be loaded from system/container environment");
         }
     }
 
@@ -58,7 +59,7 @@ public static class EnvironmentConfiguration
         if (nonNullOverrides.Any())
         {
             builder.Configuration.AddInMemoryCollection(nonNullOverrides);
-            Console.WriteLine($"✓ Applied {nonNullOverrides.Count} environment variable overrides");
+            Log.Information("Applied {Count} environment variable overrides", nonNullOverrides.Count);
         }
     }
 

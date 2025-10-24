@@ -1,25 +1,27 @@
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using DotNetEnv;
+using BarbApp.API.Configuration;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// ══════════════════════════════════════════════════════════
+// LOGGING CONFIGURATION
+// ══════════════════════════════════════════════════════════
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .Enrich.FromLogContext()
+    .WriteTo.Console()
+    .WriteTo.File("logs/barbapp-.txt", rollingInterval: RollingInterval.Day)
+    .CreateLogger();
+
+builder.Host.UseSerilog();
 
 // ══════════════════════════════════════════════════════════
 // LOAD ENVIRONMENT VARIABLES FROM .env FILE
 // ══════════════════════════════════════════════════════════
-// Carregar .env do diretório backend (não do diretório API)
-var backendRoot = Path.Combine(Directory.GetCurrentDirectory(), "..", "..");
-var envPath = Path.Combine(backendRoot, ".env");
-if (File.Exists(envPath))
-{
-    Env.Load(envPath);
-    Console.WriteLine($"✓ Loaded .env from: {envPath}");
-}
-else
-{
-    Console.WriteLine($"⚠ .env file not found at: {envPath}");
-    Console.WriteLine("  Environment variables will be loaded from system/container environment");
-}
-
-var builder = WebApplication.CreateBuilder(args);
+EnvironmentConfiguration.LoadEnvironmentVariables();
 
 // ══════════════════════════════════════════════════════════
 // OVERRIDE CONFIGURATION WITH ENVIRONMENT VARIABLES
@@ -44,7 +46,12 @@ var overrides = new Dictionary<string, string?>
     ["R2Storage:BucketName"] = Environment.GetEnvironmentVariable("R2_BUCKET_NAME"),
     ["R2Storage:PublicUrl"] = Environment.GetEnvironmentVariable("R2_PUBLIC_URL"),
     ["R2Storage:AccessKeyId"] = Environment.GetEnvironmentVariable("R2_ACCESS_KEY_ID"),
-    ["R2Storage:SecretAccessKey"] = Environment.GetEnvironmentVariable("R2_SECRET_ACCESS_KEY")
+    ["R2Storage:SecretAccessKey"] = Environment.GetEnvironmentVariable("R2_SECRET_ACCESS_KEY"),
+    ["Infisical:HostUri"] = Environment.GetEnvironmentVariable("INFISICAL_HOST_URI"),
+    ["Infisical:Environment"] = Environment.GetEnvironmentVariable("INFISICAL_ENVIRONMENT"),
+    ["Infisical:ProjectId"] = Environment.GetEnvironmentVariable("INFISICAL_PROJECT_ID"),
+    ["Infisical:ClientId"] = Environment.GetEnvironmentVariable("INFISICAL_CLIENT_ID"),
+    ["Infisical:ClientSecret"] = Environment.GetEnvironmentVariable("INFISICAL_CLIENT_SECRET")
 };
 
 // Only add non-null overrides
@@ -52,14 +59,12 @@ var nonNullOverrides = overrides
     .Where(kvp => kvp.Value != null)
     .Select(kvp => new KeyValuePair<string, string?>(kvp.Key, kvp.Value))
     .ToList();
-    
-if (nonNullOverrides.Any())
-{
-    builder.Configuration.AddInMemoryCollection(nonNullOverrides);
-    Console.WriteLine($"✓ Applied {nonNullOverrides.Count} environment variable overrides");
-}
 
-// ══════════════════════════════════════════════════════════
+        if (nonNullOverrides.Any())
+        {
+            builder.Configuration.AddInMemoryCollection(nonNullOverrides);
+            Log.Information("Applied {Count} environment variable overrides", nonNullOverrides.Count);
+        }// ══════════════════════════════════════════════════════════
 // TESTING ENVIRONMENT DEFAULTS
 // ══════════════════════════════════════════════════════════
 if (builder.Environment.IsEnvironment("Testing"))

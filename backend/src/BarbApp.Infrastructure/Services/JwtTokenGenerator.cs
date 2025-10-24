@@ -4,6 +4,7 @@ using System.Security.Claims;
 using System.Text;
 using BarbApp.Application.Interfaces;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using BarbApp.Infrastructure.Middlewares;
 
@@ -13,24 +14,26 @@ public class JwtTokenGenerator : IJwtTokenGenerator
 {
     private readonly JwtSettings _jwtSettings;
     private readonly string _secret;
+    private readonly ILogger<JwtTokenGenerator> _logger;
 
-    public JwtTokenGenerator(JwtSettings jwtSettings, ISecretManager secretManager)
+    public JwtTokenGenerator(JwtSettings jwtSettings, ISecretManager secretManager, ILogger<JwtTokenGenerator> logger)
     {
         _jwtSettings = jwtSettings;
+        _logger = logger;
         try
         {
             _secret = secretManager.GetSecretAsync("JWT_SECRET").GetAwaiter().GetResult();
             _jwtSettings.Secret = _secret;
-            Console.WriteLine("✓ JWT Secret loaded successfully from Infisical");
+            _logger.LogInformation("JWT Secret loaded successfully from Infisical");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"✗ Failed to load JWT Secret from Infisical: {ex.Message}");
+            _logger.LogError(ex, "Failed to load JWT Secret from Infisical");
             // Fallback to configuration if available
             if (!string.IsNullOrEmpty(_jwtSettings.Secret))
             {
                 _secret = _jwtSettings.Secret;
-                Console.WriteLine("✓ Using JWT Secret from configuration as fallback");
+                _logger.LogInformation("Using JWT Secret from configuration as fallback");
             }
             else
             {

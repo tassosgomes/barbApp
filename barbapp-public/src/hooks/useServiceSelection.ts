@@ -27,7 +27,7 @@ export const useServiceSelection = (services: PublicService[]) => {
   );
 
   const totalDuration = useMemo(
-    () => selectedServices.reduce((sum, s) => sum + s.duration, 0),
+    () => selectedServices.reduce((sum, s) => sum + s.durationMinutes, 0),
     [selectedServices]
   );
 

@@ -158,7 +158,7 @@ export const Template5Premium: React.FC<Template5PremiumProps> = ({ data }) => {
                     R$ {service.price.toFixed(2)}
                   </div>
                   <div className="text-sm text-gray-400">
-                    {service.duration} minutos
+                    {service.durationMinutes} minutos
                   </div>
                 </div>
               </div>

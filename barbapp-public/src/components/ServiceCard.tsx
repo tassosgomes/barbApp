@@ -38,7 +38,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
       <div className="flex items-center gap-4 text-sm text-gray-500">
         <div className="flex items-center gap-1">
           <Clock size={16} />
-          <span>{service.duration}min</span>
+          <span>{service.durationMinutes}min</span>
         </div>
         <div className="flex items-center gap-1 font-semibold text-primary">
           <DollarSign size={16} />

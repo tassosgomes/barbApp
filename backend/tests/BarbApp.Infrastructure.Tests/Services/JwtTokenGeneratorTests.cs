@@ -4,6 +4,8 @@ using BarbApp.Infrastructure.Services;
 using BarbApp.Infrastructure.Middlewares;
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Xunit;
 
@@ -28,7 +30,8 @@ public class JwtTokenGeneratorTests
         _secretManagerMock.Setup(x => x.GetSecretAsync(It.IsAny<string>()))
             .ReturnsAsync("my-super-secret-key-with-at-least-32-characters-for-security");
 
-        _generator = new JwtTokenGenerator(jwtSettings, _secretManagerMock.Object);
+        var logger = NullLogger<JwtTokenGenerator>.Instance;
+        _generator = new JwtTokenGenerator(jwtSettings, _secretManagerMock.Object, logger);
     }
 
     [Fact]
@@ -121,11 +124,12 @@ public class JwtTokenGeneratorTests
             ExpirationMinutes = 60
         };
 
-        var secretManagerMock = new Mock<BarbApp.Infrastructure.Services.ISecretManager>();
+        var secretManagerMock = new Mock<ISecretManager>();
         secretManagerMock.Setup(x => x.GetSecretAsync(It.IsAny<string>()))
             .ReturnsAsync("my-super-secret-key-with-at-least-32-characters-for-security");
 
-        var generator = new JwtTokenGenerator(jwtSettings, secretManagerMock.Object);
+        var logger = NullLogger<JwtTokenGenerator>.Instance;
+        var generator = new JwtTokenGenerator(jwtSettings, secretManagerMock.Object, logger);
         var userId = Guid.NewGuid().ToString();
 
         // Manually create expired token by mocking time or using short expiration

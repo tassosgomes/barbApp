@@ -1,6 +1,7 @@
 using Infisical.Sdk;
 using Infisical.Sdk.Model;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace BarbApp.Infrastructure.Services;
 
@@ -20,8 +21,9 @@ public class InfisicalService : ISecretManager
     private readonly InfisicalClient _infisicalClient;
     private readonly string _environment;
     private readonly string _projectId;
+    private readonly ILogger<InfisicalService> _logger;
 
-    public InfisicalService(IConfiguration configuration)
+    public InfisicalService(IConfiguration configuration, ILogger<InfisicalService> logger)
     {
         var settings = new InfisicalSdkSettingsBuilder()
             .WithHostUri(configuration["Infisical:HostUri"])
@@ -30,6 +32,7 @@ public class InfisicalService : ISecretManager
         _infisicalClient = new InfisicalClient(settings);
         _environment = configuration["Infisical:Environment"];
         _projectId = configuration["Infisical:ProjectId"];
+        _logger = logger;
 
         var clientId = configuration["Infisical:ClientId"];
         var clientSecret = configuration["Infisical:ClientSecret"];
@@ -37,11 +40,11 @@ public class InfisicalService : ISecretManager
         try
         {
             _infisicalClient.Auth().UniversalAuth().LoginAsync(clientId, clientSecret).GetAwaiter().GetResult();
-            Console.WriteLine("✓ Infisical authentication successful");
+            _logger.LogInformation("Infisical authentication successful");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"✗ Infisical authentication failed: {ex.Message}");
+            _logger.LogError(ex, "Infisical authentication failed");
             throw;
         }
     }
@@ -59,12 +62,12 @@ public class InfisicalService : ISecretManager
             };
 
             var secret = await _infisicalClient.Secrets().GetAsync(options);
-            Console.WriteLine($"✓ Secret '{secretName}' retrieved successfully");
+            _logger.LogInformation($"Secret '{secretName}' retrieved successfully");
             return secret.SecretValue;
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"✗ Failed to retrieve secret '{secretName}': {ex.Message}");
+            _logger.LogError(ex, $"Failed to retrieve secret '{secretName}'");
             throw;
         }
     }

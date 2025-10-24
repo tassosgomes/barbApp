@@ -38,7 +38,7 @@ export const Template2Modern: React.FC<Template2ModernProps> = ({ data }) => {
               <img
                 src={landingPage.logoUrl}
                 alt={barbershop.name}
-                className="w-12 h-12 rounded-full border-2 border-modern-light"
+                className="w-12 h-12 rounded-full border-2 border-blue-500"
               />
             )}
             <h1 className="text-2xl font-bold">{barbershop.name}</h1>
@@ -86,7 +86,7 @@ export const Template2Modern: React.FC<Template2ModernProps> = ({ data }) => {
             Nossos Serviços
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {landingPage.services.map((service) => (
+            {landingPage.Services.map((service) => (
               <div
                 key={service.id}
                 className="transform transition-all duration-300 hover:shadow-xl hover:-translate-y-2"

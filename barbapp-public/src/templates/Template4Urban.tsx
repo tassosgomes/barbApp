@@ -11,7 +11,7 @@ interface Template4UrbanProps {
 
 export const Template4Urban: React.FC<Template4UrbanProps> = ({ data }) => {
   const navigate = useNavigate();
-  const { barbershop, landingPage } = data;
+    const { barbershop, landingPage } = data;
   const {
     selectedIds,
     totalPrice,

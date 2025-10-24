@@ -22,6 +22,6 @@ export interface PublicService {
   id: string;
   name: string;
   description?: string;
-  duration: number;
+  durationMinutes: number;
   price: number;
 }
