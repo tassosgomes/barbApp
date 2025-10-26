@@ -154,6 +154,35 @@ Stores customer information.
 | created_at     | timestamp with time zone   | **NOT NULL** |
 | updated_at     | timestamp with time zone   | **NOT NULL** |
 
+### `clientes`
+Stores client information for the new appointment system.
+
+| Column         | Type                       | Constraints |
+|----------------|----------------------------|-------------|
+| cliente_id     | uuid                       | **NOT NULL, PRIMARY KEY** |
+| barbearia_id   | uuid                       | **NOT NULL** |
+| nome           | character varying(200)     | **NOT NULL** |
+| telefone       | character varying(11)      | **NOT NULL** |
+| data_criacao   | timestamp with time zone   | **NOT NULL** |
+| data_atualizacao | timestamp with time zone | **NOT NULL** |
+
+### `agendamentos`
+Stores appointment information for the new appointment system.
+
+| Column         | Type                       | Constraints |
+|----------------|----------------------------|-------------|
+| agendamento_id | uuid                       | **NOT NULL, PRIMARY KEY** |
+| barbearia_id   | uuid                       | **NOT NULL** |
+| cliente_id     | uuid                       | **NOT NULL** |
+| barbeiro_id    | uuid                       | **NOT NULL** |
+| servico_id     | uuid                       | **NOT NULL** |
+| data_hora      | timestamp with time zone   | **NOT NULL** |
+| duracao_total  | integer                    | **NOT NULL** |
+| status         | integer                    | **NOT NULL** |
+| data_cancelamento | timestamp with time zone |             |
+| data_criacao   | timestamp with time zone   | **NOT NULL** |
+| data_atualizacao | timestamp with time zone | **NOT NULL** |
+
 ### `landing_page_configs`
 
 | Column                  | Type                       | Constraints |
@@ -198,7 +227,12 @@ This section describes the foreign key relationships between the tables.
 | `barbershop_services`     | `barbearia_id` | `barbershops`     | `barbershop_id` |
 | `barbershops`             | `address_id`   | `addresses`       | `address_id`    |
 | `customers`               | `barbearia_id` | `barbershops`     | `barbershop_id` |
-| `landing_page_configs`    | `barbershop_id`| `barbershops`     | `barbershop_id` |
+| `clientes`                | `barbearia_id` | `barbershops`     | `barbershop_id` |
+| `agendamentos`            | `barbearia_id` | `barbershops`     | `barbershop_id` |
+| `agendamentos`            | `cliente_id`   | `clientes`        | `cliente_id`    |
+| `agendamentos`            | `barbeiro_id`  | `barbers`         | `barber_id`     |
+| `agendamentos`            | `servico_id`   | `barbershop_services` | `service_id` |
+| `landing_page_configs`    | `barbearia_id`| `barbershops`     | `barbershop_id` |
 | `landing_page_services`   | `landing_page_config_id` | `landing_page_configs` | `landing_page_config_id` |
 | `landing_page_services`   | `service_id`   | `barbershop_services` | `service_id` |
 
@@ -238,6 +272,12 @@ This section lists the indexes created to optimize query performance.
 | `customers`             | `ix_customers_barbearia_id`               | BTREE   | `barbearia_id`              |
 | `customers`             | `ix_customers_telefone`                   | BTREE   | `telefone`                  |
 | `customers`             | `ix_customers_telefone_barbearia_id`      | UNIQUE  | `telefone`, `barbearia_id`  |
+| `clientes`              | `idx_clientes_barbearia`                  | BTREE   | `barbearia_id`              |
+| `clientes`              | `idx_clientes_telefone_barbearia`         | UNIQUE  | `telefone`, `barbearia_id`  |
+| `agendamentos`          | `idx_agendamentos_barbearia`              | BTREE   | `barbearia_id`              |
+| `agendamentos`          | `idx_agendamentos_barbeiro_data`          | BTREE   | `barbeiro_id`, `data_hora`  |
+| `agendamentos`          | `idx_agendamentos_cliente_status`         | BTREE   | `cliente_id`, `status`      |
+| `agendamentos`          | `idx_agendamentos_data_hora`              | BTREE   | `data_hora`                 |
 | `landing_page_configs`  | `ix_landing_page_configs_is_published`    | BTREE   | `is_published`              |
 | `landing_page_configs`  | `uq_landing_page_configs_barbershop`      | UNIQUE  | `barbershop_id`             |
 | `landing_page_services` | `ix_landing_page_services_config_id`      | BTREE   | `landing_page_config_id`    |

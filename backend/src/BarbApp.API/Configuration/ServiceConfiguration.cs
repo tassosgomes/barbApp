@@ -75,6 +75,8 @@ public static class ServiceConfiguration
         services.AddScoped<ICustomerRepository, CustomerRepository>();
         services.AddScoped<IBarbershopServiceRepository, BarbershopServiceRepository>();
         services.AddScoped<IAppointmentRepository, AppointmentRepository>();
+        services.AddScoped<IClienteRepository, ClienteRepository>();
+        services.AddScoped<IAgendamentoRepository, AgendamentoRepository>();
 
         // Security services
         services.AddSingleton<IPasswordHasher, PasswordHasher>();
