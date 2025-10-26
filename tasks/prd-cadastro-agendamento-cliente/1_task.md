@@ -1,5 +1,5 @@
 ---
-status: pending
+status: completed
 parallelizable: false
 blocked_by: []
 ---
@@ -28,12 +28,12 @@ Implementar as entidades e regras de domínio do módulo de Cadastro e Agendamen
 - Navegações previstas para EF (Cliente→Agendamentos; Agendamento→Cliente/Barbeiro/Servico)
 
 ## Subtarefas
-- [ ] 1.1 Implementar entidade `Cliente` com validações e método `ValidarNomeLogin`
-- [ ] 1.2 Implementar entidade `Agendamento` com validações e transições
-- [ ] 1.3 Definir enum `StatusAgendamento`
-- [ ] 1.4 Criar exceções de domínio (ex.: `DomainException`)
-- [ ] 1.5 Criar testes unitários para `Cliente` (casos válidos e inválidos)
-- [ ] 1.6 Criar testes unitários para `Agendamento` (criação, confirmar, cancelar, concluir e inválidos)
+- [x] 1.1 Implementar entidade `Cliente` com validações e método `ValidarNomeLogin`
+- [x] 1.2 Implementar entidade `Agendamento` com validações e transições
+- [x] 1.3 Definir enum `StatusAgendamento`
+- [x] 1.4 Criar exceções de domínio (ex.: `DomainException`) - Reutilizado ValidationException existente
+- [x] 1.5 Criar testes unitários para `Cliente` (casos válidos e inválidos)
+- [x] 1.6 Criar testes unitários para `Agendamento` (criação, confirmar, cancelar, concluir e inválidos)
 
 ## Sequenciamento
 - Bloqueado por: —
