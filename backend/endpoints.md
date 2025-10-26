@@ -82,7 +82,22 @@ Este documento detalha todos os endpoints da API BarbApp, incluindo descrições
   - `NovaBarbeariaId` (Guid): ID da nova barbearia para a qual o barbeiro deseja trocar.
 - **Parâmetros de Saída**: `AuthResponse` (similar ao login, com o contexto da nova barbearia).
 
-## Barbeiro (`/api/barbeiro`)
+## Barbeiro (`/api/barber`)
+
+### `GET /api/barber/profile`
+
+- **Descrição**: Retorna o perfil do barbeiro autenticado, incluindo informações pessoais e da barbearia atual.
+- **Role Necessária**: `Barbeiro`.
+- **Parâmetros de Entrada**: Nenhum.
+- **Parâmetros de Saída**: `BarberProfileOutput`
+  - `Id` (Guid): ID do barbeiro.
+  - `Name` (string): Nome do barbeiro.
+  - `Email` (string): E-mail do barbeiro.
+  - `PhoneNumber` (string): Número de telefone.
+  - `IsActive` (bool): Status do barbeiro.
+  - `BarbeariaId` (Guid): ID da barbearia atual.
+  - `BarbeariaNome` (string): Nome da barbearia.
+  - `CreatedAt` (DateTime): Data de criação.
 
 ### `GET /api/barbeiro/barbearias`
 
@@ -230,6 +245,14 @@ Este documento detalha todos os endpoints da API BarbApp, incluindo descrições
   - `UpdateBarberInput` (body): Dados a serem atualizados.
 - **Parâmetros de Saída**: `BarberOutput`.
 
+### `PUT /api/barbers/{id}/deactivate`
+
+- **Descrição**: Desativa um barbeiro da barbearia (não poderá receber novos agendamentos).
+- **Role Necessária**: `AdminBarbearia`.
+- **Parâmetros de Entrada**:
+  - `id` (Guid, na rota): ID do barbeiro.
+- **Parâmetros de Saída**: `204 No Content`.
+
 ### `DELETE /api/barbers/{id}`
 
 - **Descrição**: Desativa um barbeiro (soft delete) e cancela todos os seus agendamentos futuros.
@@ -299,6 +322,14 @@ Este documento detalha todos os endpoints da API BarbApp, incluindo descrições
   - `UpdateBarbershopServiceInput` (body): Dados a serem atualizados.
 - **Parâmetros de Saída**: `BarbershopServiceOutput`.
 
+### `PUT /api/barbershop-services/{id}/deactivate`
+
+- **Descrição**: Desativa um serviço oferecido pela barbearia.
+- **Role Necessária**: `AdminBarbearia`.
+- **Parâmetros de Entrada**:
+  - `id` (Guid, na rota): ID do serviço.
+- **Parâmetros de Saída**: `204 No Content`.
+
 ### `DELETE /api/barbershop-services/{id}`
 
 - **Descrição**: Desativa um serviço (soft delete), tornando-o indisponível para novos agendamentos.
@@ -306,6 +337,36 @@ Este documento detalha todos os endpoints da API BarbApp, incluindo descrições
 - **Parâmetros de Entrada**:
   - `id` (Guid, na rota): ID do serviço.
 - **Parâmetros de Saída**: `204 No Content`.
+
+---
+
+## Landing Pages Admin (`/api/admin/landing-pages`)
+
+### `GET /api/admin/landing-pages/{barbershopId}`
+
+- **Descrição**: Busca a configuração da landing page de uma barbearia.
+- **Role Necessária**: `AdminBarbearia` ou `AdminCentral`.
+- **Parâmetros de Entrada**:
+  - `barbershopId` (Guid, na rota): ID da barbearia.
+- **Parâmetros de Saída**: `LandingPageConfigOutput`.
+
+### `PUT /api/admin/landing-pages/{barbershopId}`
+
+- **Descrição**: Atualiza a configuração da landing page.
+- **Role Necessária**: `AdminBarbearia` ou `AdminCentral`.
+- **Parâmetros de Entrada**:
+  - `barbershopId` (Guid, na rota): ID da barbearia.
+  - `UpdateLandingPageInput` (body): Dados de atualização.
+- **Parâmetros de Saída**: `204 No Content`.
+
+### `POST /api/admin/landing-pages/{barbershopId}/logo`
+
+- **Descrição**: Faz upload do logo da landing page.
+- **Role Necessária**: `AdminBarbearia` ou `AdminCentral`.
+- **Parâmetros de Entrada**:
+  - `barbershopId` (Guid, na rota): ID da barbearia.
+  - `File` (IFormFile): Arquivo de imagem (JPG, PNG ou SVG, máx. 2MB).
+- **Parâmetros de Saída**: Objeto JSON com `logoUrl` e `message`.
 
 ---
 
@@ -377,3 +438,15 @@ Este documento detalha todos os endpoints da API BarbApp, incluindo descrições
 - **Parâmetros de Entrada**:
   - `id` (Guid, na rota): ID do agendamento.
 - **Parâmetros de Saída**: `AppointmentDetailsOutput` (com status atualizado para "Completed").
+
+---
+
+## Landing Pages Públicas (`/api/public/barbershops`)
+
+### `GET /api/public/barbershops/{code}/landing-page`
+
+- **Descrição**: Busca landing page pública de uma barbearia pelo código.
+- **Role Necessária**: Nenhuma (Público).
+- **Parâmetros de Entrada**:
+  - `code` (string, na rota): Código único da barbearia.
+- **Parâmetros de Saída**: `PublicLandingPageOutput`.

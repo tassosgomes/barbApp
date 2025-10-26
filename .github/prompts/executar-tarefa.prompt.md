@@ -55,6 +55,7 @@ Riscos/Desafios: [Riscos ou desafios identificados]
 - Siga todos os padrões estabelecidos do projeto
 - Não considere a tarefa completa até seguir o processo de revisão
 - Não realize commit esse passo será realizado pós revisão
+- Não gere nenhum documento que não seja solicitado pelo usuário
 
 ## Implementação
 
