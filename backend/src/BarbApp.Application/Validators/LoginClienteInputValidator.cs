@@ -7,8 +7,9 @@ public class LoginClienteInputValidator : AbstractValidator<DTOs.LoginClienteInp
 {
     public LoginClienteInputValidator()
     {
-        RuleFor(x => x.Codigo)
-            .NotEmpty().WithMessage("Código da barbearia é obrigatório");
+        RuleFor(x => x.CodigoBarbearia)
+            .NotEmpty().WithMessage("Código da barbearia é obrigatório")
+            .Length(8).WithMessage("Código da barbearia deve ter 8 caracteres");
 
         RuleFor(x => x.Telefone)
             .NotEmpty().WithMessage("Telefone é obrigatório")

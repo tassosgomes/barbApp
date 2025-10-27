@@ -10,7 +10,7 @@ public record LoginClienteInput
     /// Código único da barbearia (8 caracteres alfanuméricos maiúsculos)
     /// </summary>
     /// <example>ABC12345</example>
-    public string Codigo { get; init; } = string.Empty;
+    public string CodigoBarbearia { get; init; } = string.Empty;
 
     /// <summary>
     /// Telefone do cliente (apenas números, formato brasileiro: 10 ou 11 dígitos)

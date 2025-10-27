@@ -25,7 +25,7 @@ public class AuthenticateClienteUseCase : IAuthenticateClienteUseCase
 
     public async Task<AuthResponse> ExecuteAsync(LoginClienteInput input, CancellationToken cancellationToken = default)
     {
-        var barbearia = await _barbershopRepository.GetByCodeAsync(input.Codigo, cancellationToken);
+        var barbearia = await _barbershopRepository.GetByCodeAsync(input.CodigoBarbearia, cancellationToken);
 
         if (barbearia == null || !barbearia.IsActive)
         {

@@ -43,7 +43,7 @@ public class AuthenticateClienteUseCaseTests
         // Arrange
         var input = new LoginClienteInput
         {
-            Codigo = "ABC23456",
+            CodigoBarbearia = "ABC23456",
             Telefone = "11987654321",
             Nome = "João Silva"
         };
@@ -53,7 +53,7 @@ public class AuthenticateClienteUseCaseTests
         var customer = Customer.Create(barbearia.Id, "11987654321", "João Silva");
 
         _barbershopRepoMock
-            .Setup(x => x.GetByCodeAsync(input.Codigo, It.IsAny<CancellationToken>()))
+            .Setup(x => x.GetByCodeAsync(input.CodigoBarbearia, It.IsAny<CancellationToken>()))
             .ReturnsAsync(barbearia);
 
         _repositoryMock
@@ -82,7 +82,7 @@ public class AuthenticateClienteUseCaseTests
         result.NomeBarbearia.Should().Be(barbearia.Name);
         result.ExpiresAt.Should().Be(expectedToken.ExpiresAt);
 
-        _barbershopRepoMock.Verify(x => x.GetByCodeAsync(input.Codigo, It.IsAny<CancellationToken>()), Times.Once);
+        _barbershopRepoMock.Verify(x => x.GetByCodeAsync(input.CodigoBarbearia, It.IsAny<CancellationToken>()), Times.Once);
         _repositoryMock.Verify(x => x.GetByTelefoneAndBarbeariaIdAsync(input.Telefone, barbearia.Id, It.IsAny<CancellationToken>()), Times.Once);
         _repositoryMock.Verify(x => x.AddAsync(It.IsAny<Customer>(), It.IsAny<CancellationToken>()), Times.Never);
         _tokenGeneratorMock.Verify(x => x.GenerateToken(
@@ -99,7 +99,7 @@ public class AuthenticateClienteUseCaseTests
         // Arrange
         var input = new LoginClienteInput
         {
-            Codigo = "ABC23456",
+            CodigoBarbearia = "ABC23456",
             Telefone = "11987654321",
             Nome = "João Silva"
         };
@@ -108,7 +108,7 @@ public class AuthenticateClienteUseCaseTests
         var barbearia = CreateTestBarbershop("Barbearia Teste", barbeariaCode);
 
         _barbershopRepoMock
-            .Setup(x => x.GetByCodeAsync(input.Codigo, It.IsAny<CancellationToken>()))
+            .Setup(x => x.GetByCodeAsync(input.CodigoBarbearia, It.IsAny<CancellationToken>()))
             .ReturnsAsync(barbearia);
 
         _repositoryMock
@@ -141,7 +141,7 @@ public class AuthenticateClienteUseCaseTests
         result.NomeBarbearia.Should().Be(barbearia.Name);
         result.ExpiresAt.Should().Be(expectedToken.ExpiresAt);
 
-        _barbershopRepoMock.Verify(x => x.GetByCodeAsync(input.Codigo, It.IsAny<CancellationToken>()), Times.Once);
+        _barbershopRepoMock.Verify(x => x.GetByCodeAsync(input.CodigoBarbearia, It.IsAny<CancellationToken>()), Times.Once);
         _repositoryMock.Verify(x => x.GetByTelefoneAndBarbeariaIdAsync(input.Telefone, barbearia.Id, It.IsAny<CancellationToken>()), Times.Once);
         _repositoryMock.Verify(x => x.AddAsync(It.IsAny<Customer>(), It.IsAny<CancellationToken>()), Times.Once);
         _tokenGeneratorMock.Verify(x => x.GenerateToken(
@@ -158,13 +158,13 @@ public class AuthenticateClienteUseCaseTests
         // Arrange
         var input = new LoginClienteInput
         {
-            Codigo = "INVALID",
+            CodigoBarbearia = "INVALID",
             Telefone = "11987654321",
             Nome = "João Silva"
         };
 
         _barbershopRepoMock
-            .Setup(x => x.GetByCodeAsync(input.Codigo, It.IsAny<CancellationToken>()))
+            .Setup(x => x.GetByCodeAsync(input.CodigoBarbearia, It.IsAny<CancellationToken>()))
             .ReturnsAsync((Barbershop?)null);
 
         // Act
@@ -174,7 +174,7 @@ public class AuthenticateClienteUseCaseTests
         await act.Should().ThrowAsync<BarbApp.Domain.Exceptions.UnauthorizedAccessException>()
             .WithMessage("Código da barbearia inválido");
 
-        _barbershopRepoMock.Verify(x => x.GetByCodeAsync(input.Codigo, It.IsAny<CancellationToken>()), Times.Once);
+        _barbershopRepoMock.Verify(x => x.GetByCodeAsync(input.CodigoBarbearia, It.IsAny<CancellationToken>()), Times.Once);
         _repositoryMock.Verify(x => x.GetByTelefoneAndBarbeariaIdAsync(It.IsAny<string>(), It.IsAny<Guid>(), It.IsAny<CancellationToken>()), Times.Never);
         _repositoryMock.Verify(x => x.AddAsync(It.IsAny<Customer>(), It.IsAny<CancellationToken>()), Times.Never);
         _tokenGeneratorMock.Verify(x => x.GenerateToken(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Guid?>(), It.IsAny<string>()), Times.Never);
@@ -186,7 +186,7 @@ public class AuthenticateClienteUseCaseTests
         // Arrange
         var input = new LoginClienteInput
         {
-            Codigo = "ABC23456",
+            CodigoBarbearia = "ABC23456",
             Telefone = "11987654321",
             Nome = "João Silva"
         };
@@ -196,7 +196,7 @@ public class AuthenticateClienteUseCaseTests
         var customer = Customer.Create(barbearia.Id, "11987654321", "Maria Silva"); // Different name
 
         _barbershopRepoMock
-            .Setup(x => x.GetByCodeAsync(input.Codigo, It.IsAny<CancellationToken>()))
+            .Setup(x => x.GetByCodeAsync(input.CodigoBarbearia, It.IsAny<CancellationToken>()))
             .ReturnsAsync(barbearia);
 
         _repositoryMock
@@ -210,7 +210,7 @@ public class AuthenticateClienteUseCaseTests
         await act.Should().ThrowAsync<BarbApp.Domain.Exceptions.UnauthorizedAccessException>()
             .WithMessage("Nome não corresponde ao telefone cadastrado");
 
-        _barbershopRepoMock.Verify(x => x.GetByCodeAsync(input.Codigo, It.IsAny<CancellationToken>()), Times.Once);
+        _barbershopRepoMock.Verify(x => x.GetByCodeAsync(input.CodigoBarbearia, It.IsAny<CancellationToken>()), Times.Once);
         _repositoryMock.Verify(x => x.GetByTelefoneAndBarbeariaIdAsync(input.Telefone, barbearia.Id, It.IsAny<CancellationToken>()), Times.Once);
         _repositoryMock.Verify(x => x.AddAsync(It.IsAny<Customer>(), It.IsAny<CancellationToken>()), Times.Never);
         _tokenGeneratorMock.Verify(x => x.GenerateToken(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Guid?>(), It.IsAny<string>()), Times.Never);
