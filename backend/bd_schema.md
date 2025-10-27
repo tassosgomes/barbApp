@@ -284,3 +284,194 @@ This section lists the indexes created to optimize query performance.
 | `landing_page_services` | `ix_landing_page_services_config_order`   | BTREE   | `landing_page_config_id`, `display_order` |
 | `landing_page_services` | `ix_landing_page_services_service_id`     | BTREE   | `service_id`                |
 | `landing_page_services` | `uq_landing_page_services_config_service` | UNIQUE  | `landing_page_config_id`, `service_id` |
+
+---
+
+## ER Diagram
+
+> **💡 Dica de Visualização**: 
+> - No GitHub/VS Code: Clique no diagrama e use `Ctrl + Scroll` (ou `Cmd + Scroll` no Mac) para zoom
+> - Para melhor visualização, você pode copiar o código Mermaid e colar em [mermaid.live](https://mermaid.live) que tem controles de zoom nativos
+> - No VS Code com extensão Mermaid: Clique com botão direito → "Open Preview to the Side"
+
+```mermaid
+%%{init: {'theme':'default', 'themeVariables': {'fontSize':'16px'}, 'er': {'layoutDirection': 'TB', 'useMaxWidth': true}}}%%
+erDiagram
+    %% Core Tables
+    barbershops {
+        uuid barbershop_id PK
+        varchar code "NOT NULL, UNIQUE"
+        varchar name "NOT NULL"
+        varchar document "NOT NULL, UNIQUE"
+        int document_type "NOT NULL"
+        varchar email "NOT NULL"
+        varchar owner_name "NOT NULL"
+        varchar phone "NOT NULL"
+        uuid address_id FK "NOT NULL"
+        boolean is_active "NOT NULL"
+        varchar created_by "NOT NULL"
+        varchar updated_by "NOT NULL"
+        timestamptz created_at "NOT NULL"
+        timestamptz updated_at "NOT NULL"
+    }
+
+    addresses {
+        uuid address_id PK
+        varchar zip_code "NOT NULL"
+        varchar street "NOT NULL"
+        varchar number "NOT NULL"
+        varchar complement
+        varchar neighborhood "NOT NULL"
+        varchar city "NOT NULL"
+        varchar state "NOT NULL"
+        timestamptz created_at "NOT NULL"
+        timestamptz updated_at "NOT NULL"
+    }
+
+    %% User Tables
+    admin_central_users {
+        uuid admin_central_user_id PK
+        varchar email "NOT NULL, UNIQUE"
+        varchar password_hash "NOT NULL"
+        varchar name "NOT NULL"
+        boolean is_active "NOT NULL"
+        timestamptz created_at "NOT NULL"
+        timestamptz updated_at "NOT NULL"
+    }
+
+    admin_barbearia_users {
+        uuid admin_barbearia_user_id PK
+        uuid barbearia_id FK "NOT NULL"
+        varchar email "NOT NULL"
+        text password_hash "NOT NULL"
+        varchar name "NOT NULL"
+        boolean is_active "NOT NULL"
+        timestamptz created_at "NOT NULL"
+        timestamptz updated_at "NOT NULL"
+    }
+
+    barbers {
+        uuid barber_id PK
+        uuid barbearia_id FK "NOT NULL"
+        varchar name "NOT NULL"
+        varchar email "NOT NULL, UNIQUE per barbershop"
+        text password_hash "NOT NULL"
+        varchar phone "NOT NULL"
+        uuid[] service_ids "NOT NULL"
+        boolean is_active "NOT NULL"
+        timestamptz created_at "NOT NULL"
+        timestamptz updated_at "NOT NULL"
+    }
+
+    %% Service Tables
+    barbershop_services {
+        uuid service_id PK
+        uuid barbearia_id FK "NOT NULL"
+        varchar name "NOT NULL"
+        varchar description
+        int duration_minutes "NOT NULL"
+        decimal price "NOT NULL"
+        boolean is_active "NOT NULL"
+        timestamptz created_at "NOT NULL"
+        timestamptz updated_at "NOT NULL"
+    }
+
+    %% Customer Tables
+    customers {
+        uuid customer_id PK
+        uuid barbearia_id FK "NOT NULL"
+        varchar name "NOT NULL"
+        varchar telefone "NOT NULL, UNIQUE per barbershop"
+        boolean is_active "NOT NULL"
+        timestamptz created_at "NOT NULL"
+        timestamptz updated_at "NOT NULL"
+    }
+
+    clientes {
+        uuid cliente_id PK
+        uuid barbearia_id FK "NOT NULL"
+        varchar nome "NOT NULL"
+        varchar telefone "NOT NULL, UNIQUE per barbershop"
+        timestamptz data_criacao "NOT NULL"
+        timestamptz data_atualizacao "NOT NULL"
+    }
+
+    %% Appointment Tables
+    appointments {
+        uuid appointment_id PK
+        uuid barbearia_id FK "NOT NULL"
+        uuid barber_id FK "NOT NULL"
+        uuid customer_id FK "NOT NULL"
+        uuid service_id FK "NOT NULL"
+        timestamptz start_time "NOT NULL"
+        timestamptz end_time "NOT NULL"
+        varchar status "NOT NULL"
+        timestamptz cancelled_at
+        timestamptz completed_at
+        timestamptz confirmed_at
+        timestamptz created_at "NOT NULL"
+        timestamptz updated_at "NOT NULL"
+    }
+
+    agendamentos {
+        uuid agendamento_id PK
+        uuid barbearia_id FK "NOT NULL"
+        uuid cliente_id FK "NOT NULL"
+        uuid barbeiro_id FK "NOT NULL"
+        uuid servico_id FK "NOT NULL"
+        timestamptz data_hora "NOT NULL"
+        int duracao_total "NOT NULL"
+        int status "NOT NULL"
+        timestamptz data_cancelamento
+        timestamptz data_criacao "NOT NULL"
+        timestamptz data_atualizacao "NOT NULL"
+    }
+
+    %% Landing Page Tables
+    landing_page_configs {
+        uuid landing_page_config_id PK
+        uuid barbershop_id FK "NOT NULL, UNIQUE"
+        int template_id "NOT NULL"
+        varchar logo_url
+        varchar about_text
+        varchar opening_hours
+        varchar instagram_url
+        varchar facebook_url
+        varchar whatsapp_number "NOT NULL"
+        boolean is_published "NOT NULL, DEFAULT true"
+        timestamptz created_at "NOT NULL"
+        timestamptz updated_at "NOT NULL"
+    }
+
+    landing_page_services {
+        uuid landing_page_service_id PK
+        uuid landing_page_config_id FK "NOT NULL"
+        uuid service_id FK "NOT NULL"
+        int display_order "NOT NULL, DEFAULT 0"
+        boolean is_visible "NOT NULL, DEFAULT true"
+        timestamptz created_at "NOT NULL"
+    }
+
+    %% Relationships
+    barbershops ||--|| addresses : "has"
+    barbershops ||--o{ admin_barbearia_users : "has"
+    barbershops ||--o{ barbers : "employs"
+    barbershops ||--o{ barbershop_services : "offers"
+    barbershops ||--o{ customers : "serves"
+    barbershops ||--o{ clientes : "serves"
+    barbershops ||--o{ appointments : "has"
+    barbershops ||--o{ agendamentos : "has"
+    barbershops ||--o| landing_page_configs : "has"
+    
+    barbers ||--o{ appointments : "attends"
+    barbers ||--o{ agendamentos : "attends"
+    
+    barbershop_services ||--o{ appointments : "booked_for"
+    barbershop_services ||--o{ agendamentos : "booked_for"
+    barbershop_services ||--o{ landing_page_services : "displayed_in"
+    
+    customers ||--o{ appointments : "books"
+    clientes ||--o{ agendamentos : "books"
+    
+    landing_page_configs ||--o{ landing_page_services : "includes"
+```
