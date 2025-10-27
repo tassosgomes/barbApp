@@ -14,7 +14,7 @@ public class ClienteRepository : IClienteRepository
         _context = context;
     }
 
-    public async Task<Cliente?> GetByTelefoneAsync(string telefone, CancellationToken cancellationToken = default)
+    public async Task<Cliente?> GetByTelefoneAsync(Guid barbeariaId, string telefone, CancellationToken cancellationToken = default)
     {
         // Global Query Filter já aplica filtro por barbeariaId
         return await _context.Clientes
@@ -32,7 +32,7 @@ public class ClienteRepository : IClienteRepository
         await _context.Clientes.AddAsync(cliente, cancellationToken);
     }
 
-    public async Task<bool> ExisteAsync(string telefone, CancellationToken cancellationToken = default)
+    public async Task<bool> ExisteAsync(Guid barbeariaId, string telefone, CancellationToken cancellationToken = default)
     {
         return await _context.Clientes
             .AnyAsync(c => c.Telefone == telefone, cancellationToken);

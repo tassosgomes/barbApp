@@ -111,6 +111,8 @@ public static class ServiceConfiguration
         services.AddScoped<IAuthenticateAdminBarbeariaUseCase, AuthenticateAdminBarbeariaUseCase>();
         services.AddScoped<IAuthenticateBarbeiroUseCase, AuthenticateBarbeiroUseCase>();
         services.AddScoped<IAuthenticateClienteUseCase, AuthenticateClienteUseCase>();
+        services.AddScoped<ICadastrarClienteUseCase, CadastrarClienteUseCase>();
+        services.AddScoped<ILoginClienteUseCase, LoginClienteUseCase>();
 
         // Barbershop management
         services.AddScoped<IListBarbeirosBarbeariaUseCase, ListBarbeirosBarbeariaUseCase>();

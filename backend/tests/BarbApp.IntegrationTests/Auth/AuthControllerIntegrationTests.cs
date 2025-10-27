@@ -159,7 +159,7 @@ public class AuthControllerIntegrationTests : IClassFixture<WebApplicationFactor
 
         var response = await client.PostAsJsonAsync("/api/auth/cliente/login", new LoginClienteInput
         {
-            Codigo = "BARB123",
+            CodigoBarbearia = "BARB123",
             Telefone = "11999998888",
             Nome = "Cliente Teste"
         });

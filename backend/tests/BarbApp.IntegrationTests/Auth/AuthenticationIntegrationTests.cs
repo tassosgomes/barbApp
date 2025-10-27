@@ -240,7 +240,7 @@ public class AuthenticationIntegrationTests
 
         var loginInput = new LoginClienteInput
         {
-            Codigo = codigo,
+            CodigoBarbearia = codigo,
             Telefone = telefone,
             Nome = nome
         };
@@ -264,7 +264,7 @@ public class AuthenticationIntegrationTests
         // Arrange
         var loginInput = new LoginClienteInput
         {
-            Codigo = "INVALID",
+            CodigoBarbearia = "INVALID",
             Telefone = "11999999999",
             Nome = "Test Cliente"
         };
