@@ -1,5 +1,5 @@
 ---
-status: pending
+status: completed
 parallelizable: true
 blocked_by: ["2.0"]
 ---
@@ -30,20 +30,20 @@ Implementar use cases para consulta de barbeiros e serviços da barbearia. Essas
 
 ## Subtarefas
 
-- [ ] 5.1 Criar DTOs: BarbeiroDto e ServicoDto
-- [ ] 5.2 Criar interface IBarbeirosRepository com métodos de consulta
-- [ ] 5.3 Implementar BarbeirosRepository
-- [ ] 5.4 Criar interface IServicosRepository com métodos de consulta
-- [ ] 5.5 Implementar ServicosRepository
-- [ ] 5.6 Criar interface IListarBarbeirosUseCase
-- [ ] 5.7 Implementar ListarBarbeirosUseCase
-- [ ] 5.8 Criar interface IListarServicosUseCase
-- [ ] 5.9 Implementar ListarServicosUseCase
-- [ ] 5.10 Configurar AutoMapper para Barbeiro → BarbeiroDto
-- [ ] 5.11 Configurar AutoMapper para Servico → ServicoDto
-- [ ] 5.12 Criar testes unitários para ListarBarbeirosUseCase
-- [ ] 5.13 Criar testes unitários para ListarServicosUseCase
-- [ ] 5.14 Registrar use cases e repositórios no DI
+- [x] 5.1 Criar DTOs: BarbeiroDto e ServicoDto
+- [x] 5.2 Criar interface IBarbeirosRepository com métodos de consulta
+- [x] 5.3 Implementar BarbeirosRepository
+- [x] 5.4 Criar interface IServicosRepository com métodos de consulta
+- [x] 5.5 Implementar ServicosRepository
+- [x] 5.6 Criar interface IListarBarbeirosUseCase
+- [x] 5.7 Implementar ListarBarbeirosUseCase
+- [x] 5.8 Criar interface IListarServicosUseCase
+- [x] 5.9 Implementar ListarServicosUseCase
+- [x] 5.10 Configurar AutoMapper para Barbeiro → BarbeiroDto
+- [x] 5.11 Configurar AutoMapper para Servico → ServicoDto
+- [x] 5.12 Criar testes unitários para ListarBarbeirosUseCase
+- [x] 5.13 Criar testes unitários para ListarServicosUseCase
+- [x] 5.14 Registrar use cases e repositórios no DI
 
 ## Sequenciamento
 
