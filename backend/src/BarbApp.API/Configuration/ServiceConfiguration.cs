@@ -110,7 +110,6 @@ public static class ServiceConfiguration
         services.AddScoped<IAuthenticateAdminCentralUseCase, AuthenticateAdminCentralUseCase>();
         services.AddScoped<IAuthenticateAdminBarbeariaUseCase, AuthenticateAdminBarbeariaUseCase>();
         services.AddScoped<IAuthenticateBarbeiroUseCase, AuthenticateBarbeiroUseCase>();
-        services.AddScoped<IAuthenticateClienteUseCase, AuthenticateClienteUseCase>();
         services.AddScoped<ICadastrarClienteUseCase, CadastrarClienteUseCase>();
         services.AddScoped<ILoginClienteUseCase, LoginClienteUseCase>();
 
@@ -127,6 +126,10 @@ public static class ServiceConfiguration
         services.AddScoped<IResendCredentialsUseCase, ResendCredentialsUseCase>();
         services.AddScoped<IGetMyBarbershopUseCase, GetMyBarbershopUseCase>();
         services.AddScoped<ValidateBarbeariaCodeUseCase>();
+
+        // Client listing use cases
+        services.AddScoped<IListarBarbeirosUseCase, ListarBarbeirosUseCase>();
+        services.AddScoped<IListarServicosUseCase, ListarServicosUseCase>();
 
         // Barber management
         services.AddScoped<ICreateBarberUseCase, CreateBarberUseCase>();
@@ -173,18 +176,18 @@ public static class ServiceConfiguration
             options.Providers.Add<GzipCompressionProvider>();
         });
 
-        // Authentication & Authorization
+                // Authentication & Authorization
         // Build temporary service provider to get dependencies
         var tempServiceProvider = services.BuildServiceProvider();
         var jwtSettings = tempServiceProvider.GetRequiredService<IOptions<JwtSettings>>().Value;
-        var secretManager = tempServiceProvider.GetRequiredService<ISecretManager>();
         var loggerFactory = tempServiceProvider.GetRequiredService<ILoggerFactory>();
         var logger = loggerFactory.CreateLogger("JwtAuthentication");
         
-        // Get JWT secret from Infisical
+        // Get JWT secret from Infisical or fallback to configuration
         string jwtSecret;
         try
         {
+            var secretManager = tempServiceProvider.GetRequiredService<ISecretManager>();
             jwtSecret = secretManager.GetSecretAsync("JWT_SECRET").GetAwaiter().GetResult();
             logger.LogInformation("JWT Secret loaded successfully from Infisical for authentication");
         }
