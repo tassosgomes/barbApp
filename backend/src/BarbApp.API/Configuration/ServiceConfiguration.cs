@@ -70,10 +70,12 @@ public static class ServiceConfiguration
         services.AddScoped<IAdminCentralUserRepository, AdminCentralUserRepository>();
         services.AddScoped<IAdminBarbeariaUserRepository, AdminBarbeariaUserRepository>();
         services.AddScoped<IBarberRepository, BarberRepository>();
+        services.AddScoped<IBarbeirosRepository, BarbeirosRepository>();
         services.AddScoped<IBarbershopRepository, BarbershopRepository>();
         services.AddScoped<IAddressRepository, AddressRepository>();
         services.AddScoped<ICustomerRepository, CustomerRepository>();
         services.AddScoped<IBarbershopServiceRepository, BarbershopServiceRepository>();
+        services.AddScoped<IServicosRepository, ServicosRepository>();
         services.AddScoped<IAppointmentRepository, AppointmentRepository>();
         services.AddScoped<IClienteRepository, ClienteRepository>();
         services.AddScoped<IAgendamentoRepository, AgendamentoRepository>();
@@ -86,6 +88,7 @@ public static class ServiceConfiguration
         services.AddScoped<ITenantContext, TenantContext>();
         services.AddScoped<IUniqueCodeGenerator, UniqueCodeGenerator>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddScoped<IDisponibilidadeCache, DisponibilidadeCache>();
 
         // Email service (conditional based on environment)
         var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production";
@@ -101,6 +104,9 @@ public static class ServiceConfiguration
 
     public static void ConfigureUseCases(this IServiceCollection services)
     {
+        // AutoMapper configuration
+        services.AddAutoMapper(typeof(BarbApp.Application.Mappings.AutoMapperProfile).Assembly);
+
         services.AddMediatR(cfg =>
         {
             cfg.RegisterServicesFromAssembly(typeof(CreateBarbershopUseCase).Assembly);
@@ -130,6 +136,7 @@ public static class ServiceConfiguration
         // Client listing use cases
         services.AddScoped<IListarBarbeirosUseCase, ListarBarbeirosUseCase>();
         services.AddScoped<IListarServicosUseCase, ListarServicosUseCase>();
+        services.AddScoped<IConsultarDisponibilidadeUseCase, ConsultarDisponibilidadeUseCase>();
 
         // Barber management
         services.AddScoped<ICreateBarberUseCase, CreateBarberUseCase>();

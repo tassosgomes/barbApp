@@ -1,4 +1,5 @@
 // BarbApp.Application/UseCases/ListarServicosUseCase.cs
+using AutoMapper;
 using BarbApp.Application.DTOs;
 using BarbApp.Application.Interfaces.UseCases;
 using BarbApp.Domain.Interfaces.Repositories;
@@ -8,14 +9,17 @@ namespace BarbApp.Application.UseCases;
 
 public class ListarServicosUseCase : IListarServicosUseCase
 {
-    private readonly IBarbershopServiceRepository _servicosRepository;
+    private readonly IServicosRepository _servicosRepository;
+    private readonly IMapper _mapper;
     private readonly ILogger<ListarServicosUseCase> _logger;
 
     public ListarServicosUseCase(
-        IBarbershopServiceRepository servicosRepository,
+        IServicosRepository servicosRepository,
+        IMapper mapper,
         ILogger<ListarServicosUseCase> logger)
     {
         _servicosRepository = servicosRepository;
+        _mapper = mapper;
         _logger = logger;
     }
 
@@ -23,19 +27,12 @@ public class ListarServicosUseCase : IListarServicosUseCase
     {
         _logger.LogInformation("Listando serviços ativos da barbearia {BarbeariaId}", barbeariaId);
 
-        var servicos = await _servicosRepository.ListAsync(
+        var servicos = await _servicosRepository.GetAtivosAsync(
             barbeariaId,
-            isActive: true,
-            cancellationToken: cancellationToken);
+            cancellationToken);
 
         _logger.LogInformation("Encontrados {Count} serviços ativos", servicos.Count);
 
-        return servicos.Select(s => new ServicoDto(
-            s.Id,
-            s.Name,
-            s.Description ?? string.Empty,
-            s.DurationMinutes,
-            s.Price
-        )).ToList();
+        return _mapper.Map<List<ServicoDto>>(servicos);
     }
 }
