@@ -1,5 +1,5 @@
 ---
-status: pending
+status: completed
 parallelizable: false
 blocked_by: ["3.0"]
 ---
@@ -32,19 +32,19 @@ Criar os endpoints REST de autenticação de clientes, configurar middleware JWT
 
 ## Subtarefas
 
-- [ ] 4.1 Criar AuthClienteController com endpoints vazios
-- [ ] 4.2 Implementar POST /api/auth/cliente/cadastro
-- [ ] 4.3 Implementar POST /api/auth/cliente/login
-- [ ] 4.4 Configurar middleware JWT Authentication
-- [ ] 4.5 Criar middleware TenantContextMiddleware para extrair barbeariaId do token
-- [ ] 4.6 Implementar ExceptionHandlerMiddleware com Problem Details
-- [ ] 4.7 Configurar validação automática com FluentValidation
-- [ ] 4.8 Documentar endpoints no Swagger com exemplos e descrições
-- [ ] 4.9 Adicionar atributos [ProducesResponseType] para documentação
-- [ ] 4.10 Criar testes de integração para POST cadastro (201, 404, 422)
-- [ ] 4.11 Criar testes de integração para POST login (200, 401, 404)
-- [ ] 4.12 Testar middleware de autenticação (token válido/inválido)
-- [ ] 4.13 Configurar CORS se necessário
+- [x] 4.1 Criar AuthClienteController com endpoints vazios
+- [x] 4.2 Implementar POST /api/auth/cliente/cadastro
+- [x] 4.3 Implementar POST /api/auth/cliente/login
+- [x] 4.4 Configurar middleware JWT Authentication
+- [x] 4.5 Criar middleware TenantContextMiddleware para extrair barbeariaId do token
+- [x] 4.6 Implementar ExceptionHandlerMiddleware com Problem Details
+- [x] 4.7 Configurar validação automática com FluentValidation
+- [x] 4.8 Documentar endpoints no Swagger com exemplos e descrições
+- [x] 4.9 Adicionar atributos [ProducesResponseType] para documentação
+- [x] 4.10 Criar testes de integração para POST cadastro (201, 404, 422)
+- [x] 4.11 Criar testes de integração para POST login (200, 401, 404)
+- [x] 4.12 Testar middleware de autenticação (token válido/inválido)
+- [x] 4.13 Configurar CORS se necessário
 
 ## Sequenciamento
 
