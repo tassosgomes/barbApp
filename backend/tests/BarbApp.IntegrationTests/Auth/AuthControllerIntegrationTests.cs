@@ -12,11 +12,11 @@ using Moq;
 
 namespace BarbApp.IntegrationTests.Auth;
 
-public class AuthControllerIntegrationTests : IClassFixture<WebApplicationFactory<Program>>
+public class AuthControllerIntegrationTests : IClassFixture<IntegrationTestWebAppFactory>
 {
-    private readonly WebApplicationFactory<Program> _factory;
+    private readonly IntegrationTestWebAppFactory _factory;
 
-    public AuthControllerIntegrationTests(WebApplicationFactory<Program> factory)
+    public AuthControllerIntegrationTests(IntegrationTestWebAppFactory factory)
     {
         _factory = factory;
     }
@@ -159,7 +159,7 @@ public class AuthControllerIntegrationTests : IClassFixture<WebApplicationFactor
 
         var response = await client.PostAsJsonAsync("/api/auth/cliente/login", new LoginClienteInput
         {
-            CodigoBarbearia = "BARB123",
+            CodigoBarbearia = "BARB1234",
             Telefone = "11999998888",
             Nome = "Cliente Teste"
         });

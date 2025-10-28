@@ -42,6 +42,31 @@ public class Customer
         };
     }
 
+    public static Customer Create(
+        Guid id,
+        Guid barbeariaId,
+        string telefone,
+        string name)
+    {
+        if (id == Guid.Empty)
+            throw new ArgumentException("ID is required");
+        if (barbeariaId == Guid.Empty)
+            throw new ArgumentException("Barbearia ID is required");
+        if (string.IsNullOrWhiteSpace(name))
+            throw new ArgumentException("Name is required");
+
+        return new Customer
+        {
+            Id = id,
+            BarbeariaId = barbeariaId,
+            Telefone = CleanAndValidatePhone(telefone),
+            Name = name.Trim(),
+            IsActive = true,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        };
+    }
+
     private static string CleanAndValidatePhone(string telefone)
     {
         if (string.IsNullOrWhiteSpace(telefone))

@@ -51,7 +51,7 @@ public static class ServiceConfiguration
         });
     }
 
-    public static void ConfigureInfrastructureServices(this IServiceCollection services)
+    public static void ConfigureInfrastructureServices(this IServiceCollection services, IWebHostEnvironment? environment = null)
     {
         // Configuration options - MUST be configured before services that depend on them
         services.Configure<JwtSettings>(
@@ -85,15 +85,26 @@ public static class ServiceConfiguration
         services.AddSingleton<IPasswordHasher, PasswordHasher>();
         services.AddSingleton<IPasswordGenerator, SecurePasswordGenerator>();
         services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>(); // Now JwtSettings is available
-        services.AddSingleton<ISecretManager, InfisicalService>();
+        
+        // Secret manager (conditional based on environment)
+        var env = environment?.EnvironmentName ?? Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production";
+        if (env == "Testing")
+        {
+            services.AddSingleton<ISecretManager, TestSecretManager>();
+        }
+        else
+        {
+            services.AddSingleton<ISecretManager, InfisicalService>();
+        }
+        
         services.AddScoped<ITenantContext, TenantContext>();
         services.AddScoped<IUniqueCodeGenerator, UniqueCodeGenerator>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IDisponibilidadeCache, DisponibilidadeCache>();
 
         // Email service (conditional based on environment)
-        var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production";
-        if (environment == "Development")
+        var env2 = environment?.EnvironmentName ?? Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production";
+        if (env2 == "Development")
         {
             services.AddScoped<IEmailService, FakeEmailService>();
         }
@@ -117,6 +128,7 @@ public static class ServiceConfiguration
         services.AddScoped<IAuthenticateAdminCentralUseCase, AuthenticateAdminCentralUseCase>();
         services.AddScoped<IAuthenticateAdminBarbeariaUseCase, AuthenticateAdminBarbeariaUseCase>();
         services.AddScoped<IAuthenticateBarbeiroUseCase, AuthenticateBarbeiroUseCase>();
+        services.AddScoped<IAuthenticateClienteUseCase, AuthenticateClienteUseCase>();
         services.AddScoped<ICadastrarClienteUseCase, CadastrarClienteUseCase>();
         services.AddScoped<ILoginClienteUseCase, LoginClienteUseCase>();
 
@@ -199,21 +211,31 @@ public static class ServiceConfiguration
         var loggerFactory = tempServiceProvider.GetRequiredService<ILoggerFactory>();
         var logger = loggerFactory.CreateLogger("JwtAuthentication");
         
-        // Get JWT secret from Infisical or fallback to configuration
+        // Get JWT secret - skip Infisical in testing environment
         string jwtSecret;
-        try
+        var environment = builder.Environment.EnvironmentName ?? Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production";
+        logger.LogInformation("Environment detected: {Environment}", environment);
+        if (environment == "Testing")
         {
-            var secretManager = tempServiceProvider.GetRequiredService<ISecretManager>();
-            jwtSecret = secretManager.GetSecretAsync("JWT_SECRET").GetAwaiter().GetResult();
-            logger.LogInformation("JWT Secret loaded successfully from Infisical for authentication");
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Failed to load JWT Secret from Infisical, falling back to configuration");
             jwtSecret = jwtSettings.Secret;
-            if (string.IsNullOrEmpty(jwtSecret))
+            logger.LogInformation("Using test JWT secret for testing environment");
+        }
+        else
+        {
+            try
             {
-                throw new InvalidOperationException("JWT Secret not available from Infisical or configuration", ex);
+                var secretManager = tempServiceProvider.GetRequiredService<ISecretManager>();
+                jwtSecret = secretManager.GetSecretAsync("JWT_SECRET").GetAwaiter().GetResult();
+                logger.LogInformation("JWT Secret loaded successfully from Infisical for authentication");
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Failed to load JWT Secret from Infisical, falling back to configuration");
+                jwtSecret = jwtSettings.Secret;
+                if (string.IsNullOrEmpty(jwtSecret))
+                {
+                    throw new InvalidOperationException("JWT Secret not available from Infisical or configuration", ex);
+                }
             }
         }
 

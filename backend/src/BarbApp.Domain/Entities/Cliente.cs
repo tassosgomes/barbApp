@@ -40,6 +40,24 @@ public class Cliente
         };
     }
 
+    public static Cliente Create(Guid id, Guid barbeariaId, string nome, string telefone)
+    {
+        var nomeValidado = ValidarNome(nome);
+        var telefoneValidado = ValidarTelefone(telefone);
+
+        var now = DateTime.UtcNow;
+
+        return new Cliente
+        {
+            Id = id,
+            BarbeariaId = barbeariaId,
+            Nome = nomeValidado,
+            Telefone = telefoneValidado,
+            CreatedAt = now,
+            UpdatedAt = now
+        };
+    }
+
     private static string ValidarNome(string nome)
     {
         if (string.IsNullOrWhiteSpace(nome))

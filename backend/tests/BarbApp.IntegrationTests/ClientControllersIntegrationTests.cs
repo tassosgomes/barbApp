@@ -110,8 +110,12 @@ public class ClientControllersIntegrationTests : IAsyncLifetime
 
         _testBarberId = barber.Id;
 
-        // Create test customer for barbearia1
-        var cliente = Cliente.Create(_testBarbeariaId, "Cliente Teste", "11999999999");
+        // Create test customer for barbearia1 (both Customer and Cliente entities with same ID)
+        var clienteId = Guid.NewGuid();
+        var customer = Customer.Create(clienteId, _testBarbeariaId, "11999999999", "Cliente Teste");
+        var cliente = Cliente.Create(clienteId, _testBarbeariaId, "Cliente Teste", "11999999999");
+        
+        dbContext.Customers.Add(customer);
         dbContext.Clientes.Add(cliente);
         await dbContext.SaveChangesAsync();
 

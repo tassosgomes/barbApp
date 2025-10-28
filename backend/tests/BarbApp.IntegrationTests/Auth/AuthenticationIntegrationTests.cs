@@ -15,63 +15,37 @@ using Microsoft.Extensions.DependencyInjection;
 namespace BarbApp.IntegrationTests.Auth;
 
 [Collection(nameof(IntegrationTestCollection))]
-public class AuthenticationIntegrationTests
+public class AuthenticationIntegrationTests : IAsyncLifetime
 {
     private readonly HttpClient _client;
-    private readonly WebApplicationFactory<Program> _factory;
+    private readonly IntegrationTestWebAppFactory _factory;
     private readonly DatabaseFixture _dbFixture;
-    private static bool _dbInitialized;
-    private static readonly object _initLock = new();
-    private readonly ILogger _logger;
 
     public AuthenticationIntegrationTests(DatabaseFixture dbFixture)
     {
         _dbFixture = dbFixture;
-        _logger = LoggerFactory.Create(builder => builder.AddConsole()).CreateLogger<AuthenticationIntegrationTests>();
-
-        // Initialize database once
-        if (!_dbInitialized)
-        {
-            lock (_initLock)
-            {
-                if (!_dbInitialized)
-                {
-                    _dbFixture.RunMigrations();
-                    _dbInitialized = true;
-                }
-            }
-        }
-
-        // Create factory with inline configuration
-        _factory = new WebApplicationFactory<Program>()
-            .WithWebHostBuilder(builder =>
-            {
-                builder.ConfigureAppConfiguration((context, config) =>
-                {
-                    config.AddInMemoryCollection(new Dictionary<string, string?>
-                    {
-                        ["JwtSettings:Secret"] = "test-secret-key-at-least-32-characters-long-for-jwt",
-                        ["JwtSettings:Issuer"] = "BarbApp-Test",
-                        ["JwtSettings:Audience"] = "BarbApp-Test-Users",
-                        ["JwtSettings:ExpirationMinutes"] = "60"
-                    }!);
-                });
-
-                builder.ConfigureServices(services =>
-                {
-                    // Remove existing DbContext
-                    var descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(DbContextOptions<BarbAppDbContext>));
-                    if (descriptor != null) services.Remove(descriptor);
-
-                    // Add test DbContext
-                    services.AddDbContext<BarbAppDbContext>(options =>
-                        options.UseNpgsql(_dbFixture.ConnectionString));
-                });
-
-                builder.UseEnvironment("Testing");
-            });
-
+        _factory = new IntegrationTestWebAppFactory();
         _client = _factory.CreateClient();
+    }
+
+    public async Task InitializeAsync()
+    {
+        // Ensure database is initialized
+        _factory.EnsureDatabaseInitialized();
+
+        // Setup test data
+        await SetupTestData();
+    }
+
+    public Task DisposeAsync()
+    {
+        return Task.CompletedTask;
+    }
+
+    private async Task SetupTestData()
+    {
+        // No test data setup needed for authentication tests
+        await Task.CompletedTask;
     }
 
     [Fact]
@@ -261,10 +235,10 @@ public class AuthenticationIntegrationTests
     [Fact]
     public async Task LoginCliente_WithInvalidCredentials_ReturnsUnauthorized()
     {
-        // Arrange
+        // Arrange - Use a valid format code that doesn't exist
         var loginInput = new LoginClienteInput
         {
-            CodigoBarbearia = "INVALID",
+            CodigoBarbearia = "NONEXIST",
             Telefone = "11999999999",
             Nome = "Test Cliente"
         };
@@ -329,7 +303,7 @@ public class AuthenticationIntegrationTests
         authResult!.Token.Should().NotBeNullOrEmpty();
 
         // Debug: Print token for inspection
-        _logger.LogInformation("JWT Token: {Token}", authResult.Token);
+        Console.WriteLine($"JWT Token: {authResult.Token}");
 
         // Set the JWT token in the Authorization header for subsequent requests
         _client.DefaultRequestHeaders.Authorization =
@@ -337,7 +311,7 @@ public class AuthenticationIntegrationTests
 
         // Test authentication with weather forecast endpoint first
         var weatherResponse = await _client.GetAsync("/weatherforecast");
-        _logger.LogInformation("Weather forecast status: {StatusCode}", weatherResponse.StatusCode);
+        Console.WriteLine($"Weather forecast status: {weatherResponse.StatusCode}");
 
         // Act - List barbers (should only see barbers from barbearia1)
         var listResponse = await _client.GetAsync("/api/auth/barbeiros");

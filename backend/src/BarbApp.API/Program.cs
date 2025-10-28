@@ -123,7 +123,7 @@ if (!builder.Environment.IsEnvironment("Testing"))
 // CONFIGURE SERVICES
 // ══════════════════════════════════════════════════════════
 builder.Services.ConfigureDatabase(builder.Configuration);
-builder.Services.ConfigureInfrastructureServices();
+builder.Services.ConfigureInfrastructureServices(builder.Environment);
 builder.Services.ConfigureUseCases();
 builder.Services.ConfigureFrameworkServices(builder);
 

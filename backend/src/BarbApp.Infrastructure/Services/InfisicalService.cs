@@ -18,13 +18,23 @@ public interface ISecretManager
 
 public class InfisicalService : ISecretManager
 {
-    private readonly InfisicalClient _infisicalClient;
-    private readonly string _environment;
-    private readonly string _projectId;
+    private readonly InfisicalClient? _infisicalClient;
+    private readonly string? _environment;
+    private readonly string? _projectId;
     private readonly ILogger<InfisicalService> _logger;
 
     public InfisicalService(IConfiguration configuration, ILogger<InfisicalService> logger)
     {
+        var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production";
+        
+        // Skip Infisical authentication in testing environment
+        if (environment == "Testing")
+        {
+            _logger = logger;
+            _logger.LogInformation("Skipping Infisical authentication in testing environment");
+            return;
+        }
+
         var settings = new InfisicalSdkSettingsBuilder()
             .WithHostUri(configuration["Infisical:HostUri"])
             .Build();
@@ -51,6 +61,16 @@ public class InfisicalService : ISecretManager
 
     public async Task<string> GetSecretAsync(string secretName)
     {
+        // Return test values in testing environment
+        if (_infisicalClient == null)
+        {
+            return secretName switch
+            {
+                "JWT_SECRET" => "test-secret-key-at-least-32-characters-long-for-jwt",
+                _ => $"test-value-for-{secretName}"
+            };
+        }
+
         try
         {
             var options = new GetSecretOptions
@@ -70,5 +90,17 @@ public class InfisicalService : ISecretManager
             _logger.LogError(ex, $"Failed to retrieve secret '{secretName}'");
             throw;
         }
+    }
+}
+
+public class TestSecretManager : ISecretManager
+{
+    public Task<string> GetSecretAsync(string secretName)
+    {
+        return Task.FromResult(secretName switch
+        {
+            "JWT_SECRET" => "test-secret-key-at-least-32-characters-long-for-jwt",
+            _ => $"test-value-for-{secretName}"
+        });
     }
 }

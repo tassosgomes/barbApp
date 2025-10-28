@@ -12,66 +12,36 @@ using Microsoft.Extensions.DependencyInjection;
 namespace BarbApp.IntegrationTests;
 
 [Collection(nameof(IntegrationTestCollection))]
-public class BarbershopsControllerIntegrationTests
+public class BarbershopsControllerIntegrationTests : IAsyncLifetime
 {
     private readonly HttpClient _client;
-    private readonly WebApplicationFactory<Program> _factory;
+    private readonly IntegrationTestWebAppFactory _factory;
     private readonly DatabaseFixture _dbFixture;
-    private static bool _dbInitialized;
-    private static readonly object _initLock = new();
 
     public BarbershopsControllerIntegrationTests(DatabaseFixture dbFixture)
     {
         _dbFixture = dbFixture;
-
-        // Initialize database once
-        if (!_dbInitialized)
-        {
-            lock (_initLock)
-            {
-                if (!_dbInitialized)
-                {
-                    _dbFixture.RunMigrations();
-                    _dbInitialized = true;
-                }
-            }
-        }
-
-        // Create factory with inline configuration
-        _factory = new WebApplicationFactory<Program>()
-            .WithWebHostBuilder(builder =>
-            {
-                builder.ConfigureAppConfiguration((context, config) =>
-                {
-                    config.AddInMemoryCollection(new Dictionary<string, string?>
-                    {
-                        ["JwtSettings:Secret"] = "test-secret-key-at-least-32-characters-long-for-jwt",
-                        ["JwtSettings:Issuer"] = "BarbApp-Test",
-                        ["JwtSettings:Audience"] = "BarbApp-Test-Users",
-                        ["JwtSettings:ExpirationMinutes"] = "60"
-                    }!);
-                });
-
-                builder.ConfigureServices(services =>
-                {
-                    // Remove existing DbContext
-                    var descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(DbContextOptions<BarbAppDbContext>));
-                    if (descriptor != null) services.Remove(descriptor);
-
-                    // Add test DbContext
-                    services.AddDbContext<BarbAppDbContext>(options =>
-                        options.UseNpgsql(_dbFixture.ConnectionString));
-
-                    // Register NoOpEmailService for testing (needed for Task 15.3)
-                    services.AddScoped<BarbApp.Application.Interfaces.IEmailService, NoOpEmailService>();
-                });
-
-                builder.UseEnvironment("Testing");
-            });
-
+        _factory = new IntegrationTestWebAppFactory();
         _client = _factory.CreateClient();
+    }
 
-        // Set AdminCentral JWT token
+    public async Task InitializeAsync()
+    {
+        // Ensure database is initialized
+        _factory.EnsureDatabaseInitialized();
+
+        // Setup test data
+        await SetupTestData();
+    }
+
+    public Task DisposeAsync()
+    {
+        return Task.CompletedTask;
+    }
+
+    private async Task SetupTestData()
+    {
+        // Set JWT token for AdminCentral (no barbeariaId needed)
         var token = IntegrationTestWebAppFactory.GenerateTestJwtToken(
             userId: Guid.NewGuid().ToString(),
             userType: "AdminCentral",
@@ -759,26 +729,8 @@ public class BarbershopsControllerIntegrationTests
         var created = await createResponse.Content.ReadFromJsonAsync<BarbershopOutput>();
         var codigo = created!.Code;
 
-        // Create completely fresh client with no authentication
-        var anonymousClient = new HttpClient
-        {
-            BaseAddress = new Uri("http://localhost")
-        };
-        var factory = new WebApplicationFactory<Program>()
-            .WithWebHostBuilder(builder =>
-            {
-                builder.ConfigureAppConfiguration((context, config) =>
-                {
-                    config.AddInMemoryCollection(new Dictionary<string, string?>
-                    {
-                        ["ConnectionStrings:DefaultConnection"] = _dbFixture.ConnectionString
-                    });
-                });
-
-                builder.UseEnvironment("Testing");
-            });
-
-        anonymousClient = factory.CreateClient();
+        // Create unauthenticated client using the same factory
+        var anonymousClient = _factory.CreateClient();
 
         // Act
         var response = await anonymousClient.GetAsync($"/api/barbearias/codigo/{codigo}");

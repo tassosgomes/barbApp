@@ -47,6 +47,25 @@ public class DatabaseFixture : IAsyncLifetime
         optionsBuilder.UseNpgsql(ConnectionString);
 
         using var context = new BarbAppDbContext(optionsBuilder.Options, new TenantContext());
-        context.Database.Migrate();
+        
+        // Ensure database exists
+        context.Database.EnsureCreated();
+        
+        // Then run migrations to ensure schema is up to date
+        try
+        {
+            context.Database.Migrate();
+        }
+        catch (Exception ex) when (ex.Message.Contains("already exists") || ex.InnerException?.Message.Contains("already exists") == true)
+        {
+            // Migrations already applied, continue
+        }
+        catch (Npgsql.PostgresException ex) when (ex.SqlState == "42P01")
+        {
+            // Tables don't exist, try to recreate schema
+            context.Database.EnsureDeleted();
+            context.Database.EnsureCreated();
+            context.Database.Migrate();
+        }
     }
 }

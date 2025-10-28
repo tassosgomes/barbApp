@@ -94,14 +94,50 @@ public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>
                 options.UseNpgsql(_dbContainer.GetConnectionString());
             });
 
-            // Remove ALL IEmailService registrations and replace with no-op implementation for testing
+            // Remove ALL IEmailService registrations and replace with FakeEmailService for testing
             var emailServiceDescriptors = services.Where(
                 d => d.ServiceType == typeof(BarbApp.Application.Interfaces.IEmailService)).ToList();
             foreach (var descriptor in emailServiceDescriptors)
             {
                 services.Remove(descriptor);
             }
-            services.AddScoped<BarbApp.Application.Interfaces.IEmailService, NoOpEmailService>();
+            services.AddScoped<BarbApp.Application.Interfaces.IEmailService, BarbApp.Infrastructure.Services.FakeEmailService>();
+
+            // Register LocalLogoUploadService for testing
+            var logoUploadDescriptors = services.Where(
+                d => d.ServiceType == typeof(BarbApp.Application.Interfaces.ILogoUploadService)).ToList();
+            foreach (var descriptor in logoUploadDescriptors)
+            {
+                services.Remove(descriptor);
+            }
+            services.AddScoped<BarbApp.Application.Interfaces.ILogoUploadService, BarbApp.Infrastructure.Services.LocalLogoUploadService>();
+
+            // Register ImageSharpProcessor for testing
+            var imageProcessorDescriptors = services.Where(
+                d => d.ServiceType == typeof(BarbApp.Application.Interfaces.IImageProcessor)).ToList();
+            foreach (var descriptor in imageProcessorDescriptors)
+            {
+                services.Remove(descriptor);
+            }
+            services.AddScoped<BarbApp.Application.Interfaces.IImageProcessor, BarbApp.Infrastructure.Services.ImageSharpProcessor>();
+
+            // Replace ISecretManager with test implementation to avoid Infisical dependency
+            var secretManagerDescriptors = services.Where(
+                d => d.ServiceType == typeof(BarbApp.Infrastructure.Services.ISecretManager)).ToList();
+            foreach (var descriptor in secretManagerDescriptors)
+            {
+                services.Remove(descriptor);
+            }
+            services.AddSingleton<BarbApp.Infrastructure.Services.ISecretManager, TestSecretManager>();
+
+            // Replace IR2StorageService with test implementation to avoid R2 dependency
+            var r2StorageDescriptors = services.Where(
+                d => d.ServiceType == typeof(BarbApp.Infrastructure.Services.IR2StorageService)).ToList();
+            foreach (var descriptor in r2StorageDescriptors)
+            {
+                services.Remove(descriptor);
+            }
+            services.AddSingleton<BarbApp.Infrastructure.Services.IR2StorageService, TestR2StorageService>();
         });
 
         builder.UseEnvironment("Testing");
@@ -126,20 +162,22 @@ public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>
         if (_dbInitialized)
             return;
 
-        lock (_dbLock)
+        using var scope = Services.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<BarbAppDbContext>();
+        
+        // Reset database to clean state - force drop and recreate
+        try
         {
-            if (_dbInitialized)
-                return;
-
-            using var scope = Services.CreateScope();
-            var dbContext = scope.ServiceProvider.GetRequiredService<BarbAppDbContext>();
-            
-            // Reset database to clean state
             dbContext.Database.EnsureDeleted();
-            dbContext.Database.EnsureCreated();
-            
-            _dbInitialized = true;
         }
+        catch
+        {
+            // Ignore errors if database doesn't exist yet
+        }
+        
+        dbContext.Database.EnsureCreated();
+        
+        _dbInitialized = true;
     }
 
     /// <summary>
@@ -233,5 +271,51 @@ class TestWebHostEnvironment : IWebHostEnvironment
         WebRootPath = Path.Combine(ContentRootPath, "wwwroot");
         Directory.CreateDirectory(WebRootPath);
         WebRootFileProvider = new PhysicalFileProvider(WebRootPath);
+    }
+}
+
+/// <summary>
+/// Test implementation of ISecretManager that returns test values without requiring Infisical.
+/// </summary>
+class TestSecretManager : BarbApp.Infrastructure.Services.ISecretManager
+{
+    public Task<string> GetSecretAsync(string secretName)
+    {
+        // Return test values for known secrets
+        return secretName switch
+        {
+            "JWT_SECRET" => Task.FromResult("test-secret-key-at-least-32-characters-long-for-jwt"),
+            _ => Task.FromResult($"test-value-for-{secretName}")
+        };
+    }
+}
+
+/// <summary>
+/// Test implementation of IR2StorageService that doesn't require real R2 credentials.
+/// </summary>
+class TestR2StorageService : BarbApp.Infrastructure.Services.IR2StorageService
+{
+    public Task<string> UploadFileAsync(Stream fileStream, string fileName, string contentType, CancellationToken cancellationToken = default)
+    {
+        // Return a fake URL for testing
+        return Task.FromResult($"https://test-r2-storage.example.com/{fileName}");
+    }
+
+    public Task<bool> DeleteFileAsync(string fileKey, CancellationToken cancellationToken = default)
+    {
+        // No-op for testing - always return success
+        return Task.FromResult(true);
+    }
+
+    public Task<Stream> DownloadFileAsync(string fileKey, CancellationToken cancellationToken = default)
+    {
+        // Return empty stream for testing
+        return Task.FromResult<Stream>(new MemoryStream());
+    }
+
+    public string GetPublicUrl(string fileKey)
+    {
+        // Return a fake public URL for testing
+        return $"https://test-r2-storage.example.com/{fileKey}";
     }
 }

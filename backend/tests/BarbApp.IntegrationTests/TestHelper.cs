@@ -140,6 +140,109 @@ public static class TestHelper
         return token.Value;
     }
 
+    public static async Task<Barbershop> CreateTestBarbershop(IServiceProvider services, string? codigo = null)
+    {
+        using var scope = services.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<BarbAppDbContext>();
+
+        var document = Document.Create(GenerateUniqueDocument());
+        var address = Address.Create("01310100", "Av. Paulista", "1000", null, "Bela Vista", "São Paulo", "SP");
+        var uniqueCode = UniqueCode.Create(codigo ?? GenerateUniqueCode());
+        var barbershop = Barbershop.Create(
+            $"Test Barbearia {Guid.NewGuid()}",
+            document,
+            "11987654321",
+            "João Silva",
+            "joao@test.com",
+            address,
+            uniqueCode,
+            "admin-user-id");
+
+        await context.Barbershops.AddAsync(barbershop);
+        await context.SaveChangesAsync();
+
+        return barbershop;
+    }
+
+    public static async Task<Customer> CreateTestCustomer(IServiceProvider services, Guid barbershopId, string? telefone = null, string? nome = null)
+    {
+        using var scope = services.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<BarbAppDbContext>();
+
+        var customer = Customer.Create(
+            barbershopId,
+            telefone ?? $"119{Random.Shared.Next(10000000, 99999999)}",
+            nome ?? "Test Cliente");
+
+        await context.Customers.AddAsync(customer);
+        await context.SaveChangesAsync();
+
+        return customer;
+    }
+
+    public static async Task<Barber> CreateTestBarber(IServiceProvider services, Guid barbershopId, bool ativo = true, string? email = null)
+    {
+        using var scope = services.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<BarbAppDbContext>();
+        var passwordHasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher>();
+
+        var barber = Barber.Create(
+            barbershopId,
+            "Test Barber",
+            email ?? $"barber-{Guid.NewGuid()}@test.com",
+            passwordHasher.Hash("Test@123"),
+            $"119{Random.Shared.Next(10000000, 99999999)}");
+
+        if (!ativo)
+            barber.Deactivate();
+        await context.Barbers.AddAsync(barber);
+        await context.SaveChangesAsync();
+
+        return barber;
+    }
+
+    public static async Task<BarbershopService> CreateTestBarbershopService(IServiceProvider services, Guid barbershopId, bool ativo = true)
+    {
+        using var scope = services.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<BarbAppDbContext>();
+
+        var service = BarbershopService.Create(
+            barbershopId,
+            "Corte de Cabelo",
+            "Corte masculino completo",
+            30,
+            25.00m);
+
+        if (!ativo)
+            service.Deactivate();
+        await context.BarbershopServices.AddAsync(service);
+        await context.SaveChangesAsync();
+
+        return service;
+    }
+
+    public static async Task<Appointment> CreateTestAppointment(IServiceProvider services, Guid barbeariaId, Guid customerId, Guid barberId, Guid serviceId)
+    {
+        using var scope = services.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<BarbAppDbContext>();
+
+        var startTime = DateTime.UtcNow.AddDays(1).Date.AddHours(10);
+        var endTime = startTime.AddMinutes(30);
+
+        var appointment = Appointment.Create(
+            barbeariaId,
+            barberId,
+            customerId,
+            serviceId,
+            startTime,
+            endTime);
+
+        await context.Appointments.AddAsync(appointment);
+        await context.SaveChangesAsync();
+
+        return appointment;
+    }
+
     private static string GenerateUniqueCode()
     {
         const string chars = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";

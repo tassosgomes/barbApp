@@ -54,6 +54,7 @@ public class GlobalExceptionHandlerMiddleware
             ForbiddenException => (HttpStatusCode.Forbidden, exception.Message),
             NotFoundException => (HttpStatusCode.NotFound, exception.Message),
             ConflictException => (HttpStatusCode.Conflict, exception.Message),
+            HorarioIndisponivelException => (HttpStatusCode.Conflict, exception.Message),
             DuplicateDocumentException => (HttpStatusCode.UnprocessableEntity, exception.Message),
             DuplicateBarberException => (HttpStatusCode.Conflict, exception.Message),
             InvalidDocumentException => (HttpStatusCode.BadRequest, exception.Message),

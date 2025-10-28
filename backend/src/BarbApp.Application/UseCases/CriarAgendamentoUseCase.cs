@@ -15,7 +15,7 @@ public class CriarAgendamentoUseCase : ICriarAgendamentoUseCase
     private readonly IAgendamentoRepository _agendamentoRepository;
     private readonly IBarbeirosRepository _barbeirosRepository;
     private readonly IServicosRepository _servicosRepository;
-    private readonly IClienteRepository _clienteRepository;
+    private readonly ICustomerRepository _customerRepository;
     private readonly IDisponibilidadeCache _cache;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
@@ -25,7 +25,7 @@ public class CriarAgendamentoUseCase : ICriarAgendamentoUseCase
         IAgendamentoRepository agendamentoRepository,
         IBarbeirosRepository barbeirosRepository,
         IServicosRepository servicosRepository,
-        IClienteRepository clienteRepository,
+        ICustomerRepository customerRepository,
         IDisponibilidadeCache cache,
         IUnitOfWork unitOfWork,
         IMapper mapper,
@@ -34,7 +34,7 @@ public class CriarAgendamentoUseCase : ICriarAgendamentoUseCase
         _agendamentoRepository = agendamentoRepository;
         _barbeirosRepository = barbeirosRepository;
         _servicosRepository = servicosRepository;
-        _clienteRepository = clienteRepository;
+        _customerRepository = customerRepository;
         _cache = cache;
         _unitOfWork = unitOfWork;
         _mapper = mapper;
@@ -52,8 +52,8 @@ public class CriarAgendamentoUseCase : ICriarAgendamentoUseCase
             clienteId, barbeariaId);
 
         // 1. Validar que cliente existe
-        var cliente = await _clienteRepository.GetByIdAsync(clienteId, cancellationToken);
-        if (cliente == null)
+        var customer = await _customerRepository.GetByIdAsync(clienteId, cancellationToken);
+        if (customer == null)
         {
             _logger.LogWarning("Cliente {ClienteId} não encontrado", clienteId);
             throw new NotFoundException("Cliente não encontrado");
