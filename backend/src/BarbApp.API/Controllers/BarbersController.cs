@@ -19,6 +19,7 @@ public class BarbersController : ControllerBase
     private readonly IGetBarberByIdUseCase _getBarberByIdUseCase;
     private readonly IGetTeamScheduleUseCase _getTeamScheduleUseCase;
     private readonly IResetBarberPasswordUseCase _resetBarberPasswordUseCase;
+    private readonly IConsultarDisponibilidadeUseCase _consultarDisponibilidadeUseCase;
     private readonly ILogger<BarbersController> _logger;
 
     public BarbersController(
@@ -29,6 +30,7 @@ public class BarbersController : ControllerBase
         IGetBarberByIdUseCase getBarberByIdUseCase,
         IGetTeamScheduleUseCase getTeamScheduleUseCase,
         IResetBarberPasswordUseCase resetBarberPasswordUseCase,
+        IConsultarDisponibilidadeUseCase consultarDisponibilidadeUseCase,
         ILogger<BarbersController> logger)
     {
         _createBarberUseCase = createBarberUseCase;
@@ -38,6 +40,7 @@ public class BarbersController : ControllerBase
         _getBarberByIdUseCase = getBarberByIdUseCase;
         _getTeamScheduleUseCase = getTeamScheduleUseCase;
         _resetBarberPasswordUseCase = resetBarberPasswordUseCase;
+        _consultarDisponibilidadeUseCase = consultarDisponibilidadeUseCase;
         _logger = logger;
     }
 
@@ -261,6 +264,47 @@ public class BarbersController : ControllerBase
         var result = await _getTeamScheduleUseCase.ExecuteAsync(scheduleDate, barberId, HttpContext.RequestAborted);
 
         _logger.LogInformation("Team schedule returned with {AppointmentCount} appointments", result.Appointments.Count);
+
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Consulta horários disponíveis de um barbeiro
+    /// </summary>
+    /// <param name="barbeiroId">ID do barbeiro</param>
+    /// <param name="dataInicio">Data de início da consulta (formato: YYYY-MM-DD)</param>
+    /// <param name="dataFim">Data de fim da consulta (formato: YYYY-MM-DD)</param>
+    /// <param name="duracaoServicosMinutos">Duração total dos serviços em minutos</param>
+    /// <returns>Horários disponíveis do barbeiro</returns>
+    /// <response code="200">Disponibilidade retornada com sucesso</response>
+    /// <response code="400">Parâmetros inválidos</response>
+    /// <response code="401">Usuário não autenticado</response>
+    /// <response code="403">Usuário não tem permissão para acessar este recurso</response>
+    /// <response code="404">Barbeiro não encontrado</response>
+    [HttpGet("{barbeiroId}/disponibilidade")]
+    [ProducesResponseType(typeof(DisponibilidadeOutput), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<DisponibilidadeOutput>> GetDisponibilidade(
+        Guid barbeiroId,
+        [FromQuery] DateTime dataInicio,
+        [FromQuery] DateTime dataFim,
+        [FromQuery] int duracaoServicosMinutos = 30)
+    {
+        _logger.LogInformation("Consultando disponibilidade do barbeiro {BarbeiroId} de {DataInicio} até {DataFim}",
+            barbeiroId, dataInicio, dataFim);
+
+        var result = await _consultarDisponibilidadeUseCase.Handle(
+            barbeiroId,
+            dataInicio,
+            dataFim,
+            duracaoServicosMinutos,
+            HttpContext.RequestAborted);
+
+        _logger.LogInformation("Disponibilidade retornada para barbeiro {BarbeiroId} com {DiasCount} dias",
+            barbeiroId, result.DiasDisponiveis.Count);
 
         return Ok(result);
     }
