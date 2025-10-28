@@ -1,7 +1,7 @@
 ---
-status: pending
+status: blocked
 parallelizable: false
-blocked_by: ["2.0", "5.0", "6.0"]
+blocked_by: ["7.0"]
 ---
 
 <task_context>
@@ -32,24 +32,31 @@ Implementar os use cases críticos de gestão de agendamentos: criação com val
 
 ## Subtarefas
 
-- [ ] 7.1 Criar DTOs: CriarAgendamentoInput, AgendamentoOutput, EditarAgendamentoInput
-- [ ] 7.2 Criar validador FluentValidation para CriarAgendamentoInput
-- [ ] 7.3 Criar interface ICriarAgendamentoUseCase
-- [ ] 7.4 Implementar algoritmo de validação de conflito de horários
-- [ ] 7.5 Implementar CriarAgendamentoUseCase com transaction e lock otimista
-- [ ] 7.6 Criar interface ICancelarAgendamentoUseCase
-- [ ] 7.7 Implementar CancelarAgendamentoUseCase com validações
-- [ ] 7.8 Criar interface IEditarAgendamentoUseCase
-- [ ] 7.9 Implementar EditarAgendamentoUseCase com validação de conflito
-- [ ] 7.10 Criar interface IListarAgendamentosClienteUseCase
-- [ ] 7.11 Implementar ListarAgendamentosClienteUseCase com filtros
-- [ ] 7.12 Criar exceções: HorarioIndisponivelException, AgendamentoJaExisteException
-- [ ] 7.13 Criar testes unitários para CriarAgendamento (sucesso, conflito, race condition)
-- [ ] 7.14 Criar testes unitários para CancelarAgendamento (sucesso, não pode cancelar concluído)
-- [ ] 7.15 Criar testes unitários para EditarAgendamento (sucesso, conflito)
-- [ ] 7.16 Criar testes unitários para ListarAgendamentos (próximos, histórico)
-- [ ] 7.17 Invalidar cache de disponibilidade após criar/cancelar/editar
-- [ ] 7.18 Registrar use cases no DI
+- [x] 7.1 Criar DTOs: CriarAgendamentoInput, AgendamentoOutput, EditarAgendamentoInput
+- [x] 7.2 Criar validador FluentValidation para CriarAgendamentoInput
+- [x] 7.3 Criar interface ICriarAgendamentoUseCase
+- [x] 7.4 Implementar algoritmo de validação de conflito de horários
+- [x] 7.5 Implementar CriarAgendamentoUseCase com transaction e lock otimista
+- [x] 7.6 Criar interface ICancelarAgendamentoUseCase
+- [x] 7.7 Implementar CancelarAgendamentoUseCase com validações
+- [x] 7.8 Criar interface IEditarAgendamentoUseCase
+- [x] 7.9 Implementar EditarAgendamentoUseCase com validação de conflito
+- [x] 7.10 Criar interface IListarAgendamentosClienteUseCase
+- [x] 7.11 Implementar ListarAgendamentosClienteUseCase com filtros
+- [x] 7.12 Criar exceções: HorarioIndisponivelException, AgendamentoJaExisteException
+- [x] 7.13 Criar testes unitários para CriarAgendamento (sucesso, conflito, race condition)
+- [x] 7.14 Criar testes unitários para CancelarAgendamento (sucesso, não pode cancelar concluído)
+- [x] 7.15 Criar testes unitários para EditarAgendamento (sucesso, conflito)
+- [x] 7.16 Criar testes unitários para ListarAgendamentos (próximos, histórico)
+- [x] 7.17 Invalidar cache de disponibilidade após criar/cancelar/editar
+- [x] 7.18 Registrar use cases no DI
+- [ ] 7.19 **CRITICAL FIX**: Update DTOs for multiple services support (List<Guid> ServicosIds)
+- [ ] 7.20 **CRITICAL FIX**: Update Agendamento domain entity for multiple services
+- [ ] 7.21 **CRITICAL FIX**: Update database schema for many-to-many relationship
+- [ ] 7.22 **CRITICAL FIX**: Update all use cases for multiple services logic
+- [ ] 7.23 **CRITICAL FIX**: Update repository implementations for multiple services
+- [ ] 7.24 **CRITICAL FIX**: Update unit tests for multiple services scenarios
+- [ ] 7.25 Add concurrency tests for optimistic locking race condition prevention
 
 ## Detalhes de Implementação
 
