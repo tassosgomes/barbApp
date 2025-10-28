@@ -28,6 +28,13 @@ public class DisponibilidadeCache : IDisponibilidadeCache
         return Task.CompletedTask;
     }
 
+    public Task InvalidateAsync(Guid barbeiroId, DateTime dataInicio, DateTime dataFim, CancellationToken cancellationToken = default)
+    {
+        var key = GerarChave(barbeiroId, dataInicio, dataFim);
+        _cache.Remove(key);
+        return Task.CompletedTask;
+    }
+
     private string GerarChave(Guid barbeiroId, DateTime dataInicio, DateTime dataFim)
     {
         return $"disponibilidade:{barbeiroId}:{dataInicio:yyyyMMdd}:{dataFim:yyyyMMdd}";

@@ -18,10 +18,7 @@ public class AgendamentoConfiguration : IEntityTypeConfiguration<Agendamento>
         builder.Property(a => a.ClienteId).HasColumnName("cliente_id").IsRequired();
         builder.Property(a => a.BarbeiroId).HasColumnName("barbeiro_id").IsRequired();
 
-        // Single service ID (matching current entity)
-        builder.Property(a => a.ServicoId)
-            .HasColumnName("servico_id")
-            .IsRequired();
+        // Removed single service ID - now using many-to-many relationship
 
         builder.Property(a => a.DataHora).HasColumnName("data_hora").IsRequired();
         builder.Property(a => a.DuracaoMinutos).HasColumnName("duracao_total").IsRequired();
@@ -55,14 +52,15 @@ public class AgendamentoConfiguration : IEntityTypeConfiguration<Agendamento>
             .HasForeignKey(a => a.BarbeiroId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasOne(a => a.Servico)
-            .WithMany()
-            .HasForeignKey(a => a.ServicoId)
-            .OnDelete(DeleteBehavior.Restrict);
-
         builder.HasOne(a => a.Barbearia)
             .WithMany()
             .HasForeignKey(a => a.BarbeariaId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        // Many-to-many relationship with services
+        builder.HasMany(a => a.AgendamentoServicos)
+            .WithOne(ag => ag.Agendamento)
+            .HasForeignKey(ag => ag.AgendamentoId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

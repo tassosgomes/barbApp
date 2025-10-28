@@ -138,6 +138,12 @@ public static class ServiceConfiguration
         services.AddScoped<IListarServicosUseCase, ListarServicosUseCase>();
         services.AddScoped<IConsultarDisponibilidadeUseCase, ConsultarDisponibilidadeUseCase>();
 
+        // Client scheduling use cases
+        services.AddScoped<ICriarAgendamentoUseCase, CriarAgendamentoUseCase>();
+        services.AddScoped<ICancelarAgendamentoUseCase, CancelarAgendamentoUseCase>();
+        services.AddScoped<IEditarAgendamentoUseCase, EditarAgendamentoUseCase>();
+        services.AddScoped<IListarAgendamentosClienteUseCase, ListarAgendamentosClienteUseCase>();
+
         // Barber management
         services.AddScoped<ICreateBarberUseCase, CreateBarberUseCase>();
         services.AddScoped<IUpdateBarberUseCase, UpdateBarberUseCase>();

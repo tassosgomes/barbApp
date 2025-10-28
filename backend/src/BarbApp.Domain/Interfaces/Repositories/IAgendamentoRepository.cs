@@ -21,6 +21,8 @@ public interface IAgendamentoRepository
 
     Task AddAsync(Agendamento agendamento, CancellationToken cancellationToken = default);
 
+    Task UpdateAsync(Agendamento agendamento, CancellationToken cancellationToken = default);
+
     Task<bool> ExisteConflito(
         Guid barbeiroId,
         DateTime dataHora,

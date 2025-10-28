@@ -10,8 +10,13 @@ public class AgendamentoTests
     private readonly Guid _barbeariaId = Guid.NewGuid();
     private readonly Guid _clienteId = Guid.NewGuid();
     private readonly Guid _barbeiroId = Guid.NewGuid();
-    private readonly Guid _servicoId = Guid.NewGuid();
+    private readonly List<Guid> _servicosIds;
     private readonly DateTime _dataHoraFutura = DateTime.UtcNow.AddHours(2);
+
+    public AgendamentoTests()
+    {
+        _servicosIds = new List<Guid> { Guid.NewGuid() };
+    }
 
     [Fact]
     public void Create_ComDadosValidos_DeveCriarAgendamentoComStatusPendente()
@@ -24,7 +29,7 @@ public class AgendamentoTests
             _barbeariaId,
             _clienteId,
             _barbeiroId,
-            _servicoId,
+            _servicosIds,
             _dataHoraFutura,
             duracaoMinutos);
 
@@ -34,7 +39,8 @@ public class AgendamentoTests
         agendamento.BarbeariaId.Should().Be(_barbeariaId);
         agendamento.ClienteId.Should().Be(_clienteId);
         agendamento.BarbeiroId.Should().Be(_barbeiroId);
-        agendamento.ServicoId.Should().Be(_servicoId);
+        agendamento.AgendamentoServicos.Should().HaveCount(1);
+        agendamento.AgendamentoServicos.First().ServicoId.Should().Be(_servicosIds.First());
         agendamento.DataHora.Should().Be(_dataHoraFutura);
         agendamento.DuracaoMinutos.Should().Be(duracaoMinutos);
         agendamento.Status.Should().Be(StatusAgendamento.Pendente);
@@ -55,7 +61,7 @@ public class AgendamentoTests
             _barbeariaId,
             _clienteId,
             _barbeiroId,
-            _servicoId,
+            _servicosIds,
             dataPassada,
             duracaoMinutos);
 
@@ -76,7 +82,7 @@ public class AgendamentoTests
             _barbeariaId,
             _clienteId,
             _barbeiroId,
-            _servicoId,
+            _servicosIds,
             dataAtual,
             duracaoMinutos);
 
@@ -97,7 +103,7 @@ public class AgendamentoTests
             _barbeariaId,
             _clienteId,
             _barbeiroId,
-            _servicoId,
+            _servicosIds,
             _dataHoraFutura,
             duracaoMinutos);
 
@@ -117,7 +123,7 @@ public class AgendamentoTests
             _barbeariaId,
             _clienteId,
             _barbeiroId,
-            _servicoId,
+            _servicosIds,
             _dataHoraFutura,
             duracaoMinutos);
 
@@ -134,7 +140,7 @@ public class AgendamentoTests
             _barbeariaId,
             _clienteId,
             _barbeiroId,
-            _servicoId,
+            _servicosIds,
             _dataHoraFutura,
             30);
         var updateAtOriginal = agendamento.UpdatedAt;
@@ -160,7 +166,7 @@ public class AgendamentoTests
             _barbeariaId,
             _clienteId,
             _barbeiroId,
-            _servicoId,
+            _servicosIds,
             _dataHoraFutura,
             30);
         SetAgendamentoStatus(agendamento, status);
@@ -184,7 +190,7 @@ public class AgendamentoTests
             _barbeariaId,
             _clienteId,
             _barbeiroId,
-            _servicoId,
+            _servicosIds,
             _dataHoraFutura,
             30);
         SetAgendamentoStatus(agendamento, statusInicial);
@@ -212,7 +218,7 @@ public class AgendamentoTests
             _barbeariaId,
             _clienteId,
             _barbeiroId,
-            _servicoId,
+            _servicosIds,
             _dataHoraFutura,
             30);
         SetAgendamentoStatus(agendamento, status);
@@ -248,7 +254,7 @@ public class AgendamentoTests
             _barbeariaId,
             _clienteId,
             _barbeiroId,
-            _servicoId,
+            _servicosIds,
             _dataHoraFutura,
             30);
         agendamento.Confirmar();
@@ -275,7 +281,7 @@ public class AgendamentoTests
             _barbeariaId,
             _clienteId,
             _barbeiroId,
-            _servicoId,
+            _servicosIds,
             _dataHoraFutura,
             30);
         SetAgendamentoStatus(agendamento, status);
@@ -307,7 +313,7 @@ public class AgendamentoTests
             _barbeariaId,
             _clienteId,
             _barbeiroId,
-            _servicoId,
+            _servicosIds,
             DateTime.UtcNow.AddHours(2),
             30);
 

@@ -9,7 +9,6 @@ public class Agendamento
     public Guid BarbeariaId { get; private set; }
     public Guid ClienteId { get; private set; }
     public Guid BarbeiroId { get; private set; }
-    public Guid ServicoId { get; private set; }
     public DateTime DataHora { get; private set; }
     public int DuracaoMinutos { get; private set; }
     public StatusAgendamento Status { get; private set; }
@@ -20,8 +19,8 @@ public class Agendamento
     // Navigation properties
     public Cliente? Cliente { get; private set; }
     public Barber? Barbeiro { get; private set; }
-    public BarbershopService? Servico { get; private set; }
     public Barbershop? Barbearia { get; private set; }
+    public ICollection<AgendamentoServico> AgendamentoServicos { get; private set; } = new List<AgendamentoServico>();
 
     private Agendamento()
     {
@@ -32,28 +31,34 @@ public class Agendamento
         Guid barbeariaId,
         Guid clienteId,
         Guid barbeiroId,
-        Guid servicoId,
+        List<Guid> servicosIds,
         DateTime dataHora,
         int duracaoMinutos)
     {
         var dataHoraValidada = ValidarDataHoraFutura(dataHora);
         var duracaoValidada = ValidarDuracao(duracaoMinutos);
 
+        if (servicosIds == null || !servicosIds.Any())
+            throw new ValidationException("Pelo menos um serviço deve ser selecionado");
+
         var now = DateTime.UtcNow;
 
-        return new Agendamento
+        var agendamento = new Agendamento
         {
             Id = Guid.NewGuid(),
             BarbeariaId = barbeariaId,
             ClienteId = clienteId,
             BarbeiroId = barbeiroId,
-            ServicoId = servicoId,
             DataHora = dataHoraValidada,
             DuracaoMinutos = duracaoValidada,
             Status = StatusAgendamento.Pendente,
             CreatedAt = now,
-            UpdatedAt = now
+            UpdatedAt = now,
+            AgendamentoServicos = servicosIds.Select(servicoId =>
+                AgendamentoServico.Create(Guid.NewGuid(), servicoId)).ToList()
         };
+
+        return agendamento;
     }
 
     private static DateTime ValidarDataHoraFutura(DateTime dataHora)
@@ -106,6 +111,38 @@ public class Agendamento
                 "concluir");
 
         Status = StatusAgendamento.Concluido;
+        UpdatedAt = DateTime.UtcNow;
+    }
+
+    public void Atualizar(Guid? barbeiroId, List<Guid>? servicosIds, DateTime? dataHora, int? duracaoMinutos)
+    {
+        if (Status == StatusAgendamento.Concluido || Status == StatusAgendamento.Cancelado)
+            throw new InvalidAppointmentStatusTransitionException(
+                Status.ToString(),
+                "editar");
+
+        if (DataHora <= DateTime.UtcNow)
+            throw new ValidationException("Não é possível editar agendamento passado");
+
+        if (barbeiroId.HasValue)
+            BarbeiroId = barbeiroId.Value;
+
+        if (servicosIds != null && servicosIds.Any())
+        {
+            // Clear existing services and add new ones
+            AgendamentoServicos.Clear();
+            foreach (var servicoId in servicosIds)
+            {
+                AgendamentoServicos.Add(AgendamentoServico.Create(Id, servicoId));
+            }
+        }
+
+        if (dataHora.HasValue)
+            DataHora = ValidarDataHoraFutura(dataHora.Value);
+
+        if (duracaoMinutos.HasValue)
+            DuracaoMinutos = ValidarDuracao(duracaoMinutos.Value);
+
         UpdatedAt = DateTime.UtcNow;
     }
 }

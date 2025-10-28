@@ -58,6 +58,11 @@ public class AgendamentoRepository : IAgendamentoRepository
         await _context.Agendamentos.AddAsync(agendamento, cancellationToken);
     }
 
+    public async Task UpdateAsync(Agendamento agendamento, CancellationToken cancellationToken = default)
+    {
+        _context.Agendamentos.Update(agendamento);
+    }
+
     public async Task<bool> ExisteConflito(
         Guid barbeiroId,
         DateTime dataHora,

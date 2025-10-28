@@ -126,7 +126,7 @@ public class ConsultarDisponibilidadeUseCaseTests
             barbeariaId,
             Guid.NewGuid(),
             barbeiroId,
-            Guid.NewGuid(),
+            new List<Guid> { Guid.NewGuid() },
             dataInicio.AddHours(10), // Mesmo dia às 10:00
             30);
 
@@ -171,7 +171,7 @@ public class ConsultarDisponibilidadeUseCaseTests
             barbeariaId,
             Guid.NewGuid(),
             barbeiroId,
-            Guid.NewGuid(),
+            new List<Guid> { Guid.NewGuid() },
             dataInicio.AddHours(10), // Mesmo dia às 10:00
             60);
 
@@ -217,7 +217,7 @@ public class ConsultarDisponibilidadeUseCaseTests
             barbeariaId,
             Guid.NewGuid(),
             barbeiroId,
-            Guid.NewGuid(),
+            new List<Guid> { Guid.NewGuid() },
             dataInicio.AddHours(10), // Mesmo dia às 10:00
             30);
         agendamento.Cancelar(); // Status = Cancelado
