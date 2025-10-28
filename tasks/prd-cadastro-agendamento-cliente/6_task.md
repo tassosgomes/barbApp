@@ -1,5 +1,5 @@
 ---
-status: pending
+status: completed
 parallelizable: false
 blocked_by: ["2.0", "5.0"]
 ---
@@ -34,18 +34,18 @@ Implementar o algoritmo crítico de cálculo de disponibilidade de horários par
 
 ## Subtarefas
 
-- [ ] 6.1 Criar DTOs: DisponibilidadeOutput, DiaDisponivel
-- [ ] 6.2 Criar interface IDisponibilidadeCache
-- [ ] 6.3 Implementar DisponibilidadeCache com IMemoryCache
-- [ ] 6.4 Criar interface IConsultarDisponibilidadeUseCase
-- [ ] 6.5 Implementar algoritmo de geração de slots de 30min (08:00-20:00)
-- [ ] 6.6 Implementar algoritmo de detecção de sobreposição
-- [ ] 6.7 Implementar ConsultarDisponibilidadeUseCase com cache
-- [ ] 6.8 Criar testes unitários para algoritmo de sobreposição
-- [ ] 6.9 Criar testes unitários para cache (hit/miss)
-- [ ] 6.10 Testar cenários: sem agendamentos, múltiplos agendamentos, agendamento de 60min
-- [ ] 6.11 Adicionar métricas de performance (cache hit rate)
-- [ ] 6.12 Registrar use case e cache no DI
+- [x] 6.1 Criar DTOs: DisponibilidadeOutput, DiaDisponivel ✅ CONCLUÍDA
+- [x] 6.2 Criar interface IDisponibilidadeCache ✅ CONCLUÍDA
+- [x] 6.3 Implementar DisponibilidadeCache com IMemoryCache ✅ CONCLUÍDA
+- [x] 6.4 Criar interface IConsultarDisponibilidadeUseCase ✅ CONCLUÍDA
+- [x] 6.5 Implementar algoritmo de geração de slots de 30min (08:00-20:00) ✅ CONCLUÍDA
+- [x] 6.6 Implementar algoritmo de detecção de sobreposição ✅ CONCLUÍDA
+- [x] 6.7 Implementar ConsultarDisponibilidadeUseCase com cache ✅ CONCLUÍDA
+- [x] 6.8 Criar testes unitários para algoritmo de sobreposição ✅ CONCLUÍDA
+- [x] 6.9 Criar testes unitários para cache (hit/miss) ✅ CONCLUÍDA
+- [x] 6.10 Testar cenários: sem agendamentos, múltiplos agendamentos, agendamento de 60min ✅ CONCLUÍDA
+- [x] 6.11 Adicionar métricas de performance (cache hit rate) ✅ CONCLUÍDA
+- [x] 6.12 Registrar use case e cache no DI ✅ CONCLUÍDA
 
 ## Detalhes de Implementação
 
