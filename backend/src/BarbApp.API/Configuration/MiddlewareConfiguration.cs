@@ -37,6 +37,9 @@ public static class MiddlewareConfiguration
         app.UseAuthentication();
         app.UseAuthorization();
 
+        // Rate Limiting
+        app.UseRateLimiter();
+
         // Prometheus metrics
         // app.UseHttpMetrics();
         // app.UseMetricServer();

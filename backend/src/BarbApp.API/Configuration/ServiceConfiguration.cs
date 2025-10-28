@@ -19,7 +19,8 @@ using Microsoft.OpenApi.Models;
 using Prometheus;
 using Serilog;
 using Sentry.AspNetCore;
-using Microsoft.AspNetCore.ResponseCompression;
+using Microsoft.AspNetCore.RateLimiting;
+using System.Threading.RateLimiting;
 using DotNetEnv;
 using Microsoft.Extensions.DependencyInjection;
 using BarbApp.API.Filters;
@@ -176,6 +177,9 @@ public static class ServiceConfiguration
 
     public static void ConfigureFrameworkServices(this IServiceCollection services, WebApplicationBuilder builder)
     {
+        // Memory Cache
+        services.AddMemoryCache();
+
         // Output Cache
         services.AddOutputCache(options =>
         {
@@ -186,7 +190,6 @@ public static class ServiceConfiguration
         services.AddResponseCompression(options =>
         {
             options.EnableForHttps = true;
-            options.Providers.Add<GzipCompressionProvider>();
         });
 
                 // Authentication & Authorization
@@ -244,7 +247,7 @@ public static class ServiceConfiguration
                     logger.LogWarning("JWT Authentication failed: {Message}", context.Exception.Message);
                     if (context.Exception is SecurityTokenExpiredException)
                     {
-                        context.Response.Headers.Add("Token-Expired", "true");
+                        context.Response.Headers["Token-Expired"] = "true";
                     }
                     else if (context.Exception is SecurityTokenInvalidSignatureException)
                     {
@@ -271,6 +274,17 @@ public static class ServiceConfiguration
         // Controllers & Validation
         services.AddControllers();
         services.AddFluentValidationConfiguration();
+
+        // Rate Limiting
+        services.AddRateLimiter(options =>
+        {
+            options.AddFixedWindowLimiter("api", config =>
+            {
+                config.Window = TimeSpan.FromMinutes(1);
+                config.PermitLimit = 100;
+                config.QueueLimit = 0;
+            });
+        });
 
         // CORS
         services.AddCors(options =>

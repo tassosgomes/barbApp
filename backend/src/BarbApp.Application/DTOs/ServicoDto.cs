@@ -6,4 +6,7 @@ public record ServicoDto(
     string Descricao,
     int DuracaoMinutos,
     decimal? Preco
-);
+)
+{
+    public ServicoDto() : this(Guid.Empty, string.Empty, string.Empty, 0, null) { }
+}

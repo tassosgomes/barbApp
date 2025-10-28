@@ -44,8 +44,12 @@ public class ConsultarDisponibilidadeUseCase : IConsultarDisponibilidadeUseCase
 
         try
         {
+            // Ensure DateTimes are in UTC (treat as start of day)
+            var dataInicioUtc = dataInicio.Date.ToUniversalTime();
+            var dataFimUtc = dataFim.Date.ToUniversalTime();
+
             // 1. Tentar buscar do cache
-            var cached = await _cache.GetAsync(barbeiroId, dataInicio, dataFim, cancellationToken);
+            var cached = await _cache.GetAsync(barbeiroId, dataInicioUtc, dataFimUtc, cancellationToken);
             if (cached != null)
             {
                 _logger.LogDebug("Cache hit para disponibilidade do barbeiro {BarbeiroId}", barbeiroId);
@@ -65,8 +69,8 @@ public class ConsultarDisponibilidadeUseCase : IConsultarDisponibilidadeUseCase
             // 3. Buscar agendamentos existentes
             var agendamentos = await _agendamentoRepository.GetByBarbeiroAndDateRangeAsync(
                 barbeiroId,
-                dataInicio,
-                dataFim.AddDays(1), // Incluir dia inteiro
+                dataInicioUtc,
+                dataFimUtc.AddDays(1), // Incluir dia inteiro
                 cancellationToken);
 
             // Filtrar apenas Pendente e Confirmado
@@ -77,7 +81,7 @@ public class ConsultarDisponibilidadeUseCase : IConsultarDisponibilidadeUseCase
             // 4. Calcular disponibilidade
             var diasDisponiveis = new List<DiaDisponivel>();
 
-            for (var data = dataInicio.Date; data <= dataFim.Date; data = data.AddDays(1))
+            for (var data = dataInicioUtc.Date; data <= dataFimUtc.Date; data = data.AddDays(1))
             {
                 // Gerar todos os slots do dia
                 var todosSlots = GerarSlotsDisponiveis(data);
@@ -109,7 +113,7 @@ public class ConsultarDisponibilidadeUseCase : IConsultarDisponibilidadeUseCase
             );
 
             // 6. Salvar no cache
-            await _cache.SetAsync(barbeiroId, dataInicio, dataFim, output, cancellationToken);
+            await _cache.SetAsync(barbeiroId, dataInicioUtc, dataFimUtc, output, cancellationToken);
 
             return output;
         }

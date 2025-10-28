@@ -133,7 +133,11 @@ public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>
 
             using var scope = Services.CreateScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<BarbAppDbContext>();
-            dbContext.Database.Migrate();
+            
+            // Reset database to clean state
+            dbContext.Database.EnsureDeleted();
+            dbContext.Database.EnsureCreated();
+            
             _dbInitialized = true;
         }
     }

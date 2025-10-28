@@ -35,6 +35,9 @@ public class AgendamentoRepository : IAgendamentoRepository
         CancellationToken cancellationToken = default)
     {
         var query = _context.Agendamentos
+            .Include(a => a.Barbeiro)
+            .Include(a => a.AgendamentoServicos)
+            .ThenInclude(ag => ag.Servico)
             .Where(a => a.ClienteId == clienteId);
 
         if (status.HasValue)
