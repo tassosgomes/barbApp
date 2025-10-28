@@ -51,4 +51,25 @@ public static class BarbAppMetrics
         {
             LabelNames = new[] { "barbearia_id" }
         });
+
+    // Counter for availability consultations
+    public static readonly Counter DisponibilidadeConsultasCounter = Metrics
+        .CreateCounter("barbapp_disponibilidade_consultas_total", "Total number of availability consultations", new CounterConfiguration
+        {
+            LabelNames = new[] { "barbearia_id", "cached" }
+        });
+
+    // Histogram for availability calculation time
+    public static readonly Histogram DisponibilidadeCalculoTempo = Metrics
+        .CreateHistogram("barbapp_disponibilidade_calculo_tempo_ms", "Time taken to calculate availability", new HistogramConfiguration
+        {
+            LabelNames = new[] { "barbearia_id" }
+        });
+
+    // Gauge for cache hit rate
+    public static readonly Gauge DisponibilidadeCacheHitRate = Metrics
+        .CreateGauge("barbapp_disponibilidade_cache_hit_rate", "Cache hit rate for availability consultations", new GaugeConfiguration
+        {
+            LabelNames = new[] { "barbearia_id" }
+        });
 }

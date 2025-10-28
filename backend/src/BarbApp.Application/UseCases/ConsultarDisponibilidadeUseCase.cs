@@ -39,73 +39,96 @@ public class ConsultarDisponibilidadeUseCase : IConsultarDisponibilidadeUseCase
         int duracaoServicosMinutos,
         CancellationToken cancellationToken = default)
     {
-        // 1. Tentar buscar do cache
-        var cached = await _cache.GetAsync(barbeiroId, dataInicio, dataFim, cancellationToken);
-        if (cached != null)
+        var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+        var isCacheHit = false;
+
+        try
         {
-            _logger.LogDebug("Cache hit para disponibilidade do barbeiro {BarbeiroId}", barbeiroId);
-            return cached;
-        }
-
-        _logger.LogDebug("Cache miss para disponibilidade do barbeiro {BarbeiroId}", barbeiroId);
-
-        // 2. Buscar barbeiro
-        var barbeiro = await _barbeirosRepository.GetByIdAsync(barbeiroId, cancellationToken);
-        if (barbeiro == null || !barbeiro.IsActive)
-        {
-            throw new NotFoundException($"Barbeiro {barbeiroId} não encontrado ou inativo");
-        }
-
-        // 3. Buscar agendamentos existentes
-        var agendamentos = await _agendamentoRepository.GetByBarbeiroAndDateRangeAsync(
-            barbeiroId,
-            dataInicio,
-            dataFim.AddDays(1), // Incluir dia inteiro
-            cancellationToken);
-
-        // Filtrar apenas Pendente e Confirmado
-        var agendamentosAtivos = agendamentos
-            .Where(a => a.Status == StatusAgendamento.Pendente || a.Status == StatusAgendamento.Confirmado)
-            .ToList();
-
-        // 4. Calcular disponibilidade
-        var diasDisponiveis = new List<DiaDisponivel>();
-
-        for (var data = dataInicio.Date; data <= dataFim.Date; data = data.AddDays(1))
-        {
-            // Gerar todos os slots do dia
-            var todosSlots = GerarSlotsDisponiveis(data);
-
-            // Remover slots ocupados
-            var slotsDisponiveis = RemoverSlotsOcupados(todosSlots, agendamentosAtivos, duracaoServicosMinutos);
-
-            // Remover horários passados se data for hoje
-            if (data.Date == DateTime.UtcNow.Date)
+            // 1. Tentar buscar do cache
+            var cached = await _cache.GetAsync(barbeiroId, dataInicio, dataFim, cancellationToken);
+            if (cached != null)
             {
-                slotsDisponiveis = slotsDisponiveis
-                    .Where(s => s > DateTime.UtcNow)
-                    .ToList();
+                _logger.LogDebug("Cache hit para disponibilidade do barbeiro {BarbeiroId}", barbeiroId);
+                isCacheHit = true;
+                return cached;
             }
 
-            if (slotsDisponiveis.Any())
+            _logger.LogDebug("Cache miss para disponibilidade do barbeiro {BarbeiroId}", barbeiroId);
+
+            // 2. Buscar barbeiro
+            var barbeiro = await _barbeirosRepository.GetByIdAsync(barbeiroId, cancellationToken);
+            if (barbeiro == null || !barbeiro.IsActive)
             {
-                diasDisponiveis.Add(new DiaDisponivel(
-                    data,
-                    slotsDisponiveis.Select(s => s.ToString("HH:mm")).ToList()
-                ));
+                throw new NotFoundException($"Barbeiro {barbeiroId} não encontrado ou inativo");
+            }
+
+            // 3. Buscar agendamentos existentes
+            var agendamentos = await _agendamentoRepository.GetByBarbeiroAndDateRangeAsync(
+                barbeiroId,
+                dataInicio,
+                dataFim.AddDays(1), // Incluir dia inteiro
+                cancellationToken);
+
+            // Filtrar apenas Pendente e Confirmado
+            var agendamentosAtivos = agendamentos
+                .Where(a => a.Status == StatusAgendamento.Pendente || a.Status == StatusAgendamento.Confirmado)
+                .ToList();
+
+            // 4. Calcular disponibilidade
+            var diasDisponiveis = new List<DiaDisponivel>();
+
+            for (var data = dataInicio.Date; data <= dataFim.Date; data = data.AddDays(1))
+            {
+                // Gerar todos os slots do dia
+                var todosSlots = GerarSlotsDisponiveis(data);
+
+                // Remover slots ocupados
+                var slotsDisponiveis = RemoverSlotsOcupados(todosSlots, agendamentosAtivos, duracaoServicosMinutos);
+
+                // Remover horários passados se data for hoje
+                if (data.Date == DateTime.UtcNow.Date)
+                {
+                    slotsDisponiveis = slotsDisponiveis
+                        .Where(s => s > DateTime.UtcNow)
+                        .ToList();
+                }
+
+                if (slotsDisponiveis.Any())
+                {
+                    diasDisponiveis.Add(new DiaDisponivel(
+                        data,
+                        slotsDisponiveis.Select(s => s.ToString("HH:mm")).ToList()
+                    ));
+                }
+            }
+
+            // 5. Criar output
+            var output = new DisponibilidadeOutput(
+                new BarbeiroDto(barbeiro.Id, barbeiro.Name, null, new List<string>()),
+                diasDisponiveis
+            );
+
+            // 6. Salvar no cache
+            await _cache.SetAsync(barbeiroId, dataInicio, dataFim, output, cancellationToken);
+
+            return output;
+        }
+        finally
+        {
+            stopwatch.Stop();
+            
+            // Registrar métricas
+            BarbAppMetrics.DisponibilidadeConsultasCounter
+                .WithLabels("unknown", isCacheHit ? "true" : "false")
+                .Inc();
+                
+            if (!isCacheHit)
+            {
+                BarbAppMetrics.DisponibilidadeCalculoTempo
+                    .WithLabels("unknown")
+                    .Observe(stopwatch.ElapsedMilliseconds);
             }
         }
-
-        // 5. Criar output
-        var output = new DisponibilidadeOutput(
-            new BarbeiroDto(barbeiro.Id, barbeiro.Name, null, new List<string>()),
-            diasDisponiveis
-        );
-
-        // 6. Salvar no cache
-        await _cache.SetAsync(barbeiroId, dataInicio, dataFim, output, cancellationToken);
-
-        return output;
     }
 
     private List<DateTime> GerarSlotsDisponiveis(DateTime data)
