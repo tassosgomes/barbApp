@@ -49,7 +49,7 @@ public class Agendamento
             BarbeariaId = barbeariaId,
             ClienteId = clienteId,
             BarbeiroId = barbeiroId,
-            DataHora = dataHoraValidada,
+            DataHora = dataHoraValidada.Kind == DateTimeKind.Local ? dataHoraValidada.ToUniversalTime() : dataHoraValidada,
             DuracaoMinutos = duracaoValidada,
             Status = StatusAgendamento.Pendente,
             CreatedAt = now,
@@ -138,7 +138,7 @@ public class Agendamento
         }
 
         if (dataHora.HasValue)
-            DataHora = ValidarDataHoraFutura(dataHora.Value);
+            DataHora = ValidarDataHoraFutura(dataHora.Value.Kind == DateTimeKind.Local ? dataHora.Value.ToUniversalTime() : dataHora.Value);
 
         if (duracaoMinutos.HasValue)
             DuracaoMinutos = ValidarDuracao(duracaoMinutos.Value);

@@ -1,5 +1,5 @@
 ---
-status: pending
+status: completed
 parallelizable: false
 blocked_by: ["4.0", "8.0"]
 ---
@@ -32,21 +32,21 @@ Criar suite completa de testes de integração end-to-end usando WebApplicationF
 
 ## Subtarefas
 
-- [ ] 9.1 Configurar Testcontainers para PostgreSQL
-- [ ] 9.2 Configurar WebApplicationFactory customizada
-- [ ] 9.3 Criar fixtures e helpers para testes (factory de dados)
-- [ ] 9.4 Criar testes de autenticação: cadastro e login (sucesso, falhas)
-- [ ] 9.5 Criar testes de isolamento multi-tenant para barbeiros
-- [ ] 9.6 Criar testes de isolamento multi-tenant para serviços
-- [ ] 9.7 Criar testes de isolamento multi-tenant para agendamentos
-- [ ] 9.8 Criar testes de criação de agendamento (sucesso, conflito, validações)
-- [ ] 9.9 Criar testes de cancelamento de agendamento (sucesso, não permitido)
-- [ ] 9.10 Criar testes de edição de agendamento (sucesso, conflito)
-- [ ] 9.11 Criar testes de listagem de agendamentos (próximos, histórico)
-- [ ] 9.12 Criar testes de concorrência (2 clientes, mesmo horário)
-- [ ] 9.13 Criar testes de autorização (sem token, token expirado, recurso de outro cliente)
-- [ ] 9.14 Configurar coleta de cobertura de testes de integração
-- [ ] 9.15 Documentar padrões de teste de integração
+- [x] 9.1 Configurar Testcontainers para PostgreSQL
+- [x] 9.2 Configurar WebApplicationFactory customizada
+- [x] 9.3 Criar fixtures e helpers para testes (factory de dados)
+- [x] 9.4 Criar testes de autenticação: cadastro e login (sucesso, falhas)
+- [x] 9.5 Criar testes de isolamento multi-tenant para barbeiros
+- [x] 9.6 Criar testes de isolamento multi-tenant para serviços
+- [x] 9.7 Criar testes de isolamento multi-tenant para agendamentos
+- [x] 9.8 Criar testes de criação de agendamento (sucesso, conflito, validações)
+- [x] 9.9 Criar testes de cancelamento de agendamento (sucesso, não permitido)
+- [x] 9.10 Criar testes de edição de agendamento (sucesso, conflito)
+- [x] 9.11 Criar testes de listagem de agendamentos (próximos, histórico)
+- [x] 9.12 Criar testes de concorrência (2 clientes, mesmo horário)
+- [x] 9.13 Criar testes de autorização (sem token, token expirado, recurso de outro cliente)
+- [x] 9.14 Configurar coleta de cobertura de testes de integração
+- [x] 9.15 Documentar padrões de teste de integração
 
 ## Detalhes de Implementação
 

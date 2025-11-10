@@ -102,11 +102,11 @@ public class ClientAuthenticationIntegrationTests : IAsyncLifetime
     [Fact]
     public async Task LoginCliente_ClienteExistente_NomeCorreto_DeveRetornarToken()
     {
-        // Arrange - Create client first
+        // Arrange - Create customer first
         using var scope = _factory.Services.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<BarbAppDbContext>();
-        var cliente = Cliente.Create(_testBarbeariaId, "Cliente Existente", "11888888888");
-        dbContext.Clientes.Add(cliente);
+        var customer = Customer.Create(_testBarbeariaId, "11888888888", "Cliente Existente");
+        dbContext.Customers.Add(customer);
         await dbContext.SaveChangesAsync();
 
         var loginInput = new LoginClienteInput

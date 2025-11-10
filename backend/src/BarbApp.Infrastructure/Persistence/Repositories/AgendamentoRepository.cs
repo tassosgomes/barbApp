@@ -73,13 +73,15 @@ public class AgendamentoRepository : IAgendamentoRepository
         Guid? agendamentoIdParaIgnorar = null,
         CancellationToken cancellationToken = default)
     {
-        var dataHoraFim = dataHora.AddMinutes(duracaoMinutos);
+        // Ensure DateTime is UTC for PostgreSQL compatibility
+        var dataHoraUtc = dataHora.Kind == DateTimeKind.Local ? dataHora.ToUniversalTime() : dataHora;
+        var dataHoraFimUtc = dataHoraUtc.AddMinutes(duracaoMinutos);
 
         var query = _context.Agendamentos
             .Where(a => a.BarbeiroId == barbeiroId &&
                        a.Status != StatusAgendamento.Cancelado &&
                        a.Status != StatusAgendamento.Concluido &&
-                       ((a.DataHora < dataHoraFim && a.DataHora.AddMinutes(a.DuracaoMinutos) > dataHora)));
+                       ((a.DataHora < dataHoraFimUtc && a.DataHora.AddMinutes(a.DuracaoMinutos) > dataHoraUtc)));
 
         if (agendamentoIdParaIgnorar.HasValue)
         {

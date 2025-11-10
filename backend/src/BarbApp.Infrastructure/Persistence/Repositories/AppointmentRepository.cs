@@ -69,7 +69,7 @@ public class AppointmentRepository : IAppointmentRepository
         DateTime date,
         CancellationToken cancellationToken = default)
     {
-        var startOfDay = date.Date;
+        var startOfDay = date.Date.ToUniversalTime();
         var endOfDay = startOfDay.AddDays(1);
 
         return await _context.Appointments

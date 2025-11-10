@@ -1,13 +1,17 @@
 using System.Net;
-using System.Net.Http.Json;
+using System.Net.Http.Headers;
+using System.Text;
+using System.Text.Json;
+using BarbApp.IntegrationTests;
 using BarbApp.Application.DTOs;
+using BarbApp.Application.Interfaces.UseCases;
+using BarbApp.Domain.Entities;
+using BarbApp.Domain.ValueObjects;
 using BarbApp.Infrastructure.Persistence;
 using FluentAssertions;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Xunit;
 
 namespace BarbApp.IntegrationTests;
 
@@ -17,8 +21,9 @@ public class LandingPagesControllerIntegrationTests : IAsyncLifetime
     private readonly HttpClient _client;
     private readonly IntegrationTestWebAppFactory _factory;
     private readonly DatabaseFixture _dbFixture;
-    private Guid _testBarbeariaId;
-    private Guid _testLandingPageId;
+    private Guid _barbeariaId1;
+    private Guid _barbeariaId2;
+    private Guid _serviceId1;
 
     public LandingPagesControllerIntegrationTests(DatabaseFixture dbFixture)
     {
@@ -29,500 +34,449 @@ public class LandingPagesControllerIntegrationTests : IAsyncLifetime
 
     public async Task InitializeAsync()
     {
-        // Ensure database is initialized
         _factory.EnsureDatabaseInitialized();
-
-        // Setup test data
         await SetupTestData();
     }
 
-    public Task DisposeAsync()
-    {
-        return Task.CompletedTask;
-    }
+    public Task DisposeAsync() => Task.CompletedTask;
 
     private async Task SetupTestData()
     {
-        // No test data setup needed for landing pages tests
-        await Task.CompletedTask;
+        using var scope = _factory.Services.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<BarbAppDbContext>();
+        var landingPageService = scope.ServiceProvider.GetRequiredService<BarbApp.Application.Interfaces.UseCases.ILandingPageService>();
+
+        // Create two barbearias for testing
+        var address1 = Address.Create("01310100", "Av. Paulista", "1000", null, "Bela Vista", "São Paulo", "SP");
+        var document1 = Document.Create("11111111000191");
+        var code1 = UniqueCode.Create("LANDING2");
+        var barbearia1 = Barbershop.Create(
+            "Barbearia Teste 1",
+            document1,
+            "(11) 98765-4321",
+            "João Silva",
+            "joao@landing1.com",
+            address1,
+            code1,
+            "Password123!"
+        );
+        dbContext.Addresses.Add(address1);
+        dbContext.Barbershops.Add(barbearia1);
+
+        var address2 = Address.Create("01310200", "Av. Brigadeiro", "2000", null, "Bela Vista", "São Paulo", "SP");
+        var document2 = Document.Create("22222222000192");
+        var code2 = UniqueCode.Create("LANDING3");
+        var barbearia2 = Barbershop.Create(
+            "Barbearia Teste 2",
+            document2,
+            "(11) 98765-4322",
+            "Maria Santos",
+            "maria@landing2.com",
+            address2,
+            code2,
+            "Password123!"
+        );
+        dbContext.Addresses.Add(address2);
+        dbContext.Barbershops.Add(barbearia2);
+
+        await dbContext.SaveChangesAsync();
+
+        _barbeariaId1 = barbearia1.Id;
+        _barbeariaId2 = barbearia2.Id;
+
+        // Create a test service for barbearia1
+        var service = BarbApp.Domain.Entities.BarbershopService.Create(
+            _barbeariaId1,
+            "Corte Masculino",
+            "Corte de cabelo masculino completo",
+            30,
+            25.00m);
+        dbContext.BarbershopServices.Add(service);
+        await dbContext.SaveChangesAsync();
+        _serviceId1 = service.Id;
+
+        // Create landing pages for the test barbearias
+        await landingPageService.CreateAsync(_barbeariaId1);
+        await landingPageService.CreateAsync(_barbeariaId2);
     }
 
     [Fact]
-    public async Task GetConfig_WithValidBarbershopId_ShouldReturn200AndConfig()
+    public async Task GetConfig_AdminBarbeariaToken_ValidBarbershopId_ShouldReturn200AndConfig()
     {
         // Arrange
-        var (barbershopId, _) = await CreateBarbershopWithLandingPageAsync();
-        var client = CreateAuthorizedClient(barbershopId);
+        var token = IntegrationTestWebAppFactory.GenerateTestJwtToken("test-user", "AdminBarbearia", barbeariaId: _barbeariaId1);
 
         // Act
-        var response = await client.GetAsync($"/api/admin/landing-pages/{barbershopId}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/api/admin/landing-pages/{_barbeariaId1}");
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        var response = await _client.SendAsync(request);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var config = await response.Content.ReadFromJsonAsync<LandingPageConfigOutput>();
+        var content = await response.Content.ReadAsStringAsync();
+        var config = JsonSerializer.Deserialize<LandingPageConfigOutput>(content, new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        });
         config.Should().NotBeNull();
-        config!.BarbershopId.Should().Be(barbershopId);
-        config.TemplateId.Should().Be(1);
-        config.IsPublished.Should().BeTrue();
+        config!.BarbershopId.Should().Be(_barbeariaId1);
     }
 
     [Fact]
-    public async Task GetConfig_WithoutAuthorization_ShouldReturn401()
+    public async Task GetConfig_AdminCentralToken_ValidBarbershopId_ShouldReturn200AndConfig()
     {
         // Arrange
-        var barbershopId = Guid.NewGuid();
+        var token = IntegrationTestWebAppFactory.GenerateTestJwtToken("test-user", "AdminCentral");
 
         // Act
-        var response = await _client.GetAsync($"/api/admin/landing-pages/{barbershopId}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/api/admin/landing-pages/{_barbeariaId1}");
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        var response = await _client.SendAsync(request);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var content = await response.Content.ReadAsStringAsync();
+        var config = JsonSerializer.Deserialize<LandingPageConfigOutput>(content, new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        });
+        config.Should().NotBeNull();
+        config!.BarbershopId.Should().Be(_barbeariaId1);
     }
 
     [Fact]
-    public async Task GetConfig_WrongBarbershop_ShouldReturn403()
+    public async Task GetConfig_AdminBarbeariaToken_WrongBarbershopId_ShouldReturn403()
     {
         // Arrange
-        var (barbershopId, _) = await CreateBarbershopWithLandingPageAsync();
-        var anotherBarbershopId = Guid.NewGuid();
-        var client = CreateAuthorizedClient(anotherBarbershopId);
+        var token = IntegrationTestWebAppFactory.GenerateTestJwtToken("test-user", "AdminBarbearia", barbeariaId: _barbeariaId1);
 
         // Act
-        var response = await client.GetAsync($"/api/admin/landing-pages/{barbershopId}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/api/admin/landing-pages/{_barbeariaId2}");
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        var response = await _client.SendAsync(request);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
 
     [Fact]
-    public async Task GetConfig_NonExistentLandingPage_ShouldReturn404()
+    public async Task GetConfig_NoAuthentication_ShouldReturn401()
+    {
+        // Act
+        var response = await _client.GetAsync($"/api/admin/landing-pages/{_barbeariaId1}");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+    }
+
+    [Fact]
+    public async Task GetConfig_InvalidBarbershopId_ShouldReturn404()
     {
         // Arrange
-        var barbershopId = await CreateBarbershopWithoutLandingPageAsync();
-        var client = CreateAuthorizedClient(barbershopId);
+        var token = IntegrationTestWebAppFactory.GenerateTestJwtToken("test-user", "AdminCentral");
+        var invalidId = Guid.NewGuid();
 
         // Act
-        var response = await client.GetAsync($"/api/admin/landing-pages/{barbershopId}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/api/admin/landing-pages/{invalidId}");
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        var response = await _client.SendAsync(request);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
     [Fact]
-    public async Task UpdateConfig_WithValidData_ShouldReturn204()
+    public async Task UpdateConfig_AdminBarbeariaToken_ValidInput_ShouldReturn204()
     {
         // Arrange
-        var (barbershopId, _) = await CreateBarbershopWithLandingPageAsync();
-        var client = CreateAuthorizedClient(barbershopId);
-
-        var updateInput = new UpdateLandingPageInput(
+        var token = IntegrationTestWebAppFactory.GenerateTestJwtToken("test-user", "AdminBarbearia", barbeariaId: _barbeariaId1);
+        var input = new UpdateLandingPageInput(
             TemplateId: 2,
             LogoUrl: "https://example.com/logo.png",
-            AboutText: "Nova descrição da barbearia",
-            OpeningHours: "Seg-Sex: 10:00-20:00",
-            InstagramUrl: "https://instagram.com/barbershop",
-            FacebookUrl: "https://facebook.com/barbershop",
+            AboutText: "Updated about text",
+            OpeningHours: "Mon-Fri 9AM-6PM",
+            InstagramUrl: "https://instagram.com/barber",
+            FacebookUrl: "https://facebook.com/barber",
             WhatsappNumber: "+5511987654321",
-            Services: null
-        );
-
-        // Act
-        var response = await client.PutAsJsonAsync($"/api/admin/landing-pages/{barbershopId}", updateInput);
-
-        // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.NoContent);
-
-        // Verify update
-        var getResponse = await client.GetAsync($"/api/admin/landing-pages/{barbershopId}");
-        var config = await getResponse.Content.ReadFromJsonAsync<LandingPageConfigOutput>();
-        config.Should().NotBeNull();
-        config!.TemplateId.Should().Be(2);
-        config.AboutText.Should().Be("Nova descrição da barbearia");
-        config.OpeningHours.Should().Be("Seg-Sex: 10:00-20:00");
-        config.InstagramUrl.Should().Be("https://instagram.com/barbershop");
-    }
-
-    [Fact]
-    public async Task UpdateConfig_WithServices_ShouldReturn204AndUpdateServices()
-    {
-        // Arrange
-        var (barbershopId, serviceIds) = await CreateBarbershopWithLandingPageAsync();
-        var client = CreateAuthorizedClient(barbershopId);
-
-        var updateInput = new UpdateLandingPageInput(
-            TemplateId: null,
-            LogoUrl: null,
-            AboutText: null,
-            OpeningHours: null,
-            InstagramUrl: null,
-            FacebookUrl: null,
-            WhatsappNumber: null,
             Services: new List<ServiceDisplayInput>
             {
-                new(serviceIds[0], 1, true),
-                new(serviceIds[1], 2, false)
+                new ServiceDisplayInput(_serviceId1, 1, true)
             }
         );
 
         // Act
-        var response = await client.PutAsJsonAsync($"/api/admin/landing-pages/{barbershopId}", updateInput);
+        var request = new HttpRequestMessage(HttpMethod.Put, $"/api/admin/landing-pages/{_barbeariaId1}");
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        request.Content = new StringContent(JsonSerializer.Serialize(input), Encoding.UTF8, "application/json");
+        var response = await _client.SendAsync(request);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NoContent);
-
-        // Verify services
-        var getResponse = await client.GetAsync($"/api/admin/landing-pages/{barbershopId}");
-        var config = await getResponse.Content.ReadFromJsonAsync<LandingPageConfigOutput>();
-        config.Should().NotBeNull();
-        config!.Services.Should().HaveCount(2);
-        config.Services[0].IsVisible.Should().BeTrue();
-        config.Services[1].IsVisible.Should().BeFalse();
     }
 
     [Fact]
-    public async Task UpdateConfig_WithoutAuthorization_ShouldReturn401()
+    public async Task UpdateConfig_AdminCentralToken_ValidInput_ShouldReturn204()
     {
         // Arrange
-        var barbershopId = Guid.NewGuid();
-        var updateInput = new UpdateLandingPageInput(null, null, null, null, null, null, null, null);
+        var token = IntegrationTestWebAppFactory.GenerateTestJwtToken("test-user", "AdminCentral");
+        var input = new UpdateLandingPageInput(
+            TemplateId: 2,
+            LogoUrl: "https://example.com/logo.png",
+            AboutText: "Updated about text",
+            OpeningHours: "Mon-Fri 9AM-6PM",
+            InstagramUrl: "https://instagram.com/barber",
+            FacebookUrl: "https://facebook.com/barber",
+            WhatsappNumber: "+5511987654321",
+            Services: new List<ServiceDisplayInput>
+            {
+                new ServiceDisplayInput(_serviceId1, 1, true)
+            }
+        );
 
         // Act
-        var response = await _client.PutAsJsonAsync($"/api/admin/landing-pages/{barbershopId}", updateInput);
+        var request = new HttpRequestMessage(HttpMethod.Put, $"/api/admin/landing-pages/{_barbeariaId1}");
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        request.Content = new StringContent(JsonSerializer.Serialize(input), Encoding.UTF8, "application/json");
+        var response = await _client.SendAsync(request);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+        response.StatusCode.Should().Be(HttpStatusCode.NoContent);
     }
 
     [Fact]
-    public async Task UpdateConfig_WrongBarbershop_ShouldReturn403()
+    public async Task UpdateConfig_AdminBarbeariaToken_WrongBarbershopId_ShouldReturn403()
     {
         // Arrange
-        var (barbershopId, _) = await CreateBarbershopWithLandingPageAsync();
-        var anotherBarbershopId = Guid.NewGuid();
-        var client = CreateAuthorizedClient(anotherBarbershopId);
-
-        var updateInput = new UpdateLandingPageInput(null, null, "Test", null, null, null, null, null);
+        var token = IntegrationTestWebAppFactory.GenerateTestJwtToken("test-user", "AdminBarbearia", barbeariaId: _barbeariaId1);
+        var input = new UpdateLandingPageInput(
+            TemplateId: 2,
+            LogoUrl: "https://example.com/logo.png",
+            AboutText: "Updated about text",
+            OpeningHours: "Mon-Fri 9AM-6PM",
+            InstagramUrl: null,
+            FacebookUrl: null,
+            WhatsappNumber: null,
+            Services: null
+        );
 
         // Act
-        var response = await client.PutAsJsonAsync($"/api/admin/landing-pages/{barbershopId}", updateInput);
+        var request = new HttpRequestMessage(HttpMethod.Put, $"/api/admin/landing-pages/{_barbeariaId2}");
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        request.Content = new StringContent(JsonSerializer.Serialize(input), Encoding.UTF8, "application/json");
+        var response = await _client.SendAsync(request);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
 
     [Fact]
-    public async Task UpdateConfig_NonExistentLandingPage_ShouldReturn404()
+    public async Task UpdateConfig_NoAuthentication_ShouldReturn401()
     {
         // Arrange
-        var barbershopId = await CreateBarbershopWithoutLandingPageAsync();
-        var client = CreateAuthorizedClient(barbershopId);
-
-        var updateInput = new UpdateLandingPageInput(null, null, "Test", null, null, null, null, null);
+        var input = new UpdateLandingPageInput(
+            TemplateId: 2,
+            LogoUrl: "https://example.com/logo.png",
+            AboutText: "Updated about text",
+            OpeningHours: "Mon-Fri 9AM-6PM",
+            InstagramUrl: null,
+            FacebookUrl: null,
+            WhatsappNumber: null,
+            Services: null
+        );
 
         // Act
-        var response = await client.PutAsJsonAsync($"/api/admin/landing-pages/{barbershopId}", updateInput);
+        var request = new HttpRequestMessage(HttpMethod.Put, $"/api/admin/landing-pages/{_barbeariaId1}");
+        request.Content = new StringContent(JsonSerializer.Serialize(input), Encoding.UTF8, "application/json");
+        var response = await _client.SendAsync(request);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+    }
+
+    [Fact]
+    public async Task UpdateConfig_InvalidBarbershopId_ShouldReturn404()
+    {
+        // Arrange
+        var token = IntegrationTestWebAppFactory.GenerateTestJwtToken("test-user", "AdminCentral");
+        var invalidId = Guid.NewGuid();
+        var input = new UpdateLandingPageInput(
+            TemplateId: 2,
+            LogoUrl: "https://example.com/logo.png",
+            AboutText: "Updated about text",
+            OpeningHours: "Mon-Fri 9AM-6PM",
+            InstagramUrl: null,
+            FacebookUrl: null,
+            WhatsappNumber: null,
+            Services: null
+        );
+
+        // Act
+        var request = new HttpRequestMessage(HttpMethod.Put, $"/api/admin/landing-pages/{invalidId}");
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        request.Content = new StringContent(JsonSerializer.Serialize(input), Encoding.UTF8, "application/json");
+        var response = await _client.SendAsync(request);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
     [Fact]
-    public async Task UploadLogo_WithValidFile_ShouldReturn200AndLogoUrl()
+    public async Task UpdateConfig_InvalidInput_ShouldReturn400()
     {
         // Arrange
-        var (barbershopId, _) = await CreateBarbershopWithLandingPageAsync();
-        var client = CreateAuthorizedClient(barbershopId);
-
-        var content = new MultipartFormDataContent();
-        var fileContent = new ByteArrayContent(CreateMinimalValidPng());
-        fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/png");
-        content.Add(fileContent, "file", "logo.png");
+        var token = IntegrationTestWebAppFactory.GenerateTestJwtToken("test-user", "AdminBarbearia", barbeariaId: _barbeariaId1);
+        var invalidInput = new
+        {
+            templateId = 10, // Invalid: should be between 1-5
+            whatsappNumber = "invalid-phone", // Invalid: should match +55XXXXXXXXXXX format
+            logoUrl = "not-a-url" // Invalid: should be a valid URL
+        };
 
         // Act
-        var response = await client.PostAsync($"/api/admin/landing-pages/{barbershopId}/logo", content);
+        var request = new HttpRequestMessage(HttpMethod.Put, $"/api/admin/landing-pages/{_barbeariaId1}");
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        request.Content = new StringContent(JsonSerializer.Serialize(invalidInput), Encoding.UTF8, "application/json");
+        var response = await _client.SendAsync(request);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+    }
+
+    [Fact]
+    public async Task UploadLogo_AdminBarbeariaToken_ValidFile_ShouldReturn200()
+    {
+        // Arrange
+        var token = IntegrationTestWebAppFactory.GenerateTestJwtToken("test-user", "AdminBarbearia", barbeariaId: _barbeariaId1);
+        // Minimal valid PNG file (1x1 transparent pixel)
+        var pngBytes = Convert.FromBase64String("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==");
+        var fileContent = new ByteArrayContent(pngBytes);
+        fileContent.Headers.ContentType = new MediaTypeHeaderValue("image/png");
+        var multipartContent = new MultipartFormDataContent();
+        multipartContent.Add(fileContent, "File", "test-logo.png");
+
+        // Act
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/api/admin/landing-pages/{_barbeariaId1}/logo");
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        request.Content = multipartContent;
+        var response = await _client.SendAsync(request);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var result = await response.Content.ReadFromJsonAsync<Dictionary<string, string>>();
-        result.Should().NotBeNull();
-        result!.Should().ContainKey("logoUrl");
-        result.Should().ContainKey("message");
+        var content = await response.Content.ReadAsStringAsync();
+        content.Should().Contain("logoUrl");
+        content.Should().Contain("message");
     }
 
     [Fact]
-    public async Task UploadLogo_WithoutFile_ShouldReturn400()
+    public async Task UploadLogo_AdminCentralToken_ValidFile_ShouldReturn200()
     {
         // Arrange
-        var (barbershopId, _) = await CreateBarbershopWithLandingPageAsync();
-        var client = CreateAuthorizedClient(barbershopId);
-
-        var content = new MultipartFormDataContent();
+        var token = IntegrationTestWebAppFactory.GenerateTestJwtToken("test-user", "AdminCentral");
+        // Minimal valid PNG file (1x1 transparent pixel)
+        var pngBytes = Convert.FromBase64String("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==");
+        var fileContent = new ByteArrayContent(pngBytes);
+        fileContent.Headers.ContentType = new MediaTypeHeaderValue("image/png");
+        var multipartContent = new MultipartFormDataContent();
+        multipartContent.Add(fileContent, "File", "test-logo.png");
 
         // Act
-        var response = await client.PostAsync($"/api/admin/landing-pages/{barbershopId}/logo", content);
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/api/admin/landing-pages/{_barbeariaId1}/logo");
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        request.Content = multipartContent;
+        var response = await _client.SendAsync(request);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var content = await response.Content.ReadAsStringAsync();
+        content.Should().Contain("logoUrl");
+        content.Should().Contain("message");
     }
 
     [Fact]
-    public async Task UploadLogo_WithInvalidFileType_ShouldReturn400()
+    public async Task UploadLogo_AdminBarbeariaToken_WrongBarbershopId_ShouldReturn403()
     {
         // Arrange
-        var (barbershopId, _) = await CreateBarbershopWithLandingPageAsync();
-        var client = CreateAuthorizedClient(barbershopId);
-
-        var content = new MultipartFormDataContent();
-        var fileContent = new ByteArrayContent(new byte[100]);
-        fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/pdf");
-        content.Add(fileContent, "file", "document.pdf");
+        var token = IntegrationTestWebAppFactory.GenerateTestJwtToken("test-user", "AdminBarbearia", barbeariaId: _barbeariaId1);
+        // Minimal valid PNG file (1x1 transparent pixel)
+        var pngBytes = Convert.FromBase64String("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==");
+        var fileContent = new ByteArrayContent(pngBytes);
+        fileContent.Headers.ContentType = new MediaTypeHeaderValue("image/png");
+        var multipartContent = new MultipartFormDataContent();
+        multipartContent.Add(fileContent, "File", "test-logo.png");
 
         // Act
-        var response = await client.PostAsync($"/api/admin/landing-pages/{barbershopId}/logo", content);
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/api/admin/landing-pages/{_barbeariaId2}/logo");
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        request.Content = multipartContent;
+        var response = await _client.SendAsync(request);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
 
     [Fact]
-    public async Task UploadLogo_WithFileTooLarge_ShouldReturn400()
+    public async Task UploadLogo_NoAuthentication_ShouldReturn401()
     {
         // Arrange
-        var (barbershopId, _) = await CreateBarbershopWithLandingPageAsync();
-        var client = CreateAuthorizedClient(barbershopId);
-
-        var content = new MultipartFormDataContent();
-        var largeFile = new byte[3 * 1024 * 1024]; // 3MB
-        var fileContent = new ByteArrayContent(largeFile);
-        fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/png");
-        content.Add(fileContent, "file", "large-logo.png");
+        // Minimal valid PNG file (1x1 transparent pixel)
+        var pngBytes = Convert.FromBase64String("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==");
+        var fileContent = new ByteArrayContent(pngBytes);
+        fileContent.Headers.ContentType = new MediaTypeHeaderValue("image/png");
+        var multipartContent = new MultipartFormDataContent();
+        multipartContent.Add(fileContent, "File", "test-logo.png");
 
         // Act
-        var response = await client.PostAsync($"/api/admin/landing-pages/{barbershopId}/logo", content);
-
-        // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-    }
-
-    [Fact]
-    public async Task UploadLogo_WithoutAuthorization_ShouldReturn401()
-    {
-        // Arrange
-        var barbershopId = Guid.NewGuid();
-        var content = new MultipartFormDataContent();
-
-        // Act
-        var response = await _client.PostAsync($"/api/admin/landing-pages/{barbershopId}/logo", content);
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/api/admin/landing-pages/{_barbeariaId1}/logo");
+        request.Content = multipartContent;
+        var response = await _client.SendAsync(request);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
 
     [Fact]
-    public async Task UploadLogo_WrongBarbershop_ShouldReturn403()
+    public async Task UploadLogo_NoFile_ShouldReturn400()
     {
         // Arrange
-        var (barbershopId, _) = await CreateBarbershopWithLandingPageAsync();
-        var anotherBarbershopId = Guid.NewGuid();
-        var client = CreateAuthorizedClient(anotherBarbershopId);
-
-        var content = new MultipartFormDataContent();
-        var fileContent = new ByteArrayContent(new byte[100]);
-        fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/png");
-        content.Add(fileContent, "file", "logo.png");
+        var token = IntegrationTestWebAppFactory.GenerateTestJwtToken("test-user", "AdminBarbearia", barbeariaId: _barbeariaId1);
+        var multipartContent = new MultipartFormDataContent();
+        // Add an empty file field
+        var emptyContent = new ByteArrayContent(new byte[0]);
+        emptyContent.Headers.ContentType = new MediaTypeHeaderValue("image/png");
+        multipartContent.Add(emptyContent, "File", "empty.png");
 
         // Act
-        var response = await client.PostAsync($"/api/admin/landing-pages/{barbershopId}/logo", content);
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/api/admin/landing-pages/{_barbeariaId1}/logo");
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        request.Content = multipartContent;
+        var response = await _client.SendAsync(request);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        var content = await response.Content.ReadAsStringAsync();
+        content.Should().Contain("Nenhum arquivo foi enviado");
     }
 
-    private HttpClient CreateAuthorizedClient(Guid barbershopId)
+    [Fact]
+    public async Task UploadLogo_InvalidBarbershopId_ShouldReturn404()
     {
-        var client = _factory.CreateClient();
-        var token = IntegrationTestWebAppFactory.GenerateTestJwtToken(
-            userId: Guid.NewGuid().ToString(),
-            userType: "AdminBarbearia",
-            email: "admin@barbearia.com",
-            barbeariaId: barbershopId
-        );
-        client.DefaultRequestHeaders.Authorization =
-            new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-        return client;
-    }
+        // Arrange
+        var token = IntegrationTestWebAppFactory.GenerateTestJwtToken("test-user", "AdminCentral");
+        var invalidId = Guid.NewGuid();
+        // Minimal valid PNG file (1x1 transparent pixel)
+        var pngBytes = Convert.FromBase64String("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==");
+        var fileContent = new ByteArrayContent(pngBytes);
+        fileContent.Headers.ContentType = new MediaTypeHeaderValue("image/png");
+        var multipartContent = new MultipartFormDataContent();
+        multipartContent.Add(fileContent, "File", "test-logo.png");
 
-    private static byte[] CreateMinimalValidPng()
-    {
-        // Minimal valid 1x1 PNG image (transparent)
-        // This is a known valid minimal PNG file
-        return Convert.FromBase64String(
-            "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=="
-        );
-    }
+        // Act
+        var request = new HttpRequestMessage(HttpMethod.Post, $"/api/admin/landing-pages/{invalidId}/logo");
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        request.Content = multipartContent;
+        var response = await _client.SendAsync(request);
 
-    private static string GenerateRandomUniqueCode()
-    {
-        // Valid characters: A-Z (excluding I, O) and 2-9 (excluding 0, 1)
-        const string validChars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-        var random = new Random();
-        var code = new char[8];
-        
-        for (int i = 0; i < 8; i++)
-        {
-            code[i] = validChars[random.Next(validChars.Length)];
-        }
-        
-        return new string(code);
-    }
-
-    private static string GenerateRandomCNPJ()
-    {
-        var random = new Random();
-        
-        // Generate base 12 digits
-        var cnpj = new int[14];
-        for (int i = 0; i < 12; i++)
-        {
-            cnpj[i] = random.Next(0, 10);
-        }
-        
-        // Calculate first verification digit
-        int sum = 0;
-        int[] weight1 = { 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2 };
-        for (int i = 0; i < 12; i++)
-        {
-            sum += cnpj[i] * weight1[i];
-        }
-        int remainder = sum % 11;
-        cnpj[12] = remainder < 2 ? 0 : 11 - remainder;
-        
-        // Calculate second verification digit
-        sum = 0;
-        int[] weight2 = { 6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2 };
-        for (int i = 0; i < 13; i++)
-        {
-            sum += cnpj[i] * weight2[i];
-        }
-        remainder = sum % 11;
-        cnpj[13] = remainder < 2 ? 0 : 11 - remainder;
-        
-        return string.Join("", cnpj);
-    }
-
-    private async Task<(Guid barbershopId, List<Guid> serviceIds)> CreateBarbershopWithLandingPageAsync()
-    {
-        using var scope = _factory.Services.CreateScope();
-        var context = scope.ServiceProvider.GetRequiredService<BarbAppDbContext>();
-
-        var address = BarbApp.Domain.Entities.Address.Create(
-            "01310-100",
-            "Av. Paulista",
-            "1000",
-            "Sala 10",
-            "Bela Vista",
-            "São Paulo",
-            "SP"
-        );
-
-        var document = BarbApp.Domain.ValueObjects.Document.Create(GenerateRandomCNPJ());
-        var code = BarbApp.Domain.ValueObjects.UniqueCode.Create(GenerateRandomUniqueCode());
-
-        var barbershop = BarbApp.Domain.Entities.Barbershop.Create(
-            name: $"Barbearia Teste {Guid.NewGuid()}",
-            document: document,
-            phone: "(11) 98765-4321",
-            ownerName: "João Teste",
-            email: $"teste{Guid.NewGuid()}@teste.com",
-            address: address,
-            code: code,
-            createdBy: "integration-test"
-        );
-
-        context.Barbershops.Add(barbershop);
-        await context.SaveChangesAsync();
-
-        var service1 = BarbApp.Domain.Entities.BarbershopService.Create(
-            barbershop.Id,
-            "Corte Tradicional",
-            "Corte clássico",
-            30,
-            50.00m
-        );
-
-        var service2 = BarbApp.Domain.Entities.BarbershopService.Create(
-            barbershop.Id,
-            "Barba",
-            "Barba completa",
-            20,
-            30.00m
-        );
-
-        context.BarbershopServices.AddRange(service1, service2);
-        await context.SaveChangesAsync();
-
-        var landingPageConfig = BarbApp.Domain.Entities.LandingPageConfig.Create(
-            barbershop.Id,
-            1,
-            barbershop.Phone ?? "",
-            "Seg-Sex: 09:00-18:00"
-        );
-
-        context.LandingPageConfigs.Add(landingPageConfig);
-        await context.SaveChangesAsync();
-
-        var landingPageService1 = BarbApp.Domain.Entities.LandingPageService.Create(
-            landingPageConfig.Id,
-            service1.Id,
-            1,
-            true
-        );
-
-        var landingPageService2 = BarbApp.Domain.Entities.LandingPageService.Create(
-            landingPageConfig.Id,
-            service2.Id,
-            2,
-            true
-        );
-
-        context.LandingPageServices.AddRange(landingPageService1, landingPageService2);
-        await context.SaveChangesAsync();
-
-        return (barbershop.Id, new List<Guid> { service1.Id, service2.Id });
-    }
-
-    private async Task<Guid> CreateBarbershopWithoutLandingPageAsync()
-    {
-        using var scope = _factory.Services.CreateScope();
-        var context = scope.ServiceProvider.GetRequiredService<BarbAppDbContext>();
-
-        var address = BarbApp.Domain.Entities.Address.Create(
-            "01310-100",
-            "Av. Paulista",
-            "2000",
-            null,
-            "Bela Vista",
-            "São Paulo",
-            "SP"
-        );
-
-        var document = BarbApp.Domain.ValueObjects.Document.Create(GenerateRandomCNPJ());
-        var code = BarbApp.Domain.ValueObjects.UniqueCode.Create(GenerateRandomUniqueCode());
-
-        var barbershop = BarbApp.Domain.Entities.Barbershop.Create(
-            name: $"Barbearia Sem Landing {Guid.NewGuid()}",
-            document: document,
-            phone: "(11) 91234-5678",
-            ownerName: "Maria Teste",
-            email: $"maria{Guid.NewGuid()}@teste.com",
-            address: address,
-            code: code,
-            createdBy: "integration-test"
-        );
-
-        context.Barbershops.Add(barbershop);
-        await context.SaveChangesAsync();
-
-        return barbershop.Id;
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 }

@@ -211,11 +211,13 @@ public class MultiTenantIsolationIntegrationTests : IAsyncLifetime
         var dbContext = scope.ServiceProvider.GetRequiredService<BarbAppDbContext>();
         var barberTenant2 = await dbContext.Barbers
             .FirstAsync(b => b.BarbeariaId == _barbearia2Id);
+        var serviceTenant2 = await dbContext.BarbershopServices
+            .FirstAsync(s => s.BarbeariaId == _barbearia2Id);
 
         var agendamentoInput = new CriarAgendamentoInput(
             BarbeiroId: barberTenant2.Id,
-            ServicosIds: new List<Guid> { Guid.NewGuid() }, // Invalid service ID
-            DataHora: DateTime.Now.AddDays(1)
+            ServicosIds: new List<Guid> { serviceTenant2.Id },
+            DataHora: DateTime.Today.AddDays(1).AddHours(10) // 10:00 AM - within allowed range
         );
 
         // Act
@@ -239,16 +241,16 @@ public class MultiTenantIsolationIntegrationTests : IAsyncLifetime
         var service1 = await dbContext.BarbershopServices.FirstAsync(s => s.BarbeariaId == _barbearia1Id);
         var service2 = await dbContext.BarbershopServices.FirstAsync(s => s.BarbeariaId == _barbearia2Id);
 
-        var agendamento1 = Appointment.Create(
-            _barbearia1Id, barber1.Id, cliente1.Id, service1.Id,
-            DateTime.UtcNow.AddDays(1), DateTime.UtcNow.AddDays(1).AddMinutes(service1.DurationMinutes));
+        var agendamento1 = Agendamento.Create(
+            _barbearia1Id, cliente1.Id, barber1.Id, new List<Guid> { service1.Id },
+            DateTime.UtcNow.AddDays(1), service1.DurationMinutes);
 
-        var agendamento2 = Appointment.Create(
-            _barbearia2Id, barber2.Id, cliente2.Id, service2.Id,
-            DateTime.UtcNow.AddDays(2), DateTime.UtcNow.AddDays(2).AddMinutes(service2.DurationMinutes));
+        var agendamento2 = Agendamento.Create(
+            _barbearia2Id, cliente2.Id, barber2.Id, new List<Guid> { service2.Id },
+            DateTime.UtcNow.AddDays(2), service2.DurationMinutes);
 
-        dbContext.Appointments.Add(agendamento1);
-        dbContext.Appointments.Add(agendamento2);
+        dbContext.Agendamentos.Add(agendamento1);
+        dbContext.Agendamentos.Add(agendamento2);
         await dbContext.SaveChangesAsync();
 
         // Act - Client 1 gets their appointments
@@ -277,16 +279,16 @@ public class MultiTenantIsolationIntegrationTests : IAsyncLifetime
         var service1 = await dbContext.BarbershopServices.FirstAsync(s => s.BarbeariaId == _barbearia1Id);
         var service2 = await dbContext.BarbershopServices.FirstAsync(s => s.BarbeariaId == _barbearia2Id);
 
-        var agendamento1 = Appointment.Create(
-            _barbearia1Id, barber1.Id, cliente1.Id, service1.Id,
-            DateTime.UtcNow.AddDays(1), DateTime.UtcNow.AddDays(1).AddMinutes(service1.DurationMinutes));
+        var agendamento1 = Agendamento.Create(
+            _barbearia1Id, cliente1.Id, barber1.Id, new List<Guid> { service1.Id },
+            DateTime.UtcNow.AddDays(1), service1.DurationMinutes);
 
-        var agendamento2 = Appointment.Create(
-            _barbearia2Id, barber2.Id, cliente2.Id, service2.Id,
-            DateTime.UtcNow.AddDays(2), DateTime.UtcNow.AddDays(2).AddMinutes(service2.DurationMinutes));
+        var agendamento2 = Agendamento.Create(
+            _barbearia2Id, cliente2.Id, barber2.Id, new List<Guid> { service2.Id },
+            DateTime.UtcNow.AddDays(2), service2.DurationMinutes);
 
-        dbContext.Appointments.Add(agendamento1);
-        dbContext.Appointments.Add(agendamento2);
+        dbContext.Agendamentos.Add(agendamento1);
+        dbContext.Agendamentos.Add(agendamento2);
         await dbContext.SaveChangesAsync();
 
         // Act - Client 1 tries to delete Client 2's appointment
