@@ -269,6 +269,43 @@ The implementation has been successfully completed and meets all requirements sp
 ---
 
 **Review Conducted By:** GitHub Copilot  
-**Date:** October 28, 2025  
-**Review Standard:** Internal Code Review Process v2.0</content>
+**Date:** November 24, 2025  
+**Review Standard:** Internal Code Review Process v2.0
+
+---
+
+## 9. Correções Realizadas Nesta Revisão (24/11/2025)
+
+### Problemas Corrigidos
+
+| Arquivo | Problema | Resolução |
+|---------|----------|-----------|
+| `CriarAgendamentoUseCaseTests.cs` | Mock usava `IClienteRepository` em vez de `ICustomerRepository` | Substituído para `ICustomerRepository` |
+| `CriarAgendamentoUseCaseTests.cs` | Ordem incorreta de parâmetros em `Customer.Create()` | Corrigido para `(barbeariaId, telefone, nome)` |
+| `AuthenticateClienteUseCaseTests.cs` | Parâmetros faltando no construtor do UseCase | Adicionados `IClienteRepository` e `IUnitOfWork` |
+| `ConsultarDisponibilidadeUseCaseTests.cs` | Mock de cache com datas específicas vs UTC | Atualizado para usar `It.IsAny<DateTime>()` |
+
+### Resultados Após Correções
+
+**Testes Unitários:**
+```
+Total: 26 testes
+✅ Passed: 26
+❌ Failed: 0
+Duração: 368ms
+```
+
+**Testes de Integração:**
+```
+Total: 20 testes  
+✅ Passed: 20
+❌ Failed: 0
+Duração: 2m 27s
+```
+
+**Build:**
+```
+Build succeeded.
+0 Error(s)
+```</content>
 <parameter name="filePath">/home/tsgomes/github-tassosgomes/barbApp/tasks/prd-cadastro-agendamento-cliente/8_task_review.md

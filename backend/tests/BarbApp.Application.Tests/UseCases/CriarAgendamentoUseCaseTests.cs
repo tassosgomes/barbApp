@@ -18,7 +18,7 @@ public class CriarAgendamentoUseCaseTests
     private readonly Mock<IAgendamentoRepository> _agendamentoRepositoryMock;
     private readonly Mock<IBarbeirosRepository> _barbeirosRepositoryMock;
     private readonly Mock<IServicosRepository> _servicosRepositoryMock;
-    private readonly Mock<IClienteRepository> _clienteRepositoryMock;
+    private readonly Mock<ICustomerRepository> _customerRepositoryMock;
     private readonly Mock<IDisponibilidadeCache> _cacheMock;
     private readonly Mock<IUnitOfWork> _unitOfWorkMock;
     private readonly Mock<IMapper> _mapperMock;
@@ -30,7 +30,7 @@ public class CriarAgendamentoUseCaseTests
         _agendamentoRepositoryMock = new Mock<IAgendamentoRepository>();
         _barbeirosRepositoryMock = new Mock<IBarbeirosRepository>();
         _servicosRepositoryMock = new Mock<IServicosRepository>();
-        _clienteRepositoryMock = new Mock<IClienteRepository>();
+        _customerRepositoryMock = new Mock<ICustomerRepository>();
         _cacheMock = new Mock<IDisponibilidadeCache>();
         _unitOfWorkMock = new Mock<IUnitOfWork>();
         _mapperMock = new Mock<IMapper>();
@@ -40,7 +40,7 @@ public class CriarAgendamentoUseCaseTests
             _agendamentoRepositoryMock.Object,
             _barbeirosRepositoryMock.Object,
             _servicosRepositoryMock.Object,
-            _clienteRepositoryMock.Object,
+            _customerRepositoryMock.Object,
             _cacheMock.Object,
             _unitOfWorkMock.Object,
             _mapperMock.Object,
@@ -63,7 +63,7 @@ public class CriarAgendamentoUseCaseTests
             DataHora: dataHora
         );
 
-        var cliente = Cliente.Create(barbeariaId, "João Silva", "11987654321");
+        var cliente = Customer.Create(barbeariaId, "11987654321", "João Silva");
         var barbeiro = Barber.Create(barbeariaId, "Carlos Santos", "carlos@test.com", "hash123", "11987654321");
         var servico = BarbershopService.Create(barbeariaId, "Corte", "Corte masculino", 30, 25.00m);
 
@@ -76,7 +76,7 @@ public class CriarAgendamentoUseCaseTests
             "Agendado"
         );
 
-        _clienteRepositoryMock
+        _customerRepositoryMock
             .Setup(x => x.GetByIdAsync(clienteId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(cliente);
 
@@ -120,7 +120,7 @@ public class CriarAgendamentoUseCaseTests
         result.DuracaoTotal.Should().Be(30);
         result.Status.Should().Be("Pendente");
 
-        _clienteRepositoryMock.Verify(x => x.GetByIdAsync(clienteId, It.IsAny<CancellationToken>()), Times.Once);
+        _customerRepositoryMock.Verify(x => x.GetByIdAsync(clienteId, It.IsAny<CancellationToken>()), Times.Once);
         _barbeirosRepositoryMock.Verify(x => x.GetByIdAsync(barbeiroId, It.IsAny<CancellationToken>()), Times.Once);
         _servicosRepositoryMock.Verify(x => x.GetByIdsAsync(It.IsAny<List<Guid>>(), It.IsAny<CancellationToken>()), Times.Once);
         _agendamentoRepositoryMock.Verify(x => x.ExisteConflito(barbeiroId, dataHora, 30, null, It.IsAny<CancellationToken>()), Times.Once);
@@ -141,9 +141,9 @@ public class CriarAgendamentoUseCaseTests
             DataHora: DateTime.UtcNow.AddHours(2)
         );
 
-        _clienteRepositoryMock
+        _customerRepositoryMock
             .Setup(x => x.GetByIdAsync(clienteId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync((Cliente?)null);
+            .ReturnsAsync((Customer?)null);
 
         // Act & Assert
         await Assert.ThrowsAsync<NotFoundException>(
@@ -167,9 +167,9 @@ public class CriarAgendamentoUseCaseTests
             DataHora: DateTime.UtcNow.AddHours(2)
         );
 
-        var cliente = Cliente.Create(barbeariaId, "João Silva", "11987654321");
+        var cliente = Customer.Create(barbeariaId, "11987654321", "João Silva");
 
-        _clienteRepositoryMock
+        _customerRepositoryMock
             .Setup(x => x.GetByIdAsync(clienteId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(cliente);
 
@@ -199,11 +199,11 @@ public class CriarAgendamentoUseCaseTests
             DataHora: DateTime.UtcNow.AddHours(2)
         );
 
-        var cliente = Cliente.Create(barbeariaId, "João Silva", "11987654321");
+        var cliente = Customer.Create(barbeariaId, "11987654321", "João Silva");
         var barbeiro = Barber.Create(barbeariaId, "Carlos Santos", "carlos@test.com", "hash123", "11987654321");
         barbeiro.Deactivate(); // Make barber inactive
 
-        _clienteRepositoryMock
+        _customerRepositoryMock
             .Setup(x => x.GetByIdAsync(clienteId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(cliente);
 
@@ -233,10 +233,10 @@ public class CriarAgendamentoUseCaseTests
             DataHora: DateTime.UtcNow.AddHours(2)
         );
 
-        var cliente = Cliente.Create(barbeariaId, "João Silva", "11987654321");
+        var cliente = Customer.Create(barbeariaId, "11987654321", "João Silva");
         var barbeiro = Barber.Create(barbeariaId, "Carlos Santos", "carlos@test.com", "hash123", "11987654321");
 
-        _clienteRepositoryMock
+        _customerRepositoryMock
             .Setup(x => x.GetByIdAsync(clienteId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(cliente);
 
@@ -270,10 +270,10 @@ public class CriarAgendamentoUseCaseTests
             DataHora: DateTime.UtcNow.AddHours(2)
         );
 
-        var cliente = Cliente.Create(barbeariaId, "João Silva", "11987654321");
+        var cliente = Customer.Create(barbeariaId, "11987654321", "João Silva");
         var barbeiro = Barber.Create(differentBarbeariaId, "Carlos Santos", "carlos@test.com", "hash123", "11987654321");
 
-        _clienteRepositoryMock
+        _customerRepositoryMock
             .Setup(x => x.GetByIdAsync(clienteId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(cliente);
 
@@ -304,11 +304,11 @@ public class CriarAgendamentoUseCaseTests
             DataHora: DateTime.UtcNow.AddHours(2)
         );
 
-        var cliente = Cliente.Create(barbeariaId, "João Silva", "11987654321");
+        var cliente = Customer.Create(barbeariaId, "11987654321", "João Silva");
         var barbeiro = Barber.Create(barbeariaId, "Carlos Santos", "carlos@test.com", "hash123", "11987654321");
         var servico = BarbershopService.Create(differentBarbeariaId, "Corte", "Corte masculino", 30, 25.00m);
 
-        _clienteRepositoryMock
+        _customerRepositoryMock
             .Setup(x => x.GetByIdAsync(clienteId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(cliente);
 
@@ -342,11 +342,11 @@ public class CriarAgendamentoUseCaseTests
             DataHora: DateTime.UtcNow.AddMinutes(-30) // Past time
         );
 
-        var cliente = Cliente.Create(barbeariaId, "João Silva", "11987654321");
+        var cliente = Customer.Create(barbeariaId, "11987654321", "João Silva");
         var barbeiro = Barber.Create(barbeariaId, "Carlos Santos", "carlos@test.com", "hash123", "11987654321");
         var servico = BarbershopService.Create(barbeariaId, "Corte", "Corte masculino", 30, 25.00m);
 
-        _clienteRepositoryMock
+        _customerRepositoryMock
             .Setup(x => x.GetByIdAsync(clienteId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(cliente);
 
@@ -382,11 +382,11 @@ public class CriarAgendamentoUseCaseTests
             DataHora: dataHora
         );
 
-        var cliente = Cliente.Create(barbeariaId, "João Silva", "11987654321");
+        var cliente = Customer.Create(barbeariaId, "11987654321", "João Silva");
         var barbeiro = Barber.Create(barbeariaId, "Carlos Santos", "carlos@test.com", "hash123", "11987654321");
         var servico = BarbershopService.Create(barbeariaId, "Corte", "Corte masculino", 30, 25.00m);
 
-        _clienteRepositoryMock
+        _customerRepositoryMock
             .Setup(x => x.GetByIdAsync(clienteId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(cliente);
 
@@ -426,11 +426,11 @@ public class CriarAgendamentoUseCaseTests
             DataHora: dataHora
         );
 
-        var cliente = Cliente.Create(barbeariaId, "João Silva", "11987654321");
+        var cliente = Customer.Create(barbeariaId, "11987654321", "João Silva");
         var barbeiro = Barber.Create(barbeariaId, "Carlos Santos", "carlos@test.com", "hash123", "11987654321");
         var servico = BarbershopService.Create(barbeariaId, "Corte", "Corte masculino", 30, 25.00m);
 
-        _clienteRepositoryMock
+        _customerRepositoryMock
             .Setup(x => x.GetByIdAsync(clienteId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(cliente);
 

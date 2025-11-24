@@ -1,5 +1,5 @@
 ---
-status: pending
+status: completed
 parallelizable: false
 blocked_by: ["4.0", "5.0", "6.0", "7.0"]
 ---
@@ -13,7 +13,7 @@ blocked_by: ["4.0", "5.0", "6.0", "7.0"]
 <unblocks>9.0, 14.0</unblocks>
 </task_context>
 
-# Tarefa 8.0: API - Endpoints Barbeiros/Serviços/Agendamentos (REST + autorização)
+# Tarefa 8.0: API - Endpoints Barbeiros/Serviços/Agendamentos (REST + autorização) ✅ CONCLUÍDA
 
 ## Visão Geral
 
@@ -33,20 +33,20 @@ Criar todos os endpoints REST para consulta e gestão de agendamentos, incluindo
 
 ## Subtarefas
 
-- [ ] 8.1 Criar BarbeirosController com endpoint GET /api/barbeiros
-- [ ] 8.2 Criar endpoint GET /api/barbeiros/{id}/disponibilidade
-- [ ] 8.3 Criar ServicosController com endpoint GET /api/servicos
-- [ ] 8.4 Criar AgendamentosController vazio
-- [ ] 8.5 Implementar POST /api/agendamentos
-- [ ] 8.6 Implementar GET /api/agendamentos/meus
-- [ ] 8.7 Implementar DELETE /api/agendamentos/{id}
-- [ ] 8.8 Implementar PUT /api/agendamentos/{id}
-- [ ] 8.9 Adicionar atributo [Authorize] em todos os controllers (exceto Auth)
-- [ ] 8.10 Implementar middleware de validação de tenant
-- [ ] 8.11 Documentar todos os endpoints no Swagger
-- [ ] 8.12 Adicionar rate limiting (ex: 100 req/min por IP)
-- [ ] 8.13 Criar testes de integração para todos os endpoints
-- [ ] 8.14 Testar isolamento multi-tenant (cliente de barbearia A não vê dados de B)
+- [x] 8.1 Criar BarbeirosController com endpoint GET /api/barbeiros ✅
+- [x] 8.2 Criar endpoint GET /api/barbeiros/{id}/disponibilidade ✅
+- [x] 8.3 Criar ServicosController com endpoint GET /api/servicos ✅
+- [x] 8.4 Criar AgendamentosController vazio ✅
+- [x] 8.5 Implementar POST /api/agendamentos ✅
+- [x] 8.6 Implementar GET /api/agendamentos/meus ✅
+- [x] 8.7 Implementar DELETE /api/agendamentos/{id} ✅
+- [x] 8.8 Implementar PUT /api/agendamentos/{id} ✅
+- [x] 8.9 Adicionar atributo [Authorize] em todos os controllers (exceto Auth) ✅
+- [x] 8.10 Implementar middleware de validação de tenant ✅
+- [x] 8.11 Documentar todos os endpoints no Swagger ✅
+- [x] 8.12 Adicionar rate limiting (ex: 100 req/min por IP) ✅
+- [x] 8.13 Criar testes de integração para todos os endpoints ✅
+- [x] 8.14 Testar isolamento multi-tenant (cliente de barbearia A não vê dados de B) ✅
 
 ## Detalhes de Implementação
 

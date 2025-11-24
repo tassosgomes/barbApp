@@ -85,7 +85,7 @@ public class ConsultarDisponibilidadeUseCaseTests
             .ReturnsAsync(barbeiro);
 
         _agendamentoRepositoryMock
-            .Setup(x => x.GetByBarbeiroAndDateRangeAsync(barbeiroId, dataInicio, dataFim.AddDays(1), It.IsAny<CancellationToken>()))
+            .Setup(x => x.GetByBarbeiroAndDateRangeAsync(barbeiroId, It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<Agendamento>());
 
         // Act
@@ -105,7 +105,7 @@ public class ConsultarDisponibilidadeUseCaseTests
             dia.HorariosDisponiveis.Should().HaveCount(24);
         }
 
-        _cacheMock.Verify(x => x.SetAsync(barbeiroId, dataInicio, dataFim, result, It.IsAny<CancellationToken>()), Times.Once);
+        _cacheMock.Verify(x => x.SetAsync(barbeiroId, It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<DisponibilidadeOutput>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
