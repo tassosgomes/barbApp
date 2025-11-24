@@ -3,19 +3,23 @@ using BarbApp.Application.DTOs;
 using BarbApp.Infrastructure.Services;
 using FluentAssertions;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Moq;
 
 namespace BarbApp.Infrastructure.Tests.Services;
 
 public class DisponibilidadeCacheTests
 {
     private readonly IMemoryCache _memoryCache;
+    private readonly Mock<ILogger<DisponibilidadeCache>> _loggerMock;
     private readonly DisponibilidadeCache _cache;
 
     public DisponibilidadeCacheTests()
     {
         _memoryCache = new MemoryCache(Microsoft.Extensions.Options.Options.Create(new MemoryCacheOptions()));
-        _cache = new DisponibilidadeCache(_memoryCache);
+        _loggerMock = new Mock<ILogger<DisponibilidadeCache>>();
+        _cache = new DisponibilidadeCache(_memoryCache, _loggerMock.Object);
     }
 
     [Fact]

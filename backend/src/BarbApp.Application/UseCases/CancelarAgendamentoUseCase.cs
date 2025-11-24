@@ -29,7 +29,7 @@ public class CancelarAgendamentoUseCase : ICancelarAgendamentoUseCase
     public async Task Handle(Guid clienteId, Guid agendamentoId, CancellationToken cancellationToken = default)
     {
         _logger.LogInformation(
-            "Cancelando agendamento {AgendamentoId} pelo cliente {ClienteId}",
+            "Iniciando cancelamento de agendamento. AgendamentoId: {AgendamentoId}, ClienteId: {ClienteId}",
             agendamentoId, clienteId);
 
         // 1. Buscar agendamento
@@ -44,10 +44,12 @@ public class CancelarAgendamentoUseCase : ICancelarAgendamentoUseCase
         if (agendamento.ClienteId != clienteId)
         {
             _logger.LogWarning(
-                "Cliente {ClienteId} tentou cancelar agendamento {AgendamentoId} que pertence a outro cliente",
-                clienteId, agendamentoId);
+                "Tentativa de cancelamento não autorizada. ClienteId: {ClienteId}, AgendamentoId: {AgendamentoId}, DonoId: {DonoId}",
+                clienteId, agendamentoId, agendamento.ClienteId);
             throw new ForbiddenException("Você não tem permissão para cancelar este agendamento");
         }
+
+        var barbeariaId = agendamento.BarbeariaId;
 
         // 3. Cancelar (validações internas da entidade)
         agendamento.Cancelar(); // Lança exceção se não puder cancelar
@@ -56,8 +58,11 @@ public class CancelarAgendamentoUseCase : ICancelarAgendamentoUseCase
         await _unitOfWork.Commit(cancellationToken);
 
         _logger.LogInformation(
-            "Agendamento {AgendamentoId} cancelado pelo cliente {ClienteId}",
-            agendamentoId, clienteId);
+            "Agendamento cancelado com sucesso. AgendamentoId: {AgendamentoId}, ClienteId: {ClienteId}, BarbeariaId: {BarbeariaId}",
+            agendamentoId, clienteId, barbeariaId);
+
+        // Incrementar métrica de cancelamentos
+        BarbAppMetrics.AgendamentosCanceladosCounter.WithLabels(barbeariaId.ToString()).Inc();
 
         // Invalidar cache de disponibilidade
         await _cache.InvalidateAsync(agendamento.BarbeiroId, DateTime.UtcNow.Date, DateTime.UtcNow.Date.AddDays(30));

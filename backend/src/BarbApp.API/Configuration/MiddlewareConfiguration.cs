@@ -2,7 +2,10 @@ using BarbApp.API.Filters;
 using BarbApp.Infrastructure.Middlewares;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
+using System.Text.Json;
+using Prometheus;
 
 namespace BarbApp.API.Configuration;
 
@@ -10,7 +13,10 @@ public static class MiddlewareConfiguration
 {
     public static WebApplication ConfigureMiddleware(this WebApplication app)
     {
-        // Global exception handling (first)
+        // Correlation ID (first for request tracing)
+        app.UseCorrelationId();
+
+        // Global exception handling
         app.UseGlobalExceptionHandler();
 
         // Swagger (development only)
@@ -41,8 +47,7 @@ public static class MiddlewareConfiguration
         app.UseRateLimiter();
 
         // Prometheus metrics
-        // app.UseHttpMetrics();
-        // app.UseMetricServer();
+        app.UseHttpMetrics();
 
         // Tenant middleware (after authentication)
         app.UseTenantMiddleware();
@@ -51,13 +56,58 @@ public static class MiddlewareConfiguration
         // Controllers
         app.MapControllers();
 
-        // Health checks
-        app.MapHealthChecks("/health");
+        // Prometheus metrics endpoint
+        app.MapMetrics();
+
+        // Health checks with detailed response
+        app.MapHealthChecks("/health", new HealthCheckOptions
+        {
+            ResponseWriter = WriteHealthCheckResponse
+        });
+
+        app.MapHealthChecks("/health/ready", new HealthCheckOptions
+        {
+            Predicate = check => check.Tags.Contains("ready"),
+            ResponseWriter = WriteHealthCheckResponse
+        });
+
+        app.MapHealthChecks("/health/live", new HealthCheckOptions
+        {
+            Predicate = _ => false // Always returns healthy for liveness
+        });
 
         // Test endpoints for middleware testing
         ConfigureTestEndpoints(app);
 
         return app;
+    }
+
+    private static async Task WriteHealthCheckResponse(HttpContext context, HealthReport report)
+    {
+        context.Response.ContentType = "application/json";
+
+        var response = new
+        {
+            status = report.Status.ToString(),
+            totalDuration = report.TotalDuration.TotalMilliseconds,
+            checks = report.Entries.Select(e => new
+            {
+                name = e.Key,
+                status = e.Value.Status.ToString(),
+                duration = e.Value.Duration.TotalMilliseconds,
+                description = e.Value.Description,
+                exception = e.Value.Exception?.Message,
+                data = e.Value.Data
+            })
+        };
+
+        var options = new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            WriteIndented = true
+        };
+
+        await context.Response.WriteAsync(JsonSerializer.Serialize(response, options));
     }
 
     private static void ConfigureTestEndpoints(WebApplication app)

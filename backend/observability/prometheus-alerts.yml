@@ -1,0 +1,217 @@
+# Regras de Alerta Prometheus para BarbApp
+# Módulo: Cadastro e Agendamento de Clientes
+
+groups:
+  - name: barbapp_agendamentos
+    interval: 30s
+    rules:
+      # ═══════════════════════════════════════════════════════════════
+      # ALERTAS DE CONFLITOS DE AGENDAMENTO
+      # ═══════════════════════════════════════════════════════════════
+      
+      - alert: AltaTaxaDeConflitos
+        expr: |
+          sum(rate(barbapp_agendamentos_conflito_total[5m])) 
+          / 
+          sum(rate(barbapp_agendamentos_criados_total[5m])) 
+          > 0.1
+        for: 5m
+        labels:
+          severity: warning
+          team: backend
+          module: agendamentos
+        annotations:
+          summary: "Taxa de conflito de horários > 10%"
+          description: |
+            Mais de 10% dos agendamentos estão falhando por conflito de horário.
+            Valor atual: {{ $value | printf "%.2f" }}%
+            Isso pode indicar alta demanda ou problema no algoritmo de disponibilidade.
+          runbook_url: "https://wiki.barbapp.com/runbooks/alta-taxa-conflitos"
+
+      - alert: MuitosConflitosEmCurtoTempo
+        expr: increase(barbapp_agendamentos_conflito_total[10m]) > 20
+        for: 2m
+        labels:
+          severity: warning
+          team: backend
+          module: agendamentos
+        annotations:
+          summary: "Muitos conflitos de agendamento em curto período"
+          description: |
+            Mais de 20 conflitos de horário detectados nos últimos 10 minutos.
+            Valor atual: {{ $value }}
+            Verifique se há algum problema com o sistema de cache ou concorrência.
+
+      # ═══════════════════════════════════════════════════════════════
+      # ALERTAS DE PERFORMANCE
+      # ═══════════════════════════════════════════════════════════════
+      
+      - alert: AltaLatenciaAgendamento
+        expr: |
+          histogram_quantile(0.95, rate(barbapp_agendamento_duracao_segundos_bucket[5m])) > 2
+        for: 5m
+        labels:
+          severity: warning
+          team: backend
+          module: agendamentos
+        annotations:
+          summary: "Latência p95 de agendamentos > 2s"
+          description: |
+            O percentil 95 da latência de criação de agendamentos está acima de 2 segundos.
+            Valor atual: {{ $value | printf "%.2f" }}s
+            Verifique o banco de dados e o sistema de cache.
+
+      - alert: LatenciaCriticaAgendamento
+        expr: |
+          histogram_quantile(0.99, rate(barbapp_agendamento_duracao_segundos_bucket[5m])) > 5
+        for: 3m
+        labels:
+          severity: critical
+          team: backend
+          module: agendamentos
+        annotations:
+          summary: "Latência p99 de agendamentos > 5s"
+          description: |
+            O percentil 99 da latência de criação de agendamentos está criticamente alto.
+            Valor atual: {{ $value | printf "%.2f" }}s
+            Ação imediata necessária!
+
+      # ═══════════════════════════════════════════════════════════════
+      # ALERTAS DE CACHE
+      # ═══════════════════════════════════════════════════════════════
+      
+      - alert: BaixaTaxaHitCache
+        expr: barbapp_disponibilidade_cache_hit_rate < 0.5
+        for: 10m
+        labels:
+          severity: warning
+          team: backend
+          module: cache
+        annotations:
+          summary: "Taxa de hit do cache de disponibilidade < 50%"
+          description: |
+            O cache de disponibilidade está com taxa de acerto abaixo do esperado.
+            Valor atual: {{ $value | printf "%.2f" }}%
+            Isso pode indicar problema no TTL do cache ou padrão de acesso ineficiente.
+
+      - alert: CacheMissExcessivo
+        expr: |
+          sum(rate(barbapp_cache_operations_total{operation="miss"}[5m])) 
+          / 
+          sum(rate(barbapp_cache_operations_total[5m])) 
+          > 0.7
+        for: 5m
+        labels:
+          severity: warning
+          team: backend
+          module: cache
+        annotations:
+          summary: "Taxa de cache miss > 70%"
+          description: |
+            Mais de 70% das operações de cache estão resultando em miss.
+            Considere revisar a estratégia de cache.
+
+      # ═══════════════════════════════════════════════════════════════
+      # ALERTAS DE AUTENTICAÇÃO
+      # ═══════════════════════════════════════════════════════════════
+      
+      - alert: MuitasLoginsFalhas
+        expr: increase(barbapp_logins_falhados_total[10m]) > 50
+        for: 2m
+        labels:
+          severity: warning
+          team: security
+          module: auth
+        annotations:
+          summary: "Muitas tentativas de login falhadas"
+          description: |
+            Mais de 50 tentativas de login falhadas nos últimos 10 minutos.
+            Valor atual: {{ $value }}
+            Possível tentativa de brute force ou problema no sistema.
+          runbook_url: "https://wiki.barbapp.com/runbooks/login-brute-force"
+
+      # ═══════════════════════════════════════════════════════════════
+      # ALERTAS DE ERROS
+      # ═══════════════════════════════════════════════════════════════
+      
+      - alert: AltaTaxaErros
+        expr: sum(rate(barbapp_erros_total[5m])) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+          team: backend
+        annotations:
+          summary: "Taxa de erros elevada"
+          description: |
+            Taxa de erros acima de 0.1/s nos últimos 5 minutos.
+            Valor atual: {{ $value | printf "%.4f" }} erros/s
+            Verifique os logs para identificar a causa.
+
+      - alert: TaxaCriticaErros
+        expr: sum(rate(barbapp_erros_total[5m])) > 1
+        for: 2m
+        labels:
+          severity: critical
+          team: backend
+        annotations:
+          summary: "Taxa crítica de erros"
+          description: |
+            Taxa de erros acima de 1/s! Sistema pode estar em estado degradado.
+            Valor atual: {{ $value | printf "%.2f" }} erros/s
+            Ação imediata necessária!
+
+      # ═══════════════════════════════════════════════════════════════
+      # ALERTAS DE SAÚDE DO SISTEMA
+      # ═══════════════════════════════════════════════════════════════
+      
+      - alert: SemAgendamentosRecentes
+        expr: |
+          increase(barbapp_agendamentos_criados_total[1h]) == 0 
+          and 
+          hour() >= 8 
+          and 
+          hour() <= 20
+        for: 30m
+        labels:
+          severity: info
+          team: business
+          module: agendamentos
+        annotations:
+          summary: "Nenhum agendamento criado na última hora"
+          description: |
+            Nenhum agendamento foi criado na última hora durante horário comercial.
+            Isso pode ser normal ou indicar um problema no sistema.
+
+  - name: barbapp_infraestrutura
+    interval: 30s
+    rules:
+      # ═══════════════════════════════════════════════════════════════
+      # ALERTAS DE INFRAESTRUTURA (Healthchecks)
+      # ═══════════════════════════════════════════════════════════════
+      
+      - alert: DatabaseDown
+        expr: up{job="barbapp-postgresql"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          team: infra
+          module: database
+        annotations:
+          summary: "PostgreSQL está down"
+          description: |
+            O banco de dados PostgreSQL não está respondendo.
+            Verifique o status do serviço imediatamente.
+          runbook_url: "https://wiki.barbapp.com/runbooks/database-down"
+
+      - alert: HealthCheckFalhando
+        expr: |
+          probe_success{job="barbapp-health"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          team: infra
+        annotations:
+          summary: "Health check da aplicação falhando"
+          description: |
+            O endpoint /health da aplicação está retornando erro.
+            A aplicação pode estar em estado crítico.

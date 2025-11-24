@@ -1,5 +1,5 @@
 ---
-status: pending
+status: completed
 parallelizable: true
 blocked_by: ["4.0", "8.0"]
 ---
@@ -31,19 +31,19 @@ Implementar observabilidade completa para o módulo de Cadastro e Agendamento de
 
 ## Subtarefas
 
-- [ ] 10.1 Configurar Serilog com sinks (console, arquivo, seq opcional)
-- [ ] 10.2 Adicionar Correlation ID middleware
-- [ ] 10.3 Implementar logs estruturados em todos os use cases
-- [ ] 10.4 Implementar logs de auditoria para operações críticas
-- [ ] 10.5 Configurar prometheus-net para métricas
-- [ ] 10.6 Criar métricas de negócio: counter de agendamentos, gauge de cache hit rate
-- [ ] 10.7 Criar métricas de performance: histograma de latência de endpoints
-- [ ] 10.8 Implementar healthchecks para PostgreSQL
-- [ ] 10.9 Implementar healthchecks para IMemoryCache
-- [ ] 10.10 Criar endpoint /health e /health/ready
-- [ ] 10.11 Criar dashboard Grafana básico (arquivo JSON)
-- [ ] 10.12 Documentar métricas e logs no README
-- [ ] 10.13 Configurar alertas básicos (regras Prometheus)
+- [x] 10.1 Configurar Serilog com sinks (console, arquivo, seq opcional)
+- [x] 10.2 Adicionar Correlation ID middleware
+- [x] 10.3 Implementar logs estruturados em todos os use cases
+- [x] 10.4 Implementar logs de auditoria para operações críticas
+- [x] 10.5 Configurar prometheus-net para métricas
+- [x] 10.6 Criar métricas de negócio: counter de agendamentos, gauge de cache hit rate
+- [x] 10.7 Criar métricas de performance: histograma de latência de endpoints
+- [x] 10.8 Implementar healthchecks para PostgreSQL
+- [x] 10.9 Implementar healthchecks para IMemoryCache
+- [x] 10.10 Criar endpoint /health e /health/ready
+- [x] 10.11 Criar dashboard Grafana básico (arquivo JSON)
+- [x] 10.12 Documentar métricas e logs no README
+- [x] 10.13 Configurar alertas básicos (regras Prometheus)
 
 ## Detalhes de Implementação
 
