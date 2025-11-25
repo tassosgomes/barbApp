@@ -22,7 +22,7 @@ namespace BarbApp.IntegrationTests.Repositories
         public RepositoryIntegrationTests(DatabaseFixture dbFixture)
         {
             _dbFixture = dbFixture;
-            _factory = new IntegrationTestWebAppFactory();
+            _factory = dbFixture.CreateFactory();
         }
 
         public async Task InitializeAsync()

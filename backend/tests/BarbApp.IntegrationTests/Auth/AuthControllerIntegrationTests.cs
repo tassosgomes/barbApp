@@ -12,13 +12,27 @@ using Moq;
 
 namespace BarbApp.IntegrationTests.Auth;
 
-public class AuthControllerIntegrationTests : IClassFixture<IntegrationTestWebAppFactory>
+[Collection(nameof(IntegrationTestCollection))]
+public class AuthControllerIntegrationTests : IAsyncLifetime
 {
     private readonly IntegrationTestWebAppFactory _factory;
+    private readonly DatabaseFixture _dbFixture;
 
-    public AuthControllerIntegrationTests(IntegrationTestWebAppFactory factory)
+    public AuthControllerIntegrationTests(DatabaseFixture dbFixture)
     {
-        _factory = factory;
+        _dbFixture = dbFixture;
+        _factory = dbFixture.CreateFactory();
+    }
+
+    public Task InitializeAsync()
+    {
+        _factory.EnsureDatabaseInitialized();
+        return Task.CompletedTask;
+    }
+
+    public Task DisposeAsync()
+    {
+        return Task.CompletedTask;
     }
 
     [Fact]

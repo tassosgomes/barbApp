@@ -26,12 +26,13 @@ public class BarberProfileControllerIntegrationTests : IAsyncLifetime
     public BarberProfileControllerIntegrationTests(DatabaseFixture dbFixture)
     {
         _dbFixture = dbFixture;
-        _factory = new IntegrationTestWebAppFactory();
+        _factory = dbFixture.CreateFactory();
         _client = _factory.CreateClient();
     }
 
     public async Task InitializeAsync()
     {
+        await _dbFixture.ResetDatabaseAsync();
         // Ensure database is initialized
         _factory.EnsureDatabaseInitialized();
 

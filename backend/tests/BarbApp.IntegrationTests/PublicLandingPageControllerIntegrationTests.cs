@@ -12,59 +12,28 @@ using Microsoft.Extensions.DependencyInjection;
 namespace BarbApp.IntegrationTests;
 
 [Collection(nameof(IntegrationTestCollection))]
-public class PublicLandingPageControllerIntegrationTests
+public class PublicLandingPageControllerIntegrationTests : IAsyncLifetime
 {
     private readonly HttpClient _client;
-    private readonly WebApplicationFactory<Program> _factory;
+    private readonly IntegrationTestWebAppFactory _factory;
     private readonly DatabaseFixture _dbFixture;
-    private static bool _dbInitialized;
-    private static readonly object _initLock = new();
 
     public PublicLandingPageControllerIntegrationTests(DatabaseFixture dbFixture)
     {
         _dbFixture = dbFixture;
-
-        if (!_dbInitialized)
-        {
-            lock (_initLock)
-            {
-                if (!_dbInitialized)
-                {
-                    _dbFixture.RunMigrations();
-                    _dbInitialized = true;
-                }
-            }
-        }
-
-        _factory = new WebApplicationFactory<Program>()
-            .WithWebHostBuilder(builder =>
-            {
-                builder.ConfigureAppConfiguration((context, config) =>
-                {
-                    config.AddInMemoryCollection(new Dictionary<string, string?>
-                    {
-                        ["JwtSettings:Secret"] = "test-secret-key-at-least-32-characters-long-for-jwt",
-                        ["JwtSettings:Issuer"] = "BarbApp-Test",
-                        ["JwtSettings:Audience"] = "BarbApp-Test-Users",
-                        ["JwtSettings:ExpirationMinutes"] = "60"
-                    }!);
-                });
-
-                builder.ConfigureServices(services =>
-                {
-                    var descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(DbContextOptions<BarbAppDbContext>));
-                    if (descriptor != null) services.Remove(descriptor);
-
-                    services.AddDbContext<BarbAppDbContext>(options =>
-                        options.UseNpgsql(_dbFixture.ConnectionString));
-
-                    services.AddScoped<BarbApp.Application.Interfaces.IEmailService, NoOpEmailService>();
-                });
-
-                builder.UseEnvironment("Testing");
-            });
-
+        _factory = dbFixture.CreateFactory();
         _client = _factory.CreateClient();
+    }
+
+    public Task InitializeAsync()
+    {
+        _factory.EnsureDatabaseInitialized();
+        return Task.CompletedTask;
+    }
+
+    public Task DisposeAsync()
+    {
+        return Task.CompletedTask;
     }
 
     [Fact]

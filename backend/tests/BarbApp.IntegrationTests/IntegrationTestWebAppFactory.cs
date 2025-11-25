@@ -13,38 +13,36 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
-using Testcontainers.PostgreSql;
 
 namespace BarbApp.IntegrationTests;
 
+/// <summary>
+/// Custom WebApplicationFactory that uses a shared database connection string.
+/// This factory does NOT create its own container - it receives the connection string
+/// from the DatabaseFixture which is shared across all tests via ICollectionFixture.
+/// </summary>
 public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>
 {
-    private readonly PostgreSqlContainer _dbContainer;
+    private readonly string _connectionString;
     private bool _dbInitialized;
-    private readonly object _dbLock = new();
-    private bool _containerStarted;
 
-    public IntegrationTestWebAppFactory()
+    /// <summary>
+    /// Creates a new IntegrationTestWebAppFactory using the shared connection string from DatabaseFixture.
+    /// </summary>
+    /// <param name="connectionString">The PostgreSQL connection string from the shared DatabaseFixture container.</param>
+    public IntegrationTestWebAppFactory(string connectionString)
     {
-        _dbContainer = new PostgreSqlBuilder()
-            .WithImage("postgres:16-alpine")
-            .WithDatabase("barbapp_test")
-            .WithUsername("test_user")
-            .WithPassword("test_password")
-            .Build();
-
-        // Start container in constructor
-        _dbContainer.StartAsync().GetAwaiter().GetResult();
-        _containerStarted = true;
+        _connectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
     }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.ConfigureAppConfiguration((context, config) =>
         {
-            // Configure JWT settings for testing
+            // Configure connection string for testing (used by health checks)
             config.AddInMemoryCollection(new Dictionary<string, string?>
             {
+                ["ConnectionStrings:DefaultConnection"] = _connectionString,
                 ["JwtSettings:Secret"] = "test-secret-key-at-least-32-characters-long-for-jwt",
                 ["JwtSettings:Issuer"] = "BarbApp-Test",
                 ["JwtSettings:Audience"] = "BarbApp-Test-Users",
@@ -88,10 +86,10 @@ public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>
                 services.Remove(descriptor);
             }
 
-            // Add test DbContext with PostgreSQL
+            // Add test DbContext with PostgreSQL using the shared connection string
             services.AddDbContext<BarbAppDbContext>(options =>
             {
-                options.UseNpgsql(_dbContainer.GetConnectionString());
+                options.UseNpgsql(_connectionString);
             });
 
             // Remove ALL IEmailService registrations and replace with FakeEmailService for testing
@@ -154,8 +152,9 @@ public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>
     }
 
     /// <summary>
-    /// Runs database migrations. Call this once after the first CreateClient() call.
-    /// Thread-safe and idempotent - safe to call multiple times.
+    /// Ensures the database schema exists. The database is initialized once by DatabaseFixture,
+    /// but each test class may call this to ensure the application context is ready.
+    /// This method is idempotent - safe to call multiple times.
     /// </summary>
     public void EnsureDatabaseInitialized()
     {
@@ -165,16 +164,7 @@ public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>
         using var scope = Services.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<BarbAppDbContext>();
         
-        // Reset database to clean state - force drop and recreate
-        try
-        {
-            dbContext.Database.EnsureDeleted();
-        }
-        catch
-        {
-            // Ignore errors if database doesn't exist yet
-        }
-        
+        // Ensure schema exists (this is idempotent - EnsureCreated does nothing if tables exist)
         dbContext.Database.EnsureCreated();
         
         _dbInitialized = true;
@@ -242,16 +232,7 @@ public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>
         services.AddScoped<BarbApp.Application.Interfaces.IEmailService, NoOpEmailService>();
     }
 
-    protected override void Dispose(bool disposing)
-    {
-        if (disposing && _containerStarted)
-        {
-            _dbContainer.StopAsync().GetAwaiter().GetResult();
-            _dbContainer.DisposeAsync().AsTask().GetAwaiter().GetResult();
-            _containerStarted = false;
-        }
-        base.Dispose(disposing);
-    }
+    // Note: Container lifecycle is managed by DatabaseFixture, not by this factory
 }
 
 class TestWebHostEnvironment : IWebHostEnvironment

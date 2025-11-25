@@ -22,7 +22,7 @@ public class ExternalServicesIntegrationTests : IAsyncLifetime
     public ExternalServicesIntegrationTests(DatabaseFixture dbFixture)
     {
         _dbFixture = dbFixture;
-        _factory = new IntegrationTestWebAppFactory();
+        _factory = dbFixture.CreateFactory();
     }
 
     public async Task InitializeAsync()
@@ -385,7 +385,8 @@ public class ExternalServicesIntegrationTests : IAsyncLifetime
         var client = _factory.CreateClient();
 
         // Act - Make a request that should go through the middleware
-        var response = await client.GetAsync("/health");
+        // Use /health/live endpoint which doesn't depend on database health
+        var response = await client.GetAsync("/health/live");
 
         // Assert - The middleware should not cause errors
         response.Should().NotBeNull();

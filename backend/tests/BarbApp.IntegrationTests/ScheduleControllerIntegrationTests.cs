@@ -28,13 +28,14 @@ public class ScheduleControllerIntegrationTests : IAsyncLifetime
     public ScheduleControllerIntegrationTests(DatabaseFixture dbFixture)
     {
         _dbFixture = dbFixture;
-        _factory = new IntegrationTestWebAppFactory();
+        _factory = dbFixture.CreateFactory();
         _client = _factory.CreateClient();
         _testAppointmentIds = new List<Guid>();
     }
 
     public async Task InitializeAsync()
     {
+        await _dbFixture.ResetDatabaseAsync();
         _factory.EnsureDatabaseInitialized();
         await SetupTestData();
     }

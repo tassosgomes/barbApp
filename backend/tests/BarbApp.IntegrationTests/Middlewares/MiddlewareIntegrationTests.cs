@@ -12,13 +12,27 @@ using Xunit;
 
 namespace BarbApp.IntegrationTests.Middlewares;
 
-public class MiddlewareIntegrationTests : IClassFixture<IntegrationTestWebAppFactory>
+[Collection(nameof(IntegrationTestCollection))]
+public class MiddlewareIntegrationTests : IAsyncLifetime
 {
     private readonly IntegrationTestWebAppFactory _factory;
+    private readonly DatabaseFixture _dbFixture;
 
-    public MiddlewareIntegrationTests(IntegrationTestWebAppFactory factory)
+    public MiddlewareIntegrationTests(DatabaseFixture dbFixture)
     {
-        _factory = factory;
+        _dbFixture = dbFixture;
+        _factory = dbFixture.CreateFactory();
+    }
+
+    public Task InitializeAsync()
+    {
+        _factory.EnsureDatabaseInitialized();
+        return Task.CompletedTask;
+    }
+
+    public Task DisposeAsync()
+    {
+        return Task.CompletedTask;
     }
 
     [Fact]

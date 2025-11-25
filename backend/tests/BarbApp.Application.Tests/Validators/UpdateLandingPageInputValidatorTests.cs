@@ -114,9 +114,9 @@ public class UpdateLandingPageInputValidatorTests
     [Theory]
     [InlineData("")]
     [InlineData("   ")]
-    public void Validate_EmptyWhatsappNumber_ShouldFail(string emptyWhatsapp)
+    public void Validate_EmptyWhatsappNumber_ShouldPass(string emptyWhatsapp)
     {
-        // Arrange
+        // Arrange - Empty strings are allowed (to clear a field)
         var input = new UpdateLandingPageInput(
             TemplateId: null,
             LogoUrl: null,
@@ -131,8 +131,8 @@ public class UpdateLandingPageInputValidatorTests
         // Act
         var result = _validator.TestValidate(input);
 
-        // Assert
-        result.ShouldHaveValidationErrorFor(x => x.WhatsappNumber);
+        // Assert - Should NOT have error because empty strings are allowed
+        result.ShouldNotHaveValidationErrorFor(x => x.WhatsappNumber);
     }
 
     [Theory]
@@ -165,9 +165,9 @@ public class UpdateLandingPageInputValidatorTests
     }
 
     [Fact]
-    public void Validate_EmptyLogoUrl_ShouldFail()
+    public void Validate_EmptyLogoUrl_ShouldPass()
     {
-        // Arrange
+        // Arrange - Empty strings are allowed (to clear a field)
         var input = new UpdateLandingPageInput(
             TemplateId: null,
             LogoUrl: "",
@@ -182,8 +182,8 @@ public class UpdateLandingPageInputValidatorTests
         // Act
         var result = _validator.TestValidate(input);
 
-        // Assert
-        result.ShouldHaveValidationErrorFor(x => x.LogoUrl);
+        // Assert - Should NOT have error because empty strings are allowed
+        result.ShouldNotHaveValidationErrorFor(x => x.LogoUrl);
     }
 
     [Fact]
@@ -237,9 +237,9 @@ public class UpdateLandingPageInputValidatorTests
     }
 
     [Fact]
-    public void Validate_EmptyAboutText_ShouldFail()
+    public void Validate_EmptyAboutText_ShouldPass()
     {
-        // Arrange
+        // Arrange - Empty strings are allowed (to clear a field)
         var input = new UpdateLandingPageInput(
             TemplateId: null,
             LogoUrl: null,
@@ -254,8 +254,8 @@ public class UpdateLandingPageInputValidatorTests
         // Act
         var result = _validator.TestValidate(input);
 
-        // Assert
-        result.ShouldHaveValidationErrorFor(x => x.AboutText);
+        // Assert - Should NOT have error because empty strings are allowed
+        result.ShouldNotHaveValidationErrorFor(x => x.AboutText);
     }
 
     [Fact]
@@ -283,9 +283,9 @@ public class UpdateLandingPageInputValidatorTests
     }
 
     [Fact]
-    public void Validate_EmptyOpeningHours_ShouldFail()
+    public void Validate_EmptyOpeningHours_ShouldPass()
     {
-        // Arrange
+        // Arrange - Empty strings are allowed (to clear a field)
         var input = new UpdateLandingPageInput(
             TemplateId: null,
             LogoUrl: null,
@@ -300,8 +300,8 @@ public class UpdateLandingPageInputValidatorTests
         // Act
         var result = _validator.TestValidate(input);
 
-        // Assert
-        result.ShouldHaveValidationErrorFor(x => x.OpeningHours);
+        // Assert - Should NOT have error because empty strings are allowed
+        result.ShouldNotHaveValidationErrorFor(x => x.OpeningHours);
     }
 
     [Fact]
@@ -329,9 +329,9 @@ public class UpdateLandingPageInputValidatorTests
     }
 
     [Fact]
-    public void Validate_EmptyInstagramUrl_ShouldFail()
+    public void Validate_EmptyInstagramUrl_ShouldPass()
     {
-        // Arrange
+        // Arrange - Empty strings are allowed (to clear a field)
         var input = new UpdateLandingPageInput(
             TemplateId: null,
             LogoUrl: null,
@@ -346,8 +346,8 @@ public class UpdateLandingPageInputValidatorTests
         // Act
         var result = _validator.TestValidate(input);
 
-        // Assert
-        result.ShouldHaveValidationErrorFor(x => x.InstagramUrl);
+        // Assert - Should NOT have error because empty strings are allowed
+        result.ShouldNotHaveValidationErrorFor(x => x.InstagramUrl);
     }
 
     [Theory]
@@ -400,9 +400,9 @@ public class UpdateLandingPageInputValidatorTests
     }
 
     [Fact]
-    public void Validate_EmptyFacebookUrl_ShouldFail()
+    public void Validate_EmptyFacebookUrl_ShouldPass()
     {
-        // Arrange
+        // Arrange - Empty strings are allowed (to clear a field)
         var input = new UpdateLandingPageInput(
             TemplateId: null,
             LogoUrl: null,
@@ -417,8 +417,8 @@ public class UpdateLandingPageInputValidatorTests
         // Act
         var result = _validator.TestValidate(input);
 
-        // Assert
-        result.ShouldHaveValidationErrorFor(x => x.FacebookUrl);
+        // Assert - Should NOT have error because empty strings are allowed
+        result.ShouldNotHaveValidationErrorFor(x => x.FacebookUrl);
     }
 
     [Theory]
