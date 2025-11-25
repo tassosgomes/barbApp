@@ -281,13 +281,13 @@ describe('BarbeiroFormPage', () => {
       await waitFor(() => {
         const corteCheckbox = screen.getByRole('checkbox', {
           name: /corte/i,
-        }) as HTMLInputElement;
-        expect(corteCheckbox.checked).toBe(true);
+        });
+        expect(corteCheckbox).toHaveAttribute('aria-checked', 'true');
 
         const barbeCheckbox = screen.getByRole('checkbox', {
           name: /barba/i,
-        }) as HTMLInputElement;
-        expect(barbeCheckbox.checked).toBe(false);
+        });
+        expect(barbeCheckbox).toHaveAttribute('aria-checked', 'false');
       });
     });
 
