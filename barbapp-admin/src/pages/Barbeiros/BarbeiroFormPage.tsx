@@ -65,6 +65,9 @@ export function BarbeiroFormPage() {
     watch,
   } = useForm<CreateBarbeiroFormData | UpdateBarbeiroFormData>({
     resolver: zodResolver(isEditing ? updateBarbeiroSchema : createBarbeiroSchema),
+    defaultValues: {
+      serviceIds: [],
+    },
   });
 
   // Watch para serviceIds
@@ -132,11 +135,14 @@ export function BarbeiroFormPage() {
 
   const handleServiceToggle = (serviceId: string, checked: boolean) => {
     const currentIds = selectedServiceIds || [];
-    if (checked) {
-      setValue('serviceIds', [...currentIds, serviceId]);
-    } else {
-      setValue('serviceIds', currentIds.filter(id => id !== serviceId));
-    }
+    const nextIds = checked
+      ? Array.from(new Set([...currentIds, serviceId]))
+      : currentIds.filter(id => id !== serviceId);
+
+    setValue('serviceIds', nextIds, {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
   };
 
   // Formatação de telefone
@@ -150,7 +156,10 @@ export function BarbeiroFormPage() {
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formatted = formatPhone(e.target.value);
-    setValue('telefone', formatted);
+    setValue('telefone', formatted, {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
   };
 
   // Loading state

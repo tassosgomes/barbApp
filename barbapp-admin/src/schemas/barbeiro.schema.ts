@@ -20,7 +20,7 @@ export const createBarbeiroSchema = z.object({
     .regex(/^(\(\d{2}\)\s?)?\d{4,5}-?\d{4}$/, 'Telefone inválido. Use o formato (11) 98765-4321 ou 11987654321')
     .transform((val) => val.replace(/\D/g, '')), // Remove máscara antes de enviar para API
   senha: z.string().min(8, 'Senha deve ter no mínimo 8 caracteres'),
-  serviceIds: z.array(z.string().uuid('ID de serviço inválido')).min(1, 'Selecione pelo menos um serviço'),
+  serviceIds: z.array(z.string().min(1, 'ID de serviço inválido')).min(1, 'Selecione pelo menos um serviço'),
 });
 
 /**
@@ -35,7 +35,7 @@ export const updateBarbeiroSchema = z.object({
     .regex(/^(\(\d{2}\)\s?)?\d{4,5}-?\d{4}$/, 'Telefone inválido. Use o formato (11) 98765-4321 ou 11987654321')
     .transform((val) => val.replace(/\D/g, '')) // Remove máscara antes de enviar para API
     .optional(),
-  serviceIds: z.array(z.string().uuid('ID de serviço inválido')).min(1, 'Selecione pelo menos um serviço').optional(),
+  serviceIds: z.array(z.string().min(1, 'ID de serviço inválido')).min(1, 'Selecione pelo menos um serviço').optional(),
 });
 
 /**
