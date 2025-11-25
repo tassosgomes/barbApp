@@ -33,7 +33,7 @@ describe('ProtectedRoute', () => {
 
     const navigate = screen.getByTestId('navigate');
     expect(navigate).toBeInTheDocument();
-    expect(navigate).toHaveAttribute('data-to', '/login');
+    expect(navigate).toHaveAttribute('data-to', '/admin/login');
   });
 
   it('should render protected content when authenticated', () => {
