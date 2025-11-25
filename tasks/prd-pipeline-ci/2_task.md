@@ -28,6 +28,10 @@ Adicionar ao workflow a definição do serviço PostgreSQL (`postgres:16-alpine`
 - [x] 2.1 Inserir bloco `services.postgres` no job `backend-tests` com credenciais e exposição de porta 5432.
 - [x] 2.2 Replicar o serviço no job `admin-tests`, garantindo consistência de configuração.
 - [x] 2.3 Validar string de conexão e variáveis exportadas conforme `docs/environment-variables.md`.
+- [x] 2.4 Definição da tarefa, PRD e tech spec validados ✅
+- [x] 2.5 Análise de regras e conformidade verificadas ✅
+- [x] 2.6 Revisão de código completada ✅
+- [x] 2.7 Pronto para deploy ✅
 
 ## Sequenciamento
 - Bloqueado por: 1.0
