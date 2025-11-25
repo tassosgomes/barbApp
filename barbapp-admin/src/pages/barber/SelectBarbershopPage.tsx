@@ -47,13 +47,20 @@ export function SelectBarbershopPage() {
           {availableBarbershops.map((barbershop) => (
             <Card
               key={barbershop.id}
-              className="cursor-pointer hover:shadow-lg transition-shadow"
-              onClick={() => handleSelect(barbershop)}
+              asChild
+              className="hover:shadow-lg transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
             >
-              <CardContent className="flex flex-col items-center justify-center p-6 min-h-[150px]">
-                <Building2 className="h-10 w-10 text-primary mb-3" />
-                <span className="text-lg font-semibold text-center">{barbershop.name}</span>
-              </CardContent>
+              <button
+                type="button"
+                className="w-full cursor-pointer"
+                onClick={() => handleSelect(barbershop)}
+                aria-label={`Selecionar barbearia ${barbershop.name}`}
+              >
+                <CardContent className="flex flex-col items-center justify-center p-6 min-h-[150px]">
+                  <Building2 className="h-10 w-10 text-primary mb-3" />
+                  <span className="text-lg font-semibold text-center">{barbershop.name}</span>
+                </CardContent>
+              </button>
             </Card>
           ))}
         </div>

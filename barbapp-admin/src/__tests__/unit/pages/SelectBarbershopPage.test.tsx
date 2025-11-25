@@ -26,7 +26,7 @@ describe('SelectBarbershopPage', () => {
       </MemoryRouter>
     );
 
-    const buttons = await screen.findAllByRole('button');
+    const buttons = await screen.findAllByRole('button', { name: /selecionar barbearia/i });
     expect(buttons.length).toBeGreaterThan(0);
 
     // Click the first barbershop
