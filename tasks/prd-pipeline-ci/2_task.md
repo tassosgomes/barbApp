@@ -1,5 +1,5 @@
 ---
-status: pending
+status: done
 parallelizable: false
 blocked_by: ["1.0"]
 ---
@@ -25,9 +25,9 @@ Adicionar ao workflow a definição do serviço PostgreSQL (`postgres:16-alpine`
 - Variáveis de ambiente para `ConnectionStrings__DefaultConnection` prontas para uso nos passos .NET.
 
 ## Subtarefas
-- [ ] 2.1 Inserir bloco `services.postgres` no job `backend-tests` com credenciais e exposição de porta 5432.
-- [ ] 2.2 Replicar o serviço no job `admin-tests`, garantindo consistência de configuração.
-- [ ] 2.3 Validar string de conexão e variáveis exportadas conforme `docs/environment-variables.md`.
+- [x] 2.1 Inserir bloco `services.postgres` no job `backend-tests` com credenciais e exposição de porta 5432.
+- [x] 2.2 Replicar o serviço no job `admin-tests`, garantindo consistência de configuração.
+- [x] 2.3 Validar string de conexão e variáveis exportadas conforme `docs/environment-variables.md`.
 
 ## Sequenciamento
 - Bloqueado por: 1.0

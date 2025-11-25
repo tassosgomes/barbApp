@@ -59,7 +59,7 @@ jobs:
         run: dotnet build --configuration Release --no-restore ./backend/BarbApp.sln
 
       - name: Test
-        run: dotnet test --no-build --logger "trx;LogFileName=test-results.trx" ./backend/BarbApp.sln
+        run: dotnet test --no-build --configuration Release --logger "trx;LogFileName=test-results.trx" BarbApp.sln
         working-directory: ./backend
 
       - name: Upload backend test results
