@@ -217,8 +217,9 @@ describe('ProtectedRoute', () => {
       renderProtectedRoute({ isLoading: true });
       
       const text = screen.getByText(/verificando autenticação/i);
-      expect(text).toHaveClass('text-gray-600');
-      expect(text).toHaveClass('text-sm');
+      expect(text).toHaveClass('text-gray-700');
+      expect(text).toHaveClass('font-medium');
+      expect(text).toHaveClass('text-base');
     });
   });
 });
