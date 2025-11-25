@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useId } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -72,6 +72,9 @@ export function BarbeiroFormPage() {
 
   // Watch para serviceIds
   const selectedServiceIds = watch('serviceIds') || [];
+  const servicesHelperId = useId();
+  const servicesErrorId = errors.serviceIds ? `${servicesHelperId}-error` : undefined;
+  const servicesDescribedBy = [servicesHelperId, servicesErrorId].filter(Boolean).join(' ');
 
   // Carregar dados do barbeiro no formulário (modo edição)
   useEffect(() => {
@@ -291,8 +294,11 @@ export function BarbeiroFormPage() {
 
             {/* Serviços */}
             <div className="space-y-2">
-              <Label>Serviços *</Label>
-              <div className="space-y-2 rounded-md border p-4">
+              <fieldset
+                className="space-y-3 rounded-md border p-4"
+                aria-describedby={servicesDescribedBy || undefined}
+              >
+                <legend className="text-sm font-medium">Serviços *</legend>
                 {servicesData && servicesData.items.length > 0 ? (
                   servicesData.items.map((service) => (
                     <div key={service.id} className="flex items-center space-x-2">
@@ -317,11 +323,17 @@ export function BarbeiroFormPage() {
                     Nenhum serviço disponível. Cadastre serviços primeiro.
                   </p>
                 )}
-              </div>
+              </fieldset>
               {errors.serviceIds && (
-                <p className="text-sm text-red-600">{errors.serviceIds.message}</p>
+                <p
+                  id={servicesErrorId}
+                  role="alert"
+                  className="text-sm text-red-600"
+                >
+                  {errors.serviceIds.message}
+                </p>
               )}
-              <p className="text-sm text-gray-500">
+              <p id={servicesHelperId} className="text-sm text-gray-500">
                 Selecione os serviços que este barbeiro pode realizar.
               </p>
             </div>
