@@ -1,5 +1,5 @@
 ---
-status: pending
+status: done
 parallelizable: false
 blocked_by: []
 ---
@@ -24,9 +24,9 @@ Configurar o arquivo inicial do workflow GitHub Actions (`.github/workflows/ci-m
 - Nome do workflow e descrição alinhados ao objetivo do PRD.
 
 ## Subtarefas
-- [ ] 1.1 Criar o arquivo `.github/workflows/ci-main.yml` com cabeçalho, nome e gatilhos corretos.
-- [ ] 1.2 Definir variáveis de ambiente globais e defaults compartilhados pelos jobs.
-- [ ] 1.3 Validar sintaxe do workflow localmente (ex.: `act -l`) ou via visualização do GitHub.
+- [x] 1.1 Criar o arquivo `.github/workflows/ci-main.yml` com cabeçalho, nome e gatilhos corretos.
+- [x] 1.2 Definir variáveis de ambiente globais e defaults compartilhados pelos jobs.
+- [x] 1.3 Validar sintaxe do workflow localmente (ex.: `act -l`) ou via visualização do GitHub.
 
 ## Sequenciamento
 - Bloqueado por: —
