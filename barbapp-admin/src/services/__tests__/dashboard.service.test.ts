@@ -30,162 +30,70 @@ describe('dashboardService', () => {
         },
       };
 
-      const mockAgendamentosResponse = {
-        data: {
-          items: [
-            {
-              id: '1',
-              clienteNome: 'João Silva',
-              barbeiroNome: 'Pedro Barbeiro',
-              servicoNome: 'Corte',
-              dataHora: new Date().toISOString(),
-              status: 'Confirmado',
-            },
-            {
-              id: '2',
-              clienteNome: 'Maria Santos',
-              barbeiroNome: 'Carlos Barbeiro',
-              servicoNome: 'Barba',
-              dataHora: new Date().toISOString(),
-              status: 'Pendente',
-            },
-          ],
-        },
-      };
-
       vi.mocked(api.get)
         .mockResolvedValueOnce(mockBarbeirosResponse)
-        .mockResolvedValueOnce(mockServicosResponse)
-        .mockResolvedValueOnce(mockAgendamentosResponse);
+        .mockResolvedValueOnce(mockServicosResponse);
 
       const result = await dashboardService.getMetrics();
 
       expect(result.totalBarbeiros).toBe(5);
       expect(result.totalServicos).toBe(8);
-      expect(result.agendamentosHoje).toBe(2);
-      expect(result.proximosAgendamentos).toHaveLength(2);
+      // TODO: agendamentos not yet implemented in backend
+      expect(result.agendamentosHoje).toBe(0);
+      expect(result.proximosAgendamentos).toHaveLength(0);
     });
 
-    it('should filter appointments for today only', async () => {
-      const today = new Date();
-      const tomorrow = new Date(today);
-      tomorrow.setDate(tomorrow.getDate() + 1);
+    it('should call correct API endpoints', async () => {
+      vi.mocked(api.get)
+        .mockResolvedValueOnce({ data: { items: [], totalCount: 3 } })
+        .mockResolvedValueOnce({ data: { items: [], totalCount: 7 } });
 
-      const mockAgendamentosResponse = {
-        data: {
-          items: [
-            {
-              id: '1',
-              clienteNome: 'João Silva',
-              barbeiroNome: 'Pedro',
-              servicoNome: 'Corte',
-              dataHora: today.toISOString(),
-              status: 'Confirmado',
-            },
-            {
-              id: '2',
-              clienteNome: 'Maria Santos',
-              barbeiroNome: 'Carlos',
-              servicoNome: 'Barba',
-              dataHora: tomorrow.toISOString(),
-              status: 'Pendente',
-            },
-          ],
-        },
-      };
+      await dashboardService.getMetrics();
 
+      expect(api.get).toHaveBeenCalledWith('/barbers', { params: { pageSize: 1, page: 1 } });
+      expect(api.get).toHaveBeenCalledWith('/barbershop-services', { params: { pageSize: 1, page: 1 } });
+    });
+
+    it('should handle zero counts gracefully', async () => {
       vi.mocked(api.get)
         .mockResolvedValueOnce({ data: { items: [], totalCount: 0 } })
-        .mockResolvedValueOnce({ data: { items: [], totalCount: 0 } })
-        .mockResolvedValueOnce(mockAgendamentosResponse);
+        .mockResolvedValueOnce({ data: { items: [], totalCount: 0 } });
 
       const result = await dashboardService.getMetrics();
 
-      expect(result.agendamentosHoje).toBe(1);
-      expect(result.proximosAgendamentos).toHaveLength(1);
-      expect(result.proximosAgendamentos[0].clienteNome).toBe('João Silva');
+      expect(result.totalBarbeiros).toBe(0);
+      expect(result.totalServicos).toBe(0);
+      expect(result.agendamentosHoje).toBe(0);
+      expect(result.proximosAgendamentos).toHaveLength(0);
     });
 
-    it('should limit upcoming appointments to 5', async () => {
-      const today = new Date().toISOString();
-      const appointments = Array.from({ length: 10 }, (_, i) => ({
-        id: `${i}`,
-        clienteNome: `Cliente ${i}`,
-        barbeiroNome: 'Barbeiro',
-        servicoNome: 'Serviço',
-        dataHora: today,
-        status: 'Confirmado',
-      }));
-
-      const mockAgendamentosResponse = {
-        data: {
-          items: appointments,
-        },
-      };
-
+    it('should handle missing totalCount gracefully', async () => {
       vi.mocked(api.get)
-        .mockResolvedValueOnce({ data: { items: [], totalCount: 0 } })
-        .mockResolvedValueOnce({ data: { items: [], totalCount: 0 } })
-        .mockResolvedValueOnce(mockAgendamentosResponse);
+        .mockResolvedValueOnce({ data: { items: [] } })
+        .mockResolvedValueOnce({ data: { items: [] } });
 
       const result = await dashboardService.getMetrics();
 
-      expect(result.proximosAgendamentos).toHaveLength(5);
+      expect(result.totalBarbeiros).toBe(0);
+      expect(result.totalServicos).toBe(0);
     });
 
-    it('should handle missing data gracefully', async () => {
-      const mockAgendamentosResponse = {
-        data: {
-          items: [
-            {
-              id: '1',
-              dataHora: new Date().toISOString(),
-            },
-          ],
-        },
-      };
+    it('should return empty metrics on API error', async () => {
+      vi.mocked(api.get).mockRejectedValueOnce(new Error('Network error'));
 
-      vi.mocked(api.get)
-        .mockResolvedValueOnce({ data: { items: [], totalCount: 0 } })
-        .mockResolvedValueOnce({ data: { items: [], totalCount: 0 } })
-        .mockResolvedValueOnce(mockAgendamentosResponse);
+      // Mock console.error to avoid test output pollution
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
       const result = await dashboardService.getMetrics();
 
-      expect(result.proximosAgendamentos[0]).toMatchObject({
-        id: '1',
-        clienteNome: 'Cliente não informado',
-        barbeiro: 'Barbeiro não informado',
-        servico: 'Serviço não informado',
+      expect(result).toEqual({
+        totalBarbeiros: 0,
+        totalServicos: 0,
+        agendamentosHoje: 0,
+        proximosAgendamentos: [],
       });
-    });
 
-    it('should format date and time correctly', async () => {
-      const testDate = new Date('2025-10-18T14:30:00');
-      const mockAgendamentosResponse = {
-        data: {
-          items: [
-            {
-              id: '1',
-              clienteNome: 'João',
-              barbeiroNome: 'Pedro',
-              servicoNome: 'Corte',
-              dataHora: testDate.toISOString(),
-              status: 'Confirmado',
-            },
-          ],
-        },
-      };
-
-      vi.mocked(api.get)
-        .mockResolvedValueOnce({ data: { items: [], totalCount: 0 } })
-        .mockResolvedValueOnce({ data: { items: [], totalCount: 0 } })
-        .mockResolvedValueOnce(mockAgendamentosResponse);
-
-      const result = await dashboardService.getMetrics();
-
-      expect(result.proximosAgendamentos[0].hora).toMatch(/\d{2}:\d{2}/);
-      expect(result.proximosAgendamentos[0].data).toMatch(/\d{2}\/\d{2}\/\d{4}/);
+      consoleErrorSpy.mockRestore();
     });
   });
 });

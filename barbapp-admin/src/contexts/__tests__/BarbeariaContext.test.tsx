@@ -1,8 +1,23 @@
 import { render, screen, act, renderHook } from '@testing-library/react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { BarbeariaProvider, useBarbearia } from '../BarbeariaContext';
+import { TokenManager, UserType } from '@/services/tokenManager';
 
-// Mock localStorage
+// Mock TokenManager
+vi.mock('@/services/tokenManager', () => ({
+  TokenManager: {
+    getContext: vi.fn(),
+    setContext: vi.fn(),
+    removeContext: vi.fn(),
+  },
+  UserType: {
+    ADMIN_BARBEARIA: 'admin_barbearia',
+    ADMIN_CENTRAL: 'admin_central',
+    BARBEIRO: 'barbeiro',
+  },
+}));
+
+// Mock localStorage for specific tests
 const localStorageMock = {
   getItem: vi.fn(),
   setItem: vi.fn(),
@@ -23,10 +38,13 @@ Object.defineProperty(window, 'removeEventListener', {
   value: removeEventListenerMock,
 });
 
+const mockTokenManager = vi.mocked(TokenManager);
+
 describe('BarbeariaContext', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorageMock.clear();
+    mockTokenManager.getContext.mockReturnValue(null);
   });
 
   describe('BarbeariaProvider', () => {
@@ -98,14 +116,14 @@ describe('BarbeariaContext', () => {
         screen.getByText('Set').click();
       });
 
-      expect(localStorageMock.setItem).toHaveBeenCalledWith(
-        'admin_barbearia_context',
-        JSON.stringify({
+      expect(mockTokenManager.setContext).toHaveBeenCalledWith(
+        UserType.ADMIN_BARBEARIA,
+        {
           id: '123',
           nome: 'Test',
           codigo: 'TEST1234',
           isActive: true,
-        })
+        }
       );
     });
 
@@ -152,11 +170,15 @@ describe('BarbeariaContext', () => {
       });
 
       expect(screen.getByText('No barbearia')).toBeInTheDocument();
-      expect(localStorageMock.removeItem).toHaveBeenCalledWith('admin_barbearia_context');
+      expect(mockTokenManager.removeContext).toHaveBeenCalledWith(UserType.ADMIN_BARBEARIA);
     });
 
     it('should handle invalid localStorage data gracefully', () => {
-      localStorageMock.getItem.mockReturnValue('invalid json');
+      // Return invalid data that will fail Zod validation
+      mockTokenManager.getContext.mockReturnValue({
+        // Missing required fields - will fail Zod validation
+        invalid: true,
+      });
 
       const TestComponent = () => {
         const { barbearia, isLoaded } = useBarbearia();
@@ -176,7 +198,7 @@ describe('BarbeariaContext', () => {
       );
 
       expect(screen.getByText('No barbearia')).toBeInTheDocument();
-      expect(localStorageMock.removeItem).toHaveBeenCalledWith('admin_barbearia_context');
+      expect(mockTokenManager.removeContext).toHaveBeenCalledWith(UserType.ADMIN_BARBEARIA);
       expect(consoleErrorSpy).toHaveBeenCalled();
 
       consoleErrorSpy.mockRestore();

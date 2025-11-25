@@ -36,6 +36,15 @@ Object.defineProperty(window, 'location', {
   writable: true,
 });
 
+// Mock ResizeObserver for Radix UI components
+class ResizeObserverMock {
+  observe = vi.fn();
+  unobserve = vi.fn();
+  disconnect = vi.fn();
+}
+
+global.ResizeObserver = ResizeObserverMock;
+
 // Polyfill for Radix UI components that require pointer capture and scroll into view
 if (typeof Element.prototype.hasPointerCapture === 'undefined') {
   Element.prototype.hasPointerCapture = vi.fn(() => false);

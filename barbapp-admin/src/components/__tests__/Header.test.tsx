@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { BrowserRouter } from 'react-router-dom';
+import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { Header } from '../Header';
-import { BarbeariaProvider } from '@/contexts/BarbeariaContext';
 import * as adminBarbeariaAuthService from '@/services/adminBarbeariaAuth.service';
+import * as BarbeariaContextModule from '@/contexts/BarbeariaContext';
 
 // Mock the auth service
 vi.mock('@/services/adminBarbeariaAuth.service', () => ({
@@ -13,6 +13,26 @@ vi.mock('@/services/adminBarbeariaAuth.service', () => ({
   },
 }));
 
+// Mock the BarbeariaContext
+const mockClearBarbearia = vi.fn();
+vi.mock('@/contexts/BarbeariaContext', async () => {
+  const actual = await vi.importActual('@/contexts/BarbeariaContext');
+  return {
+    ...actual,
+    useBarbearia: vi.fn(() => ({
+      barbearia: {
+        barbeariaId: 'test-id',
+        nome: 'Barbearia Teste',
+        codigo: 'TEST1234',
+        isActive: true,
+      },
+      clearBarbearia: mockClearBarbearia,
+      setBarbearia: vi.fn(),
+      isLoaded: true,
+    })),
+  };
+});
+
 // Mock navigate
 const mockNavigate = vi.fn();
 vi.mock('react-router-dom', async () => {
@@ -20,34 +40,23 @@ vi.mock('react-router-dom', async () => {
   return {
     ...actual,
     useNavigate: () => mockNavigate,
-    useParams: () => ({ codigo: 'TEST1234' }),
   };
 });
 
 // Helper to render with providers
 const renderWithProviders = (ui: React.ReactElement) => {
-  // Setup barbearia context
-  localStorage.setItem(
-    'admin_barbearia_context',
-    JSON.stringify({
-      id: 'test-id',
-      nome: 'Barbearia Teste',
-      codigo: 'TEST1234',
-      isActive: true,
-    })
-  );
-
   return render(
-    <BrowserRouter>
-      <BarbeariaProvider>{ui}</BarbeariaProvider>
-    </BrowserRouter>
+    <MemoryRouter initialEntries={['/TEST1234']}>
+      <Routes>
+        <Route path="/:codigo/*" element={ui} />
+      </Routes>
+    </MemoryRouter>
   );
 };
 
 describe('Header', () => {
   afterEach(() => {
     vi.clearAllMocks();
-    localStorage.clear();
   });
 
   it('should render barbershop name and code', () => {
@@ -72,6 +81,7 @@ describe('Header', () => {
     await user.click(logoutButton);
 
     expect(adminBarbeariaAuthService.adminBarbeariaAuthService.logout).toHaveBeenCalledTimes(1);
+    expect(mockClearBarbearia).toHaveBeenCalledTimes(1);
     expect(mockNavigate).toHaveBeenCalledWith('/TEST1234/login');
   });
 

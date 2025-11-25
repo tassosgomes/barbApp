@@ -5,7 +5,7 @@ import React from 'react';
 import { useLogoUpload } from '@/features/landing-page/hooks/useLogoUpload';
 import { landingPageApi } from '@/services/api/landing-page.api';
 import * as toastUtils from '@/utils/toast';
-import { VALIDATION_RULES } from '@/features/landing-page/constants/validation';
+import { LOGO_UPLOAD_CONFIG } from '@/features/landing-page/constants/validation';
 
 // Mock the API
 vi.mock('@/services/api/landing-page.api', () => ({
@@ -80,7 +80,7 @@ describe('useLogoUpload', () => {
       const invalidResult = result.current.validateFile(invalidFile);
       expect(invalidResult).toEqual({
         type: 'size',
-        message: `Arquivo muito grande. Tamanho máximo: ${VALIDATION_RULES.LOGO_MAX_SIZE / 1024 / 1024}MB`,
+        message: `Arquivo muito grande. Tamanho máximo: ${LOGO_UPLOAD_CONFIG.maxSize / 1024 / 1024}MB`,
       });
     });
 
@@ -106,7 +106,7 @@ describe('useLogoUpload', () => {
       const invalidResult = result.current.validateFile(invalidFile);
       expect(invalidResult).toEqual({
         type: 'type',
-        message: `Tipo de arquivo não suportado. Use: ${VALIDATION_RULES.LOGO_ALLOWED_TYPES.join(', ')}`,
+        message: `Tipo de arquivo não suportado. Use: ${LOGO_UPLOAD_CONFIG.allowedTypes.join(', ')}`,
       });
     });
   });
@@ -336,9 +336,12 @@ describe('useLogoUpload', () => {
         result.current.uploadLogo(file);
       });
 
-      expect(result.current.isUploading).toBe(true);
+      // Wait for the mutation to start (React Query updates isUploading asynchronously)
+      await waitFor(() => {
+        expect(result.current.isUploading).toBe(true);
+      });
 
-      act(() => {
+      await act(async () => {
         resolveUpload!('https://example.com/logo.png');
       });
 
@@ -362,9 +365,12 @@ describe('useLogoUpload', () => {
         result.current.deleteLogo();
       });
 
-      expect(result.current.isDeleting).toBe(true);
+      // Wait for the mutation to start (React Query updates isDeleting asynchronously)
+      await waitFor(() => {
+        expect(result.current.isDeleting).toBe(true);
+      });
 
-      act(() => {
+      await act(async () => {
         resolveDelete!();
       });
 

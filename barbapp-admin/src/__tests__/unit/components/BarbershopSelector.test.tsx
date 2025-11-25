@@ -55,6 +55,9 @@ describe('BarbershopSelector', () => {
   });
 
   it('deve listar todas as barbearias disponíveis ao abrir o dropdown', async () => {
+    // Reset currentBarbershop to avoid duplicate text issues
+    mockContext.currentBarbershop = null;
+
     render(
       <QueryClientProvider client={queryClient}>
         <BarbershopSelector />
@@ -65,8 +68,10 @@ describe('BarbershopSelector', () => {
     const trigger = screen.getByRole('combobox');
     fireEvent.click(trigger);
 
-    // Verificar se todas as barbearias estão listadas
+    // Verificar se todas as barbearias estão listadas usando role para evitar ambiguidade
     await waitFor(() => {
+      const options = screen.getAllByRole('option');
+      expect(options).toHaveLength(3);
       expect(screen.getByText('Barbearia A')).toBeInTheDocument();
       expect(screen.getByText('Barbearia B')).toBeInTheDocument();
       expect(screen.getByText('Barbearia C')).toBeInTheDocument();
@@ -74,6 +79,9 @@ describe('BarbershopSelector', () => {
   });
 
   it('deve chamar selectBarbershop ao selecionar uma barbearia', async () => {
+    // Reset currentBarbershop to avoid duplicate text issues
+    mockContext.currentBarbershop = null;
+
     render(
       <QueryClientProvider client={queryClient}>
         <BarbershopSelector />
@@ -86,7 +94,7 @@ describe('BarbershopSelector', () => {
 
     // Selecionar uma barbearia
     await waitFor(() => {
-      const option = screen.getByText('Barbearia B');
+      const option = screen.getByRole('option', { name: /Barbearia B/i });
       fireEvent.click(option);
     });
 
@@ -100,7 +108,7 @@ describe('BarbershopSelector', () => {
   it('deve exibir check mark na barbearia atualmente selecionada', async () => {
     mockContext.currentBarbershop = { id: '2', name: 'Barbearia B' };
 
-    render(
+    const { container } = render(
       <QueryClientProvider client={queryClient}>
         <BarbershopSelector />
       </QueryClientProvider>
@@ -110,10 +118,11 @@ describe('BarbershopSelector', () => {
     const trigger = screen.getByRole('combobox');
     fireEvent.click(trigger);
 
-    // Verificar presença do check mark (ícone de Check)
+    // Verificar presença do check mark (ícone de Check via classe lucide-check)
     await waitFor(() => {
-      const checkIcons = screen.getAllByTestId('lucide-check');
-      expect(checkIcons.length).toBeGreaterThan(0);
+      const checkIcon = container.querySelector('.lucide-check') 
+        || document.querySelector('.lucide-check');
+      expect(checkIcon).toBeInTheDocument();
     });
   });
 

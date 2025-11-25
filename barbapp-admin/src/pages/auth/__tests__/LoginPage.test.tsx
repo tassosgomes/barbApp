@@ -73,7 +73,8 @@ describe('LoginPage', () => {
       expect(container).toHaveClass('items-center');
       expect(container).toHaveClass('justify-center');
       expect(container).toHaveClass('p-4');
-      expect(container).toHaveClass('bg-gray-50');
+      // Background agora usa gradiente
+      expect(container.className).toMatch(/bg-gradient|from-gray-50/);
     });
   });
   

@@ -4,9 +4,25 @@ import { describe, it, expect, vi } from 'vitest';
 import { Header } from '@/components/layout/Header';
 import { useAuth } from '@/hooks/useAuth';
 
-// Mock the useAuth hook
+// Mock the useAuth hook from hooks
 vi.mock('@/hooks/useAuth', () => ({
   useAuth: vi.fn(),
+}));
+
+// Mock the useAuth (AuthContext) - used for barbeiro auth check
+vi.mock('@/contexts/AuthContext', () => ({
+  useAuth: vi.fn(() => ({
+    user: null,
+    isAuthenticated: false,
+    isLoading: false,
+    login: vi.fn(),
+    logout: vi.fn(),
+  })),
+}));
+
+// Mock BarbershopSelector to avoid unnecessary dependencies
+vi.mock('./BarbershopSelector', () => ({
+  BarbershopSelector: () => null,
 }));
 
 const mockUseAuth = vi.mocked(useAuth);

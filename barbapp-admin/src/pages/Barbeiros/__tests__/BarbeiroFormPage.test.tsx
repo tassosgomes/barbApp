@@ -6,7 +6,6 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { BarbeiroFormPage } from '../BarbeiroFormPage';
 import { barbeiroService } from '@/services/barbeiro.service';
 import { servicesService } from '@/services/services.service';
-import { BarbeariaProvider } from '@/contexts/BarbeariaContext';
 import type { Barber, BarbershopService, PaginatedResponse } from '@/types';
 
 // Mock dos serviços
@@ -19,6 +18,32 @@ vi.mock('@/hooks/use-toast', () => ({
     toast: vi.fn(),
   }),
 }));
+
+// Mock do BarbeariaContext - usar mock direto em vez do provider real
+vi.mock('@/contexts/BarbeariaContext', () => ({
+  useBarbearia: vi.fn(() => ({
+    barbearia: {
+      barbeariaId: 'barb-1',
+      nome: 'Barbearia Teste',
+      codigo: 'TEST1234',
+      isActive: true,
+    },
+    clearBarbearia: vi.fn(),
+    setBarbearia: vi.fn(),
+    isLoaded: true,
+  })),
+  BarbeariaProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}));
+
+// Mock navigate
+const mockNavigate = vi.fn();
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual('react-router-dom');
+  return {
+    ...actual,
+    useNavigate: () => mockNavigate,
+  };
+});
 
 const mockServicos: BarbershopService[] = [
   {
@@ -61,7 +86,6 @@ const mockBarbeiro: Barber = {
 
 describe('BarbeiroFormPage', () => {
   let queryClient: QueryClient;
-  const mockNavigate = vi.fn();
 
   beforeEach(() => {
     queryClient = new QueryClient({
@@ -71,27 +95,10 @@ describe('BarbeiroFormPage', () => {
       },
     });
 
-    // Setup mock context data
-    localStorage.setItem(
-      'admin_barbearia_context',
-      JSON.stringify({
-        id: 'barb-1',
-        nome: 'Barbearia Teste',
-        codigo: 'TEST1234',
-        isActive: true,
-      })
-    );
-
     vi.clearAllMocks();
-    
-    // Mock navigate
-    vi.mock('react-router-dom', async () => {
-      const actual = await vi.importActual('react-router-dom');
-      return {
-        ...actual,
-        useNavigate: () => mockNavigate,
-      };
-    });
+
+    // Setup default mocks for services
+    vi.mocked(servicesService.list).mockResolvedValue(mockServicosResponse);
   });
 
   const renderComponent = (mode: 'create' | 'edit' = 'create', barberoId?: string) => {
@@ -103,22 +110,16 @@ describe('BarbeiroFormPage', () => {
     return render(
       <QueryClientProvider client={queryClient}>
         <MemoryRouter initialEntries={[initialEntry]}>
-          <BarbeariaProvider>
-            <Routes>
-              <Route path="/:codigo/barbeiros/novo" element={<BarbeiroFormPage />} />
-              <Route path="/:codigo/barbeiros/:id" element={<BarbeiroFormPage />} />
-            </Routes>
-          </BarbeariaProvider>
+          <Routes>
+            <Route path="/:codigo/barbeiros/novo" element={<BarbeiroFormPage />} />
+            <Route path="/:codigo/barbeiros/:id" element={<BarbeiroFormPage />} />
+          </Routes>
         </MemoryRouter>
       </QueryClientProvider>
     );
   };
 
   describe('Create Mode', () => {
-    beforeEach(() => {
-      vi.mocked(servicesService.list).mockResolvedValue(mockServicosResponse);
-    });
-
     it('should render create form title', async () => {
       renderComponent('create');
 
@@ -240,7 +241,6 @@ describe('BarbeiroFormPage', () => {
 
   describe('Edit Mode', () => {
     beforeEach(() => {
-      vi.mocked(servicesService.list).mockResolvedValue(mockServicosResponse);
       vi.mocked(barbeiroService.getById).mockResolvedValue(mockBarbeiro);
     });
 
@@ -324,10 +324,6 @@ describe('BarbeiroFormPage', () => {
   });
 
   describe('Common Behaviors', () => {
-    beforeEach(() => {
-      vi.mocked(servicesService.list).mockResolvedValue(mockServicosResponse);
-    });
-
     it('should have cancel button that navigates back', async () => {
       const user = userEvent.setup();
       renderComponent('create');

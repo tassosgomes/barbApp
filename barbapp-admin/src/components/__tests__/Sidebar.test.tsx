@@ -1,23 +1,24 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { BrowserRouter } from 'react-router-dom';
+import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { Sidebar } from '../Sidebar';
 
-// Mock useParams
-vi.mock('react-router-dom', async () => {
-  const actual = await vi.importActual('react-router-dom');
-  return {
-    ...actual,
-    useParams: () => ({ codigo: 'TEST1234' }),
-  };
-});
-
-const renderWithRouter = (ui: React.ReactElement) => {
-  return render(<BrowserRouter>{ui}</BrowserRouter>);
+const renderWithRouter = (ui: React.ReactElement, initialRoute = '/TEST1234') => {
+  return render(
+    <MemoryRouter initialEntries={[initialRoute]}>
+      <Routes>
+        <Route path="/:codigo/*" element={ui} />
+      </Routes>
+    </MemoryRouter>
+  );
 };
 
 describe('Sidebar', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   it('should render all navigation items', () => {
     renderWithRouter(<Sidebar isOpen={true} />);
 
@@ -87,14 +88,16 @@ describe('Sidebar', () => {
     const onClose = vi.fn();
     const { container } = renderWithRouter(<Sidebar isOpen={true} onClose={onClose} />);
 
-    const overlay = container.querySelector('.fixed.inset-0.bg-black\\/50');
+    // Mobile overlay tem bg-black/50, vamos procurar pelo data-attribute ou verificar a existência
+    const overlay = container.querySelector('[aria-hidden="true"]');
     expect(overlay).toBeInTheDocument();
   });
 
   it('should not render mobile overlay when onClose is not provided', () => {
     const { container } = renderWithRouter(<Sidebar isOpen={true} />);
 
-    const overlay = container.querySelector('.fixed.inset-0.bg-black\\/50');
+    // Sem onClose, não deve ter overlay
+    const overlay = container.querySelector('[aria-hidden="true"]');
     expect(overlay).not.toBeInTheDocument();
   });
 });
