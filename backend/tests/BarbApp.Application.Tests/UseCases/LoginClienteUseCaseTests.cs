@@ -8,6 +8,7 @@ using BarbApp.Domain.Exceptions;
 using BarbApp.Domain.Interfaces.Repositories;
 using BarbApp.Domain.ValueObjects;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace BarbApp.Application.Tests.UseCases;
@@ -17,6 +18,7 @@ public class LoginClienteUseCaseTests
     private readonly Mock<IBarbershopRepository> _barbershopRepositoryMock;
     private readonly Mock<IClienteRepository> _clienteRepositoryMock;
     private readonly Mock<IJwtTokenGenerator> _jwtTokenGeneratorMock;
+    private readonly Mock<ILogger<LoginClienteUseCase>> _loggerMock;
     private readonly LoginClienteUseCase _useCase;
 
     public LoginClienteUseCaseTests()
@@ -24,10 +26,12 @@ public class LoginClienteUseCaseTests
         _barbershopRepositoryMock = new Mock<IBarbershopRepository>();
         _clienteRepositoryMock = new Mock<IClienteRepository>();
         _jwtTokenGeneratorMock = new Mock<IJwtTokenGenerator>();
+        _loggerMock = new Mock<ILogger<LoginClienteUseCase>>();
         _useCase = new LoginClienteUseCase(
             _barbershopRepositoryMock.Object,
             _clienteRepositoryMock.Object,
-            _jwtTokenGeneratorMock.Object
+            _jwtTokenGeneratorMock.Object,
+            _loggerMock.Object
         );
     }
 

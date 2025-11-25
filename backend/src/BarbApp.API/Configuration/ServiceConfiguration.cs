@@ -441,11 +441,16 @@ public static class ServiceConfiguration
             c.OperationFilter<SwaggerFileUploadOperationFilter>();
         });
 
-        // Health checks
+        // Health checks with comprehensive monitoring
         services.AddHealthChecks()
             .AddNpgSql(
                 builder.Configuration.GetConnectionString("DefaultConnection")!,
-                name: "database",
-                timeout: TimeSpan.FromSeconds(5));
+                name: "postgresql",
+                tags: new[] { "db", "ready" },
+                timeout: TimeSpan.FromSeconds(5))
+            .AddCheck<MemoryCacheHealthCheck>(
+                "memory-cache",
+                tags: new[] { "cache", "ready" },
+                timeout: TimeSpan.FromSeconds(2));
     }
 }

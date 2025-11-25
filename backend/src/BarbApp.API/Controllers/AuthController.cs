@@ -124,13 +124,27 @@ public class AuthController : ControllerBase
     [ProducesResponseType(typeof(object), StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<AuthResponse>> LoginCliente([FromBody] LoginClienteInput input)
     {
-        _logger.LogInformation("Cliente login attempt for telefone: {Telefone}", input.Telefone);
+        _logger.LogInformation("Cliente login attempt for telefone: {TelefoneMascarado}", MascararTelefone(input.Telefone));
 
         var response = await _authenticateCliente.ExecuteAsync(input);
 
-        _logger.LogInformation("Cliente login successful for telefone: {Telefone}", input.Telefone);
+        _logger.LogInformation("Cliente login successful for telefone: {TelefoneMascarado}", MascararTelefone(input.Telefone));
 
         return Ok(response);
+    }
+
+    /// <summary>
+    /// Mascara o telefone para exibição em logs (LGPD)
+    /// Ex: 11987654321 -> 11987****21
+    /// </summary>
+    private static string MascararTelefone(string telefone)
+    {
+        if (string.IsNullOrEmpty(telefone) || telefone.Length < 6)
+            return "****";
+
+        var inicio = telefone.Substring(0, 5);
+        var fim = telefone.Substring(telefone.Length - 2);
+        return $"{inicio}****{fim}";
     }
 
     /// <summary>
