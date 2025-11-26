@@ -29,7 +29,7 @@ const renderWithProviders = (ui: React.ReactElement) => {
   localStorage.setItem(
     'admin_barbearia_context',
     JSON.stringify({
-      id: 'test-id',
+      id: '00000000-0000-0000-0000-000000000000',
       nome: 'Barbearia Teste',
       codigo: 'TEST1234',
       isActive: true,
