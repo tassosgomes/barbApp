@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { DatePicker } from '@/components/ui/date-picker';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { AppointmentStatus } from '@/types/schedule';
+import { AppointmentStatus, type Appointment as ScheduleAppointment } from '@/types/schedule';
 import { ScheduleList } from './ScheduleList';
 
 export function SchedulePage() {
@@ -87,6 +87,8 @@ export function SchedulePage() {
       </div>
     );
   }
+
+  const appointments = (data?.appointments ?? []) as ScheduleAppointment[];
 
   return (
     <div className="p-6 space-y-6">
@@ -177,7 +179,7 @@ export function SchedulePage() {
       </div>
 
       <ScheduleList
-        appointments={data?.appointments || []}
+        appointments={appointments}
         isLoading={isLoading}
         currentDate={dateParam}
       />

@@ -1,6 +1,6 @@
 import { Badge } from '@/components/ui/badge';
 import { Clock, User, Scissors } from 'lucide-react';
-import type { Appointment } from '@/types';
+import type { Appointment } from '@/types/schedule';
 import { AppointmentStatus } from '@/types/schedule';
 import { cn } from '@/lib/utils';
 

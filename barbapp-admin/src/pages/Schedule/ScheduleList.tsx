@@ -1,6 +1,6 @@
 import { Skeleton } from '@/components/ui/skeleton';
 import { AppointmentCard } from './AppointmentCard';
-import type { Appointment } from '@/types';
+import type { Appointment } from '@/types/schedule';
 
 interface ScheduleListProps {
   appointments: Appointment[];

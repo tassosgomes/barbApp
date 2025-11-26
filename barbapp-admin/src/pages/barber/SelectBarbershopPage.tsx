@@ -47,12 +47,11 @@ export function SelectBarbershopPage() {
           {availableBarbershops.map((barbershop) => (
             <Card
               key={barbershop.id}
-              asChild
-              className="hover:shadow-lg transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              className="hover:shadow-lg transition-shadow"
             >
               <button
                 type="button"
-                className="w-full cursor-pointer"
+                className="w-full cursor-pointer rounded-lg text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                 onClick={() => handleSelect(barbershop)}
                 aria-label={`Selecionar barbearia ${barbershop.name}`}
               >
