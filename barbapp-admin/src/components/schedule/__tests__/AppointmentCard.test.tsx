@@ -20,7 +20,7 @@ describe('AppointmentCard', () => {
 
       expect(screen.getByText('João Silva')).toBeInTheDocument();
       expect(screen.getByText('Corte de Cabelo')).toBeInTheDocument();
-      expect(screen.getByText(/07:00/)).toBeInTheDocument(); // Horário pode variar por timezone
+      expect(screen.getByTestId('appointment-time')).toBeInTheDocument(); // Horário pode variar por timezone
     });
 
     it('deve renderizar badge de status', () => {
